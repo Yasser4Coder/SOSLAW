@@ -45,7 +45,7 @@ const HeroSection = () => {
   }, [lang]);
 
   return (
-    <section className="relative w-full h-[calc(100vh-80px)] flex items-center justify-center overflow-hidden">
+    <section className="relative w-full min-h-[calc(100vh-80px)] flex items-start md:items-center justify-center overflow-hidden">
       {/* Background Image with Overlay */}
       <img
         src={bg}
