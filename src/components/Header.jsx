@@ -64,6 +64,7 @@ const NAV_LINKS = [
       { to: "/#services", label: "servicesTitle" },
       { to: "/library", label: "legalLibrary" },
       { to: "/#consultants", label: "consultantsTitle" },
+      { to: "/#faq", label: "faqSectionTitle" },
     ],
   },
 ];
@@ -250,7 +251,12 @@ const Header = () => {
           className="flex items-center gap-2 focus:outline-none"
           aria-label="SOSLAW Home"
         >
-          <img src={logo} alt="SOSLAW Logo" className="h-10 w-auto" />
+          <img
+            src={logo}
+            alt="SOSLAW Logo"
+            className="h-10 w-auto"
+            loading="lazy"
+          />
         </Link>
         {/* Desktop Navigation */}
         <ul className="hidden md:flex items-center gap-8" role="menubar">

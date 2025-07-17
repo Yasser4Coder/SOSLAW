@@ -45,6 +45,7 @@ const TestimonialCard = ({ isRTL = false, quote, name, role, avatar }) => {
             src={avatar}
             alt={name}
             className="w-14 h-14 rounded-full object-cover border-4 border-white shadow-lg"
+            loading="lazy"
           />
         ) : (
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#c8a45e] to-[#e7cfa7] flex items-center justify-center shadow-lg border-4 border-white">

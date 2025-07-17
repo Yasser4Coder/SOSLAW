@@ -1,8 +1,8 @@
-import bg from "../../assets/bgs/heroBG1.png";
+import bg from "../../assets/bgs/heroBG1.webp";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { useEffect, useRef } from "react";
-import heroLawyerImg from "../../assets/heroLawyer1.png";
+import heroLawyerImg from "../../assets/heroLawyer1.webp";
 
 const JusticeIcon = ({ className = "" }) => (
   <svg

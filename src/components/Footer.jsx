@@ -16,7 +16,12 @@ const Footer = () => {
             to="/"
             className="flex items-center gap-3 mb-2 focus:outline-none"
           >
-            <img src={logoBlueBg} alt="SOSLAW Logo" className="h-12 w-auto" />
+            <img
+              src={logoBlueBg}
+              alt="SOSLAW Logo"
+              className="h-12 w-auto"
+              loading="lazy"
+            />
           </Link>
           <span className="text-sm text-[#e7cfa7] font-light text-center md:text-left max-w-xs">
             {t("footerTagline") || "Professional legal services and solutions"}

@@ -17,6 +17,7 @@
   "heroDesc1": "We are a team of experienced legal consultants dedicated to providing you with accurate advice and reliable legal support across a wide range of cases and disputes.",
   "heroDesc2": "Our mission is to uphold justice efficiently and defend your rights with confidence and professionalism.",
   "heroButton": "Send Your Request",
+  "learnMore": "Learn More",
   "heroTestimonialQuote": "SOSLAW provided exceptional legal support. Their team was professional, responsive, and truly cared about my case.",
   "heroTestimonialName": "Sarah M.",
   "heroTestimonialRole": "Client",
@@ -69,5 +70,92 @@
   "taxes": "Taxes",
   "commercialPractices": "Commercial Practices",
   "joinUs": "Join Our Team",
-  "heroRequestNow": "Request Your Legal Consultation"
+  "heroRequestNow": "Request Your Legal Consultation",
+  "servicesSectionTitle": "Services",
+  "servicesSectionDesc": "A comprehensive range of legal and professional services to meet all your needs.",
+  "serviceGroupContracts": "Contract Templates",
+  "serviceContractsPublic": "Public Deals",
+  "serviceContractsSale": "Sales Contracts",
+  "serviceContractsLease": "Lease Contracts",
+  "serviceContractsPrivate": "Private Contracts",
+  "serviceContractsElectronic": "Electronic Contracts",
+  "serviceGroupCompanyFormation": "Company Formation",
+  "serviceCompanyJointStock": "Joint-stock Companies",
+  "serviceCompanyLLC": "Limited Liability Companies (LLC)",
+  "serviceCompanySole": "Sole Proprietorship",
+  "serviceCompanyCivil": "Civil Companies",
+  "serviceCompanyGeneral": "General Partnerships",
+  "serviceGroupAssociations": "Association Formation",
+  "serviceGroupStartups": "Startups",
+  "serviceGroupArbitration": "Arbitration & Mediation",
+  "serviceGroupTranslation": "Translation",
+  "serviceTranslationForm": "Translation Form",
+  "faqSectionTitle": "Frequently Asked Questions",
+  "faq": [
+    {
+      "q": "What is the Public Prosecution?",
+      "a": "It is the authority legally empowered to initiate public action as a preliminary step in criminal proceedings.\nIt undertakes the function of prosecution and determines its legal characterization.\nIt is an integral part of the judiciary, as established by Article 30 of the Code of Criminal Procedure, which authorizes the Minister of Justice to notify and instruct it to initiate prosecution procedures."
+    },
+    {
+      "q": "What is a public action?",
+      "a": "It is the legal action initiated by the Public Prosecution, as the authority responsible for prosecution, against individuals suspected of committing criminal offenses.\nIt is brought in the name of society before criminal courts to impose the penalties prescribed by law.\nIt may be exercised against both the principal perpetrator and accomplices."
+    },
+    {
+      "q": "What are the reasons for the extinction of public action?",
+      "a": "Public action is extinguished for one of the following reasons:\n- General amnesty\n- Withdrawal of the complaint, if required for prosecution\n- Death of the accused\n- Prescription (statute of limitations)\n- Case closure"
+    },
+    {
+      "q": "What are the limitation periods in criminal matters?",
+      "a": "For public action:\n- Felony: 10 years\n- Misdemeanor: 3 years\n- Infraction: 2 years\n\nFor penalties:\n- Felony: extinguished after 20 years from the date of the judgment\n- Misdemeanor: 5 years\n- Infraction: 2 years"
+    },
+    {
+      "q": "When is a contract absolutely null and void?",
+      "a": "A contract is considered absolutely null and void if:\n- An essential element is missing\n- One party's will is affected by a legal incapacity (insanity, incompetence, etc.)\n- The object or purpose of the contract is unlawful\n- Consent is vitiated by a defect (fraud, coercion, duress, mistake)"
+    },
+    {
+      "q": "What is the benefit of using different scientific research methods?",
+      "a": "The purpose of using various scientific research methods, especially when conducting research, is to:\n- Ensure accuracy and reliability of the presented information\n- Confirm or refute previous theories\n- Rely on evidence and proofs to support the findings"
+    },
+    {
+      "q": "What is the difference between a source and a reference?",
+      "a": "A source refers to the original material that contains the primary information of a subject.\nA reference, however, is derived from a source and is interpreted or presented according to a specific point of view.\n\nTo clarify:\n- Original source: Directly transmitted from the author, based on trust\n- Secondary source: Typically a reference that draws from original sources\n\nExamples of sources:\n- The Holy Quran or sacred books\n- Stories, novels, poetry collections\n- Historical works written by eyewitnesses\n\nExamples of references:\n- General and specialized encyclopedias\n- Major books, dictionaries, and lexicons\n- Yearbooks\n- Periodicals\n- University theses"
+    },
+    {
+      "q": "What are the characteristics of commercial law?",
+      "a": "Commercial law is characterized by:\n- Solidarity among traders\n- Commercial credit\n- Speed in development and execution"
+    },
+    {
+      "q": "What are the sources of commercial law?",
+      "a": "- Legislation of all kinds\n- Custom, in the absence of specific legal texts"
+    },
+    {
+      "q": "Can an agent appointed by heirs appoint someone else to sell the property?",
+      "a": "According to the Civil Code, an agent must carry out the agency within its limits unless the agency is broadly worded, in which case they may delegate authority to another person."
+    },
+    {
+      "q": "What is an official contract and what are the required conditions?",
+      "a": "An official contract must be drawn up by a public officer or a person entrusted with a public service, following the required legal procedures and within the limits of their authority.\n\nAccording to Article 324 of the Civil Code, the required conditions are:\n- The contract must be drafted by an authorized public officer (e.g., a notary)\n- The officer must act within their legal authority\n- Legal formalities must be respected"
+    }
+  ],
+  "aboutPageTitle": "About SOS Law",
+  "aboutPageIntro": "SOS Law is a digital platform dedicated to legal consultations and services. It is a technology-driven platform designed to provide comprehensive legal services and information to all segments of society using modern technology. The platform leverages digital and technological tools to offer a flexible and easy way to access essential legal consultations and information.",
+  "aboutPageGoal": "The platform's goal is to spread legal knowledge and provide legal services to the public in a comprehensive and effective manner. This includes information and services across all legal fields and specialties, such as criminal law, civil law, commercial law, labor law, real estate law, and more. The platform aims to meet the diverse needs of users, whether individuals seeking general legal information or companies requiring specialized legal consultation.",
+  "aboutFeature1": "For Everyone",
+  "aboutFeature1Desc": "Accessible to individuals and companies, regardless of their legal needs.",
+  "aboutFeature2": "Comprehensive Legal Fields",
+  "aboutFeature2Desc": "Covers criminal, civil, commercial, labor, real estate law, and more.",
+  "aboutFeature3": "Modern & Digital",
+  "aboutPageGoalTitle": "Our Mission",
+  "aboutFeature3Desc": "Utilizes the latest technology for easy, flexible, and secure access.",
+  "contactPageTitle": "Contact Us",
+  "contactPageSubtitle": "We'd love to hear from you. Please fill out the form and our team will get back to you as soon as possible.",
+  "contactName": "Your Name",
+  "contactEmail": "Your Email",
+  "contactMessage": "Your Message",
+  "contactSend": "Send Message",
+  "contactSuccess": "Thank you for reaching out! We will respond as soon as possible.",
+  "contactError": "Something went wrong. Please try again later.",
+  "contactLocationTitle": "Our Location",
+  "contactLocationAddress": "Algiers, Algeria",
+  "contactEmailInfo": "Email"
 }

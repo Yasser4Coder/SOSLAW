@@ -70,5 +70,89 @@
   "taxes": "Impôts",
   "commercialPractices": "Pratiques commerciales",
   "joinUs": "Rejoignez notre équipe",
-  "heroRequestNow": "Demandez votre consultation juridique"
+  "heroRequestNow": "Demandez votre consultation juridique",
+  "servicesSectionTitle": "Services",
+  "servicesSectionDesc": "Une gamme complète de services juridiques et professionnels pour répondre à tous vos besoins.",
+  "serviceGroupContracts": "Modèles de contrats",
+  "serviceContractsPublic": "Marchés publics",
+  "serviceContractsSale": "Contrats de vente",
+  "serviceContractsLease": "Contrats de location",
+  "serviceContractsPrivate": "Contrats privés",
+  "serviceContractsElectronic": "Contrats électroniques",
+  "serviceGroupCompanyFormation": "Création d'entreprises",
+  "serviceCompanyJointStock": "Sociétés par actions",
+  "serviceCompanyLLC": "SARL (Sociétés à responsabilité limitée)",
+  "serviceCompanySole": "Entreprise individuelle",
+  "serviceCompanyCivil": "Sociétés civiles",
+  "serviceCompanyGeneral": "Sociétés en nom collectif",
+  "serviceGroupAssociations": "Création d'associations",
+  "serviceGroupStartups": "Startups",
+  "serviceGroupArbitration": "Arbitrage et médiation",
+  "serviceGroupTranslation": "Traduction",
+  "serviceTranslationForm": "Formulaire de traduction",
+  "faqSectionTitle": "Questions fréquentes",
+  "faq": [
+    {
+      "q": "Qu'est-ce que le ministère public ?",
+      "a": "C'est l'autorité légalement habilitée à engager l'action publique comme première étape dans les procédures pénales.\nElle assure la fonction d'accusation et en détermine la qualification.\nElle fait partie intégrante du pouvoir judiciaire, comme le stipule l'article 30 du Code de procédure pénale, qui permet au ministre de la Justice de la saisir et de lui ordonner d'engager des poursuites."
+    },
+    {
+      "q": "Qu'est-ce qu'une action publique ?",
+      "a": "C'est l'action engagée par le ministère public en tant que détenteur du pouvoir d'accusation contre les personnes soupçonnées d'avoir commis des infractions.\nC'est la procédure légale intentée au nom de la société devant le tribunal pénal contre l'auteur de l'infraction afin d'appliquer la sanction prévue par la loi. Elle peut être exercée contre l'auteur principal et les complices."
+    },
+    {
+      "q": "Quelles sont les causes d'extinction de l'action publique ?",
+      "a": "L'action publique s'éteint pour l'une des raisons suivantes :\n- Amnistie générale\n- Retrait de la plainte si la poursuite l'exige\n- Décès de l'accusé ou des accusés\n- Prescription de la procédure\n- Classement sans suite"
+    },
+    {
+      "q": "Quels sont les délais de prescription en matière pénale ?",
+      "a": "Pour l'action publique : la prescription varie selon la qualification de l'infraction :\n- Crime : 10 ans\n- Délit : 3 ans\n- Contravention : 2 ans\n\nPour la peine :\n- Crime : 20 ans à compter du jugement\n- Délit : 5 ans\n- Contravention : 2 ans"
+    },
+    {
+      "q": "Quand un contrat est-il nul de nullité absolue ?",
+      "a": "Un contrat est nul de nullité absolue si :\n- Il manque un élément essentiel\n- La volonté d'une partie est entachée d'un vice (folie, incapacité, etc.)\n- L'objet ou la cause du contrat est illicite\n- Le consentement est vicié par un vice du consentement (dol, violence, erreur, etc.)"
+    },
+    {
+      "q": "Quel est l'intérêt d'utiliser différentes méthodes de recherche scientifique ?",
+      "a": "L'objectif de l'utilisation de différentes méthodes de recherche scientifique, notamment lors de la préparation d'une recherche, est :\n- La précision et la fiabilité des informations pour obtenir des résultats satisfaisants\n- Confirmer ou infirmer les théories existantes\n- S'appuyer sur des preuves et des arguments solides"
+    },
+    {
+      "q": "Quelle est la différence entre une source et une référence ?",
+      "a": "Une source est le support matériel contenant la matière originale et primaire d'un sujet donné.\nUne référence, quant à elle, s'appuie essentiellement sur la source pour en extraire la matière qu'elle adapte et formule selon un point de vue particulier.\n\nPour distinguer entre les deux, il faut examiner les termes suivants :\n- Source originale : ce qui est transmis directement de l'auteur, basé sur la confiance dans la transmission\n- Source secondaire : ce sont en fait les références qui puisent leur matière première dans les sources originales\n\nExemples de sources :\n- Le Coran ou les livres sacrés\n- Les histoires, romans et recueils de poésie\n- Les livres historiques décrivant les faits par leur auteur\n\nExemples de références :\n- Les encyclopédies générales et spécialisées\n- Les grands ouvrages, dictionnaires et lexiques\n- Les annuaires\n- Les périodiques\n- Les thèses universitaires"
+    },
+    {
+      "q": "Quelles sont les caractéristiques du droit commercial ?",
+      "a": "Le droit commercial présente plusieurs caractéristiques, notamment :\n- La solidarité entre commerçants\n- Le crédit commercial\n- La rapidité dans l'évolution et l'exécution"
+    },
+    {
+      "q": "Quelles sont les sources du droit commercial ?",
+      "a": "- La législation sous toutes ses formes\n- La coutume en l'absence de texte législatif"
+    },
+    {
+      "q": "Un mandataire désigné par les héritiers peut-il à son tour mandater une autre personne pour vendre un bien immobilier ?",
+      "a": "Selon le Code civil, le mandataire est tenu d'exécuter le mandat sans en dépasser le contenu, sauf si le mandat est rédigé de manière générale."
+    },
+    {
+      "q": "Qu'est-ce qu'un acte authentique et quelles sont les conditions requises ?",
+      "a": "Pour qu'un acte ait un caractère authentique, il doit être rédigé par un officier public ou toute personne chargée d'un service public, conformément aux formes légales et dans les limites de son autorité et de ses compétences.\n\nL'article 324 du Code civil reconnaît le caractère authentique des actes, ce qui permet d'en déduire les conditions requises :\n- Rédigé par un officier public tel qu'un notaire\n- Rédigé par l'officier public dans le cadre de ses compétences\n- Respect des formalités légales"
+    }
+  ],
+  "aboutPageTitle": "À propos de SOS Law",
+  "aboutPageIntro": "SOS Law est une plateforme numérique dédiée aux consultations et services juridiques. Il s'agit d'une plateforme technologique visant à fournir des services et des informations juridiques complètes à tous les segments de la société utilisant les technologies modernes. Cette plateforme exploite les outils numériques et technologiques pour offrir un moyen flexible et facile d'accéder aux consultations et informations juridiques essentielles.",
+  "aboutPageGoal": "L'objectif de la plateforme est de diffuser la connaissance juridique et de fournir des services juridiques au public de manière globale et efficace. Cela inclut des informations et des services couvrant tous les domaines et spécialités juridiques, tels que le droit pénal, le droit civil, le droit commercial, le droit du travail, le droit immobilier, et plus encore. La plateforme vise à répondre aux besoins variés des utilisateurs, qu'il s'agisse de particuliers recherchant des informations juridiques générales ou d'entreprises nécessitant des consultations juridiques spécialisées.",
+  "aboutFeature1": "Pour tous",
+  "aboutFeature1Desc": "Accessible aux particuliers et aux entreprises, quels que soient leurs besoins juridiques.",
+  "aboutFeature2": "Domaines juridiques complets",
+  "aboutFeature2Desc": "Couvre le droit pénal, civil, commercial, du travail, immobilier, et plus encore.",
+  "aboutFeature3": "Moderne & numérique",
+  "aboutPageGoalTitle": "Notre mission",
+  "aboutFeature3Desc": "Utilise les dernières technologies pour un accès facile, flexible et sécurisé.",
+  "contactPageTitle": "Contactez-nous",
+  "contactPageSubtitle": "Nous serions ravis de vous lire. Veuillez remplir le formulaire et notre équipe vous répondra dans les plus brefs délais.",
+  "contactName": "Votre nom",
+  "contactEmail": "Votre e-mail",
+  "contactMessage": "Votre message",
+  "contactSend": "Envoyer le message",
+  "contactSuccess": "Merci de nous avoir contactés ! Nous vous répondrons dès que possible.",
+  "contactError": "Une erreur s'est produite. Veuillez réessayer plus tard."
 }
