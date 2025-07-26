@@ -1,7 +1,119 @@
 @import "tailwindcss";
 
+/* Import Readex Pro font for better Arabic support */
+@import url("https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap");
+
+/* Global font settings for Arabic */
+html[lang="ar"],
+html[lang="ar"] *,
+body[lang="ar"],
+body[lang="ar"] *,
+[lang="ar"],
+[lang="ar"] * {
+  font-family: "Readex Pro", "Segoe UI", "Tahoma", "Arial", sans-serif !important;
+}
+
+/* Ensure Arabic text has proper sizing and spacing */
 html[lang="ar"],
 body[lang="ar"],
 [lang="ar"] {
-  font-family: "Readex Pro", system-ui, sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+  text-align: right !important;
+}
+
+/* Arabic text sizing overrides */
+html[lang="ar"] .text-xs,
+body[lang="ar"] .text-xs,
+[lang="ar"] .text-xs {
+  font-size: 0.875rem !important;
+}
+
+html[lang="ar"] .text-sm,
+body[lang="ar"] .text-sm,
+[lang="ar"] .text-sm {
+  font-size: 1rem !important;
+}
+
+html[lang="ar"] .text-base,
+body[lang="ar"] .text-base,
+[lang="ar"] .text-base {
+  font-size: 1.125rem !important;
+}
+
+html[lang="ar"] .text-lg,
+body[lang="ar"] .text-lg,
+[lang="ar"] .text-lg {
+  font-size: 1.25rem !important;
+}
+
+html[lang="ar"] .text-xl,
+body[lang="ar"] .text-xl,
+[lang="ar"] .text-xl {
+  font-size: 1.5rem !important;
+}
+
+html[lang="ar"] .text-2xl,
+body[lang="ar"] .text-2xl,
+[lang="ar"] .text-2xl {
+  font-size: 1.875rem !important;
+}
+
+html[lang="ar"] .text-3xl,
+body[lang="ar"] .text-3xl,
+[lang="ar"] .text-3xl {
+  font-size: 2.25rem !important;
+}
+
+html[lang="ar"] .text-4xl,
+body[lang="ar"] .text-4xl,
+[lang="ar"] .text-4xl {
+  font-size: 3rem !important;
+}
+
+html[lang="ar"] .text-5xl,
+body[lang="ar"] .text-5xl,
+[lang="ar"] .text-5xl {
+  font-size: 4rem !important;
+}
+
+/* Additional font fallbacks for better Arabic support */
+html[lang="ar"] input,
+html[lang="ar"] textarea,
+html[lang="ar"] select,
+html[lang="ar"] button,
+body[lang="ar"] input,
+body[lang="ar"] textarea,
+body[lang="ar"] select,
+body[lang="ar"] button,
+[lang="ar"] input,
+[lang="ar"] textarea,
+[lang="ar"] select,
+[lang="ar"] button {
+  font-family: "Readex Pro", "Segoe UI", "Tahoma", "Arial", sans-serif !important;
+}
+
+/* Ensure form elements in Arabic routes use the correct font */
+html[lang="ar"] .form-input,
+html[lang="ar"] .form-textarea,
+html[lang="ar"] .form-select,
+body[lang="ar"] .form-input,
+body[lang="ar"] .form-textarea,
+body[lang="ar"] .form-select,
+[lang="ar"] .form-input,
+[lang="ar"] .form-textarea,
+[lang="ar"] .form-select {
+  font-family: "Readex Pro", "Segoe UI", "Tahoma", "Arial", sans-serif !important;
+}
+
+/* Custom utility class for Arabic font */
+.font-arabic {
+  font-family: "Readex Pro", "Segoe UI", "Tahoma", "Arial", sans-serif !important;
+}
+
+/* Ensure all text elements in Arabic routes use the correct font */
+html[lang="ar"] *,
+body[lang="ar"] *,
+[lang="ar"] * {
+  font-family: "Readex Pro", "Segoe UI", "Tahoma", "Arial", sans-serif !important;
 }

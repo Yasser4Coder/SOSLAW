@@ -19,7 +19,7 @@ function ScrollToHash() {
 
 const MainLayout = ({ children }) => {
   return (
-    <div className="">
+    <div className="font-arabic">
       <ScrollToHash />
       <Header />
       {children}

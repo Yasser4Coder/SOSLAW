@@ -8,10 +8,10 @@ import { useTranslation } from "react-i18next";
 const Home = () => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language || "en";
-  const title = t("homeSeoTitle", "SOSLAW | للاستشارة القانونية");
+  const title = t("homeSeoTitle", "SOSLAW | للاستشارات والخدمات القانونية");
   const desc = t(
     "homeSeoDesc",
-    "SOSLAW للاستشارة القانونية - منصة عصرية لخدمات الاستشارات القانونية بلغات متعددة وبواجهة حديثة."
+    "SOS Law ⚖ منصة جزائرية رقمية للاستشارات والخدمات القانونية اطلب استشارتك القانونية أينما كنت"
   );
   const url = "https://soslaw.com/";
   const image = "/logo.svg";

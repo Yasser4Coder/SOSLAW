@@ -34,26 +34,88 @@ const NAV_LINKS = [
     label: "consulting",
     items: [
       {
-        label: "publicLaw",
+        label: "civilConsultation",
         children: [
-          { label: "localAuthorities" },
-          { label: "publicFacilities" },
-          { label: "publicService" },
-          { label: "humanRights" },
+          { label: "contractDisputes" },
+          { label: "civilLiabilityCases" },
+          { label: "rentalHousingIssues" },
+          { label: "damageCompensation" },
         ],
       },
       {
-        label: "privateLaw",
+        label: "commercialLawConsultation",
         children: [
-          { label: "consumer" },
-          { label: "worker" },
-          { label: "realEstate" },
-          { label: "civilLiability" },
+          { label: "companyFormation" },
+          { label: "partnershipSalesContracts" },
+          { label: "commercialDisputes" },
+          { label: "bankruptcyJudicialSettlement" },
         ],
       },
       {
-        label: "businessLaw",
-        children: [{ label: "taxes" }, { label: "commercialPractices" }],
+        label: "realEstateConsultation",
+        children: [
+          { label: "realEstateBuySell" },
+          { label: "propertyDisputes" },
+          { label: "documentationRegistration" },
+          { label: "propertyRental" },
+        ],
+      },
+      {
+        label: "laborLawConsultation",
+        children: [
+          { label: "unfairDismissal" },
+          { label: "workerEmployerRights" },
+          { label: "employmentContracts" },
+          { label: "socialSecurityDisputes" },
+        ],
+      },
+      {
+        label: "criminalConsultation",
+        children: [
+          { label: "misdemeanorCrimeCases" },
+          { label: "investigationDefense" },
+          { label: "criminalCourtProcedures" },
+        ],
+      },
+      {
+        label: "familyConsultation",
+        children: [
+          { label: "divorceKhulaAlimony" },
+          { label: "custodyChildVisitation" },
+          { label: "inheritanceWills" },
+        ],
+      },
+      {
+        label: "administrativeConsultation",
+        children: [
+          { label: "administrativeAppeals" },
+          { label: "administrativeDisputes" },
+          { label: "employmentPublicService" },
+        ],
+      },
+      {
+        label: "intellectualProperty",
+        children: [
+          { label: "trademarkProtection" },
+          { label: "patentProtection" },
+          { label: "digitalContentLiterary" },
+        ],
+      },
+      {
+        label: "publicProcurementLaw",
+        children: [
+          { label: "tenderFilePreparation" },
+          { label: "procurementAppeals" },
+          { label: "publicContractingProcedures" },
+        ],
+      },
+      {
+        label: "investmentBusinessConsultation",
+        children: [
+          { label: "foreignInvestmentLaws" },
+          { label: "taxFinancialLegislation" },
+          { label: "newInvestorSupport" },
+        ],
       },
     ],
   },
@@ -419,7 +481,7 @@ const Header = () => {
         </ul>
         {/* Free Consultation Button (Desktop Only) */}
         <Link
-          to="/contact"
+          to="/auth"
           className={`hidden md:inline-block ${
             lang === "ar" ? "mr-6" : "ml-6"
           } px-6 py-2 bg-[#c8a45e] text-white font-semibold rounded shadow hover:bg-[#c8a45e]/80 transition focus:outline-none focus:ring-2 focus:ring-[#c8a45e]`}
@@ -604,7 +666,7 @@ const Header = () => {
           </div>
           {/* Free Consultation Button (Mobile Only) */}
           <Link
-            to="/contact"
+            to="/auth"
             className="block w-full mt-4 px-6 py-3 bg-[#c8a45e] text-white font-semibold rounded shadow hover:bg-[#c8a45e]/80 transition text-center focus:outline-none focus:ring-2 focus:ring-[#c8a45e]"
             aria-label={t("freeConsultation")}
             onClick={() => setMobileMenu(false)}

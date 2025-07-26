@@ -5,9 +5,11 @@ import ServiceCard from "./ServiceCard";
 import {
   FiBriefcase,
   FiUsers,
-  FiDollarSign,
   FiShield,
-  FiHome,
+  FiFileText,
+  FiPhone,
+  FiEdit,
+  FiBell,
 } from "react-icons/fi";
 import { FaGavel } from "react-icons/fa";
 
@@ -15,9 +17,11 @@ const iconMap = {
   FiBriefcase,
   FaGavel,
   FiUsers,
-  FiDollarSign,
   FiShield,
-  FiHome,
+  FiFileText,
+  FiPhone,
+  FiEdit,
+  FiBell,
 };
 
 const ServicesSection = () => {
