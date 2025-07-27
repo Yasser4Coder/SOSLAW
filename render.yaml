@@ -1,10 +1,10 @@
 services:
   - type: web
     name: soslaw
-    env: static
+    env: node
     buildCommand: npm run build
-    staticPublishPath: ./dist
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+    startCommand: npx serve -s dist -l $PORT
+    pullRequestPreviewsEnabled: false
+    envVars:
+      - key: NODE_ENV
+        value: production
