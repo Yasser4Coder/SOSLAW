@@ -1,9 +1,9 @@
 services:
   - type: web
     name: soslaw
-    env: node
+    env: static
     buildCommand: npm run build
-    startCommand: node server.js
+    staticPublishPath: ./dist
     pullRequestPreviewsEnabled: false
     envVars:
       - key: NODE_ENV
