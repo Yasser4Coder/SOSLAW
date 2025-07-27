@@ -23,29 +23,31 @@ i18n
     detection: {
       order: ["localStorage", "navigator", "htmlTag"],
       caches: ["localStorage"],
+      lookupLocalStorage: "i18nextLng",
     },
   });
 
 // Set RTL/LTR direction on initial load
 if (typeof window !== "undefined") {
-  const lang =
-    i18n.language ||
-    (typeof navigator !== "undefined" ? navigator.language : "en");
+  const lang = i18n.language || "ar";
+  const isRTL = lang === "ar";
+
   document.documentElement.lang = lang;
-  if (lang.startsWith("ar")) {
-    document.documentElement.dir = "rtl";
-  } else {
-    document.documentElement.dir = "ltr";
-  }
+  document.documentElement.dir = isRTL ? "rtl" : "ltr";
+
+  // Also set body attributes
+  document.body.lang = lang;
+  document.body.dir = isRTL ? "rtl" : "ltr";
 }
 
 i18n.on("languageChanged", (lng) => {
+  const isRTL = lng === "ar";
+
   document.documentElement.lang = lng;
-  if (lng.startsWith("ar")) {
-    document.documentElement.dir = "rtl";
-  } else {
-    document.documentElement.dir = "ltr";
-  }
+  document.documentElement.dir = isRTL ? "rtl" : "ltr";
+
+  document.body.lang = lng;
+  document.body.dir = isRTL ? "rtl" : "ltr";
 });
 
 export default i18n;

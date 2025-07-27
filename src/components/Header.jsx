@@ -157,12 +157,13 @@ const Header = () => {
     setLang(code);
     i18n.changeLanguage(code);
     setShowLang(false);
-    // Set dir attribute for RTL
-    if (code === "ar") {
-      document.documentElement.dir = "rtl";
-    } else {
-      document.documentElement.dir = "ltr";
-    }
+
+    // Set dir attribute for RTL/LTR
+    const isRTL = code === "ar";
+    document.documentElement.dir = isRTL ? "rtl" : "ltr";
+    document.documentElement.lang = code;
+    document.body.dir = isRTL ? "rtl" : "ltr";
+    document.body.lang = code;
   };
 
   // Close Language dropdown on outside click
@@ -228,6 +229,11 @@ const Header = () => {
       header.classList.add("sticky", "top-0", "z-50", "bg-white", "shadow-sm");
     }
   }, []);
+
+  // Sync language state with i18n
+  useEffect(() => {
+    setLang(i18n.language || "ar");
+  }, [i18n.language]);
 
   // Focus indicator for accessibility
   useEffect(() => {

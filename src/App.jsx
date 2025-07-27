@@ -6,22 +6,34 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import JoinTeam from "./pages/JoinTeam";
+import Dashboard from "./pages/Dashboard";
 import { HelmetProvider } from "react-helmet-async";
 import "./App.css";
 
 function App() {
   return (
     <HelmetProvider>
-      <MainLayout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/join" element={<Navigate to="/join-team" replace />} />
-          <Route path="/join-team" element={<JoinTeam />} />
-        </Routes>
-      </MainLayout>
+      <Routes>
+        <Route path="/dashboard/*" element={<Dashboard />} />
+        <Route
+          path="/*"
+          element={
+            <MainLayout>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route
+                  path="/join"
+                  element={<Navigate to="/join-team" replace />}
+                />
+                <Route path="/join-team" element={<JoinTeam />} />
+              </Routes>
+            </MainLayout>
+          }
+        />
+      </Routes>
     </HelmetProvider>
   );
 }

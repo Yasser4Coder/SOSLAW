@@ -3,6 +3,12 @@
 /* Import Readex Pro font for better Arabic support */
 @import url("https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap");
 
+/* Global font settings - apply to all elements by default */
+html,
+body {
+  font-family: "Readex Pro", "Segoe UI", "Tahoma", "Arial", sans-serif !important;
+}
+
 /* Global font settings for Arabic */
 html[lang="ar"],
 html[lang="ar"] *,
@@ -13,13 +19,28 @@ body[lang="ar"] *,
   font-family: "Readex Pro", "Segoe UI", "Tahoma", "Arial", sans-serif !important;
 }
 
+/* RTL specific styles */
+html[dir="rtl"],
+body[dir="rtl"],
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+/* LTR specific styles */
+html[dir="ltr"],
+body[dir="ltr"],
+.ltr {
+  direction: ltr;
+  text-align: left;
+}
+
 /* Ensure Arabic text has proper sizing and spacing */
 html[lang="ar"],
 body[lang="ar"],
 [lang="ar"] {
   font-size: 16px !important;
   line-height: 1.6 !important;
-  text-align: right !important;
 }
 
 /* Arabic text sizing overrides */
@@ -111,9 +132,69 @@ body[lang="ar"] .form-select,
   font-family: "Readex Pro", "Segoe UI", "Tahoma", "Arial", sans-serif !important;
 }
 
+/* Custom alert animations */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Dashboard RTL Layout */
+[dir="rtl"] .dashboard-layout {
+  position: relative;
+  min-height: 100vh;
+}
+
+[dir="rtl"] .dashboard-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 16rem; /* 256px */
+  height: 100vh;
+  z-index: 20;
+  overflow-y: auto;
+}
+
+[dir="rtl"] .dashboard-content {
+  margin-right: 16rem; /* 256px sidebar width */
+  width: calc(100% - 16rem);
+  min-height: 100vh;
+}
+
+/* Dashboard LTR Layout */
+[dir="ltr"] .dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+[dir="ltr"] .dashboard-sidebar {
+  flex-shrink: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+[dir="ltr"] .dashboard-content {
+  flex: 1;
+  min-height: 100vh;
+}
+
 /* Ensure all text elements in Arabic routes use the correct font */
 html[lang="ar"] *,
 body[lang="ar"] *,
 [lang="ar"] * {
+  font-family: "Readex Pro", "Segoe UI", "Tahoma", "Arial", sans-serif !important;
+}
+
+/* Fallback for when lang attributes might not be set */
+.font-arabic * {
   font-family: "Readex Pro", "Segoe UI", "Tahoma", "Arial", sans-serif !important;
 }

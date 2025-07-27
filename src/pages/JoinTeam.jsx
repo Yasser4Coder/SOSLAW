@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
-import { useFontLoader } from "../hooks/useFontLoader";
+
 import {
   FiUser,
   FiPhone,
@@ -20,9 +20,6 @@ const JoinTeam = () => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language || "en";
   const isRTL = lang === "ar";
-
-  // Ensure font is loaded
-  useFontLoader();
 
   const [selectedRole, setSelectedRole] = useState("");
   const [cvFile, setCvFile] = useState(null);
