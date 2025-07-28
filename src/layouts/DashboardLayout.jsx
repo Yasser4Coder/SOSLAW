@@ -17,6 +17,7 @@ import {
   FiMail,
 } from "react-icons/fi";
 import { useFontLoader } from "../hooks/useFontLoader";
+import { useScrollToTop } from "../hooks/useScrollToTop";
 
 // Dashboard Pages
 import DashboardOverview from "../components/dashboard/DashboardOverview";
@@ -37,6 +38,9 @@ const DashboardLayout = () => {
 
   // Ensure font is loaded
   useFontLoader();
+
+  // Scroll to top on route change
+  useScrollToTop();
 
   const navigation = [
     {

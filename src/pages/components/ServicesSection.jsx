@@ -10,6 +10,10 @@ import {
   FiPhone,
   FiEdit,
   FiBell,
+  FiGlobe,
+  FiSearch,
+  FiBook,
+  FiAward,
 } from "react-icons/fi";
 import { FaGavel } from "react-icons/fa";
 
@@ -22,6 +26,10 @@ const iconMap = {
   FiPhone,
   FiEdit,
   FiBell,
+  FiGlobe,
+  FiSearch,
+  FiBook,
+  FiAward,
 };
 
 const ServicesSection = () => {
@@ -47,6 +55,7 @@ const ServicesSection = () => {
               ...item,
               label: t(item.titleKey),
             }))}
+            route={s.route}
           />
         ))}
       </div>

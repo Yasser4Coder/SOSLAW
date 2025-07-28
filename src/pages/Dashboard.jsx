@@ -7,7 +7,6 @@ import { useFontLoader } from "../hooks/useFontLoader";
 const Dashboard = () => {
   // Ensure font is loaded
   useFontLoader();
-
   return (
     <>
       <Helmet>

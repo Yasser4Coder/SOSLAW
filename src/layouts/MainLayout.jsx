@@ -4,6 +4,7 @@ import Footer from "../components/Footer";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { useFontLoader } from "../hooks/useFontLoader";
+import { useScrollToTop } from "../hooks/useScrollToTop";
 import { useTranslation } from "react-i18next";
 
 function ScrollToHash() {
@@ -24,6 +25,9 @@ const MainLayout = ({ children }) => {
 
   // Ensure font is loaded on all pages
   useFontLoader();
+
+  // Scroll to top on route change
+  useScrollToTop();
 
   // Get current language and RTL status
   const currentLang = i18n.language || "ar";
