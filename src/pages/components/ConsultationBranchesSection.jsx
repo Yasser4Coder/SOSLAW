@@ -173,7 +173,7 @@ const ConsultationBranchesSection = () => {
                 }`}
               >
                 <div
-                  className={`${branch.iconColor} p-3 rounded-xl bg-white shadow-sm group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}
+                  className={`${branch.iconColor} p-3 rounded-xl ml-[10px] bg-white shadow-sm group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}
                 >
                   <branch.icon size={24} />
                 </div>
