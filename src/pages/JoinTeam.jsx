@@ -87,52 +87,70 @@ const JoinTeam = () => {
 
   const roles = [
     {
-      id: "legal-consultant",
-      title: "legalConsultant",
-      description: "legalConsultantDesc",
-      icon: "⚖️",
+      id: "legal-writer",
+      title: "legalWriter",
+      description: "legalWriterDesc",
+      icon: "✍️",
     },
     {
-      id: "senior-lawyer",
-      title: "seniorLawyer",
-      description: "seniorLawyerDesc",
-      icon: "👨‍⚖️",
-    },
-    {
-      id: "junior-lawyer",
-      title: "juniorLawyer",
-      description: "juniorLawyerDesc",
-      icon: "👩‍⚖️",
-    },
-    {
-      id: "legal-assistant",
-      title: "legalAssistant",
-      description: "legalAssistantDesc",
+      id: "administrative-manager",
+      title: "administrativeManager",
+      description: "administrativeManagerDesc",
       icon: "📋",
     },
     {
-      id: "marketing-specialist",
-      title: "marketingSpecialist",
-      description: "marketingSpecialistDesc",
-      icon: "📢",
+      id: "legal-translator",
+      title: "legalTranslator",
+      description: "legalTranslatorDesc",
+      icon: "🌐",
     },
     {
-      id: "web-developer",
-      title: "webDeveloper",
-      description: "webDeveloperDesc",
-      icon: "💻",
+      id: "legal-trainer",
+      title: "legalTrainer",
+      description: "legalTrainerDesc",
+      icon: "🎓",
     },
     {
-      id: "customer-support",
-      title: "customerSupport",
-      description: "customerSupportDesc",
-      icon: "🎧",
+      id: "legal-content-creator",
+      title: "legalContentCreator",
+      description: "legalContentCreatorDesc",
+      icon: "🎬",
     },
     {
-      id: "content-writer",
-      title: "contentWriter",
-      description: "contentWriterDesc",
-      icon: "✍️",
+      id: "digital-platform-manager",
+      title: "digitalPlatformManager",
+      description: "digitalPlatformManagerDesc",
+      icon: "📱",
+    },
+    {
+      id: "legal-content-editor",
+      title: "legalContentEditor",
+      description: "legalContentEditorDesc",
+      icon: "📝",
+    },
+    {
+      id: "legal-instructor",
+      title: "legalInstructor",
+      description: "legalInstructorDesc",
+      icon: "👨‍🏫",
+    },
+    {
+      id: "professional-legal-translator",
+      title: "professionalLegalTranslator",
+      description: "professionalLegalTranslatorDesc",
+      icon: "🔤",
+    },
+    {
+      id: "graphic-designer",
+      title: "graphicDesigner",
+      description: "graphicDesignerDesc",
+      icon: "🎨",
+    },
+    {
+      id: "legal-accounting-specialist",
+      title: "legalAccountingSpecialist",
+      description: "legalAccountingSpecialistDesc",
+      icon: "💰",
     },
   ];
 
@@ -257,34 +275,34 @@ const JoinTeam = () => {
                   {t("joinTeamAllRoles", "جميع الأدوار")}
                 </button>
                 <button
-                  onClick={() => setSelectedRole("legal")}
+                  onClick={() => setSelectedRole("content")}
                   className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                    selectedRole === "legal"
+                    selectedRole === "content"
                       ? "bg-[#09142b] text-white shadow-lg"
                       : "bg-white text-[#6b7280] border-2 border-[#e7cfa7] hover:border-[#c8a45e] hover:text-[#09142b]"
                   }`}
                 >
-                  {t("joinTeamLegalRoles", "الأدوار القانونية")}
+                  {t("joinTeamContentRoles", "أدوار المحتوى")}
                 </button>
                 <button
-                  onClick={() => setSelectedRole("tech")}
+                  onClick={() => setSelectedRole("administrative")}
                   className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                    selectedRole === "tech"
+                    selectedRole === "administrative"
                       ? "bg-[#09142b] text-white shadow-lg"
                       : "bg-white text-[#6b7280] border-2 border-[#e7cfa7] hover:border-[#c8a45e] hover:text-[#09142b]"
                   }`}
                 >
-                  {t("joinTeamTechRoles", "الأدوار التقنية")}
+                  {t("joinTeamAdministrativeRoles", "الأدوار الإدارية")}
                 </button>
                 <button
-                  onClick={() => setSelectedRole("business")}
+                  onClick={() => setSelectedRole("training")}
                   className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                    selectedRole === "business"
+                    selectedRole === "training"
                       ? "bg-[#09142b] text-white shadow-lg"
                       : "bg-white text-[#6b7280] border-2 border-[#e7cfa7] hover:border-[#c8a45e] hover:text-[#09142b]"
                   }`}
                 >
-                  {t("joinTeamBusinessRoles", "الأدوار التجارية")}
+                  {t("joinTeamTrainingRoles", "أدوار التدريب")}
                 </button>
               </div>
             </div>
@@ -294,23 +312,24 @@ const JoinTeam = () => {
               {roles
                 .filter((role) => {
                   if (selectedRole === "") return true;
-                  if (selectedRole === "legal") {
+                  if (selectedRole === "content") {
                     return [
-                      "legal-consultant",
-                      "senior-lawyer",
-                      "junior-lawyer",
-                      "legal-assistant",
+                      "legal-writer",
+                      "legal-content-creator",
+                      "legal-content-editor",
+                      "graphic-designer",
                     ].includes(role.id);
                   }
-                  if (selectedRole === "tech") {
-                    return ["web-developer"].includes(role.id);
-                  }
-                  if (selectedRole === "business") {
+                  if (selectedRole === "administrative") {
                     return [
-                      "marketing-specialist",
-                      "customer-support",
-                      "content-writer",
+                      "administrative-manager",
+                      "legal-accounting-specialist",
                     ].includes(role.id);
+                  }
+                  if (selectedRole === "training") {
+                    return ["legal-trainer", "legal-instructor"].includes(
+                      role.id
+                    );
                   }
                   return true;
                 })
@@ -394,23 +413,22 @@ const JoinTeam = () => {
             {/* No Roles Message */}
             {roles.filter((role) => {
               if (selectedRole === "") return true;
-              if (selectedRole === "legal") {
+              if (selectedRole === "content") {
                 return [
-                  "legal-consultant",
-                  "senior-lawyer",
-                  "junior-lawyer",
-                  "legal-assistant",
+                  "legal-writer",
+                  "legal-content-creator",
+                  "legal-content-editor",
+                  "graphic-designer",
                 ].includes(role.id);
               }
-              if (selectedRole === "tech") {
-                return ["web-developer"].includes(role.id);
-              }
-              if (selectedRole === "business") {
+              if (selectedRole === "administrative") {
                 return [
-                  "marketing-specialist",
-                  "customer-support",
-                  "content-writer",
+                  "administrative-manager",
+                  "legal-accounting-specialist",
                 ].includes(role.id);
+              }
+              if (selectedRole === "training") {
+                return ["legal-trainer", "legal-instructor"].includes(role.id);
               }
               return true;
             }).length === 0 && (

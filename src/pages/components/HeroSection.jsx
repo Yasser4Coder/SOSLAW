@@ -114,6 +114,25 @@ const HeroSection = () => {
             >
               {t("heroTitle")}
             </h1>
+            {/* Tagline */}
+            <div className="mb-4 md:mb-6">
+              <h2
+                className={`text-white font-bold mb-2 drop-shadow-md ${
+                  isRTL
+                    ? "text-lg md:text-xl lg:text-2xl"
+                    : "text-base md:text-lg lg:text-xl"
+                }`}
+              >
+                {t("heroTagline")}
+              </h2>
+              <p
+                className={`text-[#b48b5a] font-semibold drop-shadow-md ${
+                  isRTL ? "text-base md:text-lg" : "text-sm md:text-base"
+                }`}
+              >
+                {t("heroTaglineSubtitle")}
+              </p>
+            </div>
             {/* Description */}
             <p
               className={`text-white mb-8 max-w-xl drop-shadow-md ${
