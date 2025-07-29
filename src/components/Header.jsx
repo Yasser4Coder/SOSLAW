@@ -27,105 +27,17 @@ const SOCIALS = [
 const NAV_LINKS = [
   { to: "/", label: "home" },
   { to: "/about", label: "about" },
+  { to: "/#services", label: "servicesTitle" },
   { to: "/contact", label: "contact" },
   { to: "/join", label: "joinUs" },
-  {
-    dropdown: "consulting",
-    label: "consulting",
-    items: [
-      {
-        label: "civilConsultation",
-        children: [
-          { label: "contractDisputes" },
-          { label: "civilLiabilityCases" },
-          { label: "rentalHousingIssues" },
-          { label: "damageCompensation" },
-        ],
-      },
-      {
-        label: "commercialLawConsultation",
-        children: [
-          { label: "companyFormation" },
-          { label: "partnershipSalesContracts" },
-          { label: "commercialDisputes" },
-          { label: "bankruptcyJudicialSettlement" },
-        ],
-      },
-      {
-        label: "realEstateConsultation",
-        children: [
-          { label: "realEstateBuySell" },
-          { label: "propertyDisputes" },
-          { label: "documentationRegistration" },
-          { label: "propertyRental" },
-        ],
-      },
-      {
-        label: "laborLawConsultation",
-        children: [
-          { label: "unfairDismissal" },
-          { label: "workerEmployerRights" },
-          { label: "employmentContracts" },
-          { label: "socialSecurityDisputes" },
-        ],
-      },
-      {
-        label: "criminalConsultation",
-        children: [
-          { label: "misdemeanorCrimeCases" },
-          { label: "investigationDefense" },
-          { label: "criminalCourtProcedures" },
-        ],
-      },
-      {
-        label: "familyConsultation",
-        children: [
-          { label: "divorceKhulaAlimony" },
-          { label: "custodyChildVisitation" },
-          { label: "inheritanceWills" },
-        ],
-      },
-      {
-        label: "administrativeConsultation",
-        children: [
-          { label: "administrativeAppeals" },
-          { label: "administrativeDisputes" },
-          { label: "employmentPublicService" },
-        ],
-      },
-      {
-        label: "intellectualProperty",
-        children: [
-          { label: "trademarkProtection" },
-          { label: "patentProtection" },
-          { label: "digitalContentLiterary" },
-        ],
-      },
-      {
-        label: "publicProcurementLaw",
-        children: [
-          { label: "tenderFilePreparation" },
-          { label: "procurementAppeals" },
-          { label: "publicContractingProcedures" },
-        ],
-      },
-      {
-        label: "investmentBusinessConsultation",
-        children: [
-          { label: "foreignInvestmentLaws" },
-          { label: "taxFinancialLegislation" },
-          { label: "newInvestorSupport" },
-        ],
-      },
-    ],
-  },
+
   {
     dropdown: "more",
     label: "more",
     items: [
-      { to: "/#services", label: "servicesTitle" },
       { to: "/library", label: "legalLibrary" },
       { to: "/#consultants", label: "consultantsTitle" },
+      { to: "/#consultation-branches", label: "consulting" },
       { to: "/#faq", label: "faqSectionTitle" },
     ],
   },
@@ -136,20 +48,16 @@ const Header = () => {
   const location = useLocation();
   const [lang, setLang] = useState(i18n.language || "en");
   const [showLang, setShowLang] = useState(false);
-  const [showConsulting, setShowConsulting] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const [mobileDropdown, setMobileDropdown] = useState({
-    consulting: false,
     more: false,
   });
   const [openDropdown, setOpenDropdown] = useState(null);
 
   // Refs for dropdowns
   const langRef = useRef();
-  const consultingMenuRef = useRef();
   const moreMenuRef = useRef();
-  const consultingTriggerRef = useRef();
   const moreTriggerRef = useRef();
 
   // Handle language change and RTL
@@ -187,23 +95,6 @@ const Header = () => {
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
   }, [showLang]);
-
-  // Close Consulting dropdown on outside click
-  useEffect(() => {
-    if (!showConsulting) return;
-    function handleClick(e) {
-      if (
-        consultingMenuRef.current &&
-        consultingTriggerRef.current &&
-        !consultingMenuRef.current.contains(e.target) &&
-        !consultingTriggerRef.current.contains(e.target)
-      ) {
-        setShowConsulting(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [showConsulting]);
 
   // Close More dropdown on outside click
   useEffect(() => {
@@ -330,80 +221,7 @@ const Header = () => {
         <ul className="hidden md:flex items-center gap-8" role="menubar">
           {NAV_LINKS.map((link) => (
             <li key={link.label} role="none" className="relative group">
-              {link.dropdown === "consulting" ? (
-                <>
-                  <button
-                    className={`font-semibold px-2 py-1 rounded flex items-center gap-1 transition-colors duration-200 focus:outline-none relative cursor-pointer ${
-                      location.pathname.startsWith(`/${link.dropdown}`)
-                        ? "text-[#c8a45e] underline underline-offset-4"
-                        : "text-[#09142b] hover:text-[#c8a45e]"
-                    }`}
-                    aria-haspopup="menu"
-                    aria-expanded={openDropdown === link.dropdown}
-                    tabIndex={0}
-                    onClick={() =>
-                      setOpenDropdown(
-                        openDropdown === link.dropdown ? null : link.dropdown
-                      )
-                    }
-                    onMouseEnter={() => setOpenDropdown(link.dropdown)}
-                    onFocus={() => setOpenDropdown(link.dropdown)}
-                    ref={consultingTriggerRef}
-                  >
-                    <span className="relative after:absolute after:left-0 after:-bottom-1 after:w-full after:h-0.5 after:bg-[#c8a45e] after:scale-x-0 group-hover:after:scale-x-100 group-focus:after:scale-x-100 after:origin-left after:transition-transform after:duration-300">
-                      {t(link.label)}
-                    </span>
-                    <FiChevronDown
-                      className={`ml-1 transition-transform duration-300 ${
-                        openDropdown === link.dropdown ? "rotate-180" : ""
-                      }`}
-                    />
-                  </button>
-                  <ul
-                    className={`absolute left-0 top-full mt-2 min-w-[220px] bg-white border rounded shadow-lg z-20 transition-opacity duration-200 ${
-                      openDropdown === link.dropdown
-                        ? "opacity-100 pointer-events-auto"
-                        : "opacity-0 pointer-events-none"
-                    }`}
-                    role="menu"
-                    tabIndex={-1}
-                    onMouseEnter={() => setOpenDropdown(link.dropdown)}
-                    onMouseLeave={() => setOpenDropdown(null)}
-                    onBlur={(e) => {
-                      if (!e.currentTarget.contains(e.relatedTarget))
-                        setOpenDropdown(null);
-                    }}
-                    ref={consultingMenuRef}
-                  >
-                    {link.items.map((item) => (
-                      <li
-                        key={item.label}
-                        className="group/sub relative px-4 py-2 text-[#09142b] font-bold hover:bg-[#faf6f0] cursor-pointer"
-                      >
-                        <div className="flex items-center justify-between">
-                          <span>{t(item.label)}</span>
-                          {item.children && (
-                            <FiChevronDown className="ml-2 rotate-[-90deg] text-[#c8a45e] group-hover/sub:rotate-0 transition-transform duration-200" />
-                          )}
-                        </div>
-                        {item.children && (
-                          <ul className="absolute left-full top-0 min-w-[200px] bg-white border rounded shadow-lg z-30 opacity-0 group-hover/sub:opacity-100 group-focus-within/sub:opacity-100 pointer-events-none group-hover/sub:pointer-events-auto group-focus-within/sub:pointer-events-auto transition-opacity duration-200">
-                            {item.children.map((sub) => (
-                              <li
-                                key={sub.label}
-                                className="px-4 py-2 text-[#09142b] font-normal whitespace-nowrap hover:bg-[#e7cfa7]/20"
-                                style={{ fontSize: "0.97em" }}
-                              >
-                                {t(sub.label)}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              ) : link.dropdown === "more" ? (
+              {link.dropdown === "more" ? (
                 <>
                   <button
                     className={`font-semibold px-2 py-1 rounded flex items-center gap-1 transition-colors duration-200 focus:outline-none relative cursor-pointer ${
@@ -449,16 +267,57 @@ const Header = () => {
                     ref={moreMenuRef}
                   >
                     {link.items.map((item) => (
-                      <li key={item.to} role="none">
-                        <Link
-                          to={item.to}
-                          className="block px-4 py-2 text-[#09142b] hover:bg-[#e7cfa7]/20 rounded focus:outline-none transition-all duration-200 transform hover:scale-105 focus:scale-105 hover:text-[#c8a45e] focus:text-[#c8a45e] cursor-pointer"
-                          role="menuitem"
-                          tabIndex={0}
-                          onClick={() => setOpenDropdown(null)}
-                        >
-                          {t(item.label)}
-                        </Link>
+                      <li key={item.label || item.to} role="none">
+                        {item.to ? (
+                          <Link
+                            to={item.to}
+                            className="block px-4 py-2 text-[#09142b] hover:bg-[#e7cfa7]/20 rounded focus:outline-none transition-all duration-200 transform hover:scale-105 focus:scale-105 hover:text-[#c8a45e] focus:text-[#c8a45e] cursor-pointer"
+                            role="menuitem"
+                            tabIndex={0}
+                            onClick={() => setOpenDropdown(null)}
+                          >
+                            {t(item.label)}
+                          </Link>
+                        ) : (
+                          <div className="group/sub relative px-4 py-2 text-[#09142b] font-bold hover:bg-[#faf6f0] cursor-pointer">
+                            <div className="flex items-center justify-between">
+                              <span>{t(item.label)}</span>
+                              {item.children && (
+                                <FiChevronDown className="ml-2 rotate-[-90deg] text-[#c8a45e] group-hover/sub:rotate-0 transition-transform duration-200" />
+                              )}
+                            </div>
+                            {item.children && (
+                              <ul className="absolute left-full top-0 min-w-[220px] bg-white border rounded shadow-lg z-30 opacity-0 group-hover/sub:opacity-100 group-focus-within/sub:opacity-100 pointer-events-none group-hover/sub:pointer-events-auto group-focus-within/sub:pointer-events-auto transition-opacity duration-200">
+                                {item.children.map((sub) => (
+                                  <li
+                                    key={sub.label}
+                                    className="group/sub2 relative px-4 py-2 text-[#09142b] font-bold hover:bg-[#faf6f0] cursor-pointer"
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <span>{t(sub.label)}</span>
+                                      {sub.children && (
+                                        <FiChevronDown className="ml-2 rotate-[-90deg] text-[#c8a45e] group-hover/sub2:rotate-0 transition-transform duration-200" />
+                                      )}
+                                    </div>
+                                    {sub.children && (
+                                      <ul className="absolute left-full top-0 min-w-[200px] bg-white border rounded shadow-lg z-40 opacity-0 group-hover/sub2:opacity-100 group-focus-within/sub2:opacity-100 pointer-events-none group-hover/sub2:pointer-events-auto group-focus-within/sub2:pointer-events-auto transition-opacity duration-200">
+                                        {sub.children.map((subItem) => (
+                                          <li
+                                            key={subItem.label}
+                                            className="px-4 py-2 text-[#09142b] font-normal whitespace-nowrap hover:bg-[#e7cfa7]/20"
+                                            style={{ fontSize: "0.97em" }}
+                                          >
+                                            {t(subItem.label)}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    )}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -513,75 +372,7 @@ const Header = () => {
         >
           {NAV_LINKS.map((link) => (
             <div key={link.label}>
-              {link.dropdown === "consulting" ? (
-                <>
-                  <button
-                    className="w-full text-left py-2 font-bold text-[#09142b] hover:text-[#c8a45e] flex items-center gap-2 focus:outline-none relative cursor-pointer"
-                    onClick={() =>
-                      setMobileDropdown((prev) => ({
-                        ...prev,
-                        [link.dropdown]: !prev[link.dropdown],
-                      }))
-                    }
-                    aria-haspopup="menu"
-                    aria-expanded={!!mobileDropdown[link.dropdown]}
-                    ref={consultingTriggerRef}
-                  >
-                    <span className="relative after:absolute after:left-0 after:-bottom-1 after:w-full after:h-0.5 after:bg-[#c8a45e] after:scale-x-0 [&.active]:after:scale-x-100 after:origin-left after:transition-transform after:duration-300">
-                      {t(link.label)}
-                    </span>
-                    <FiChevronDown
-                      className={`ml-1 transition-transform duration-300 ${
-                        mobileDropdown[link.dropdown] ? "rotate-180" : ""
-                      }`}
-                    />
-                  </button>
-                  {mobileDropdown[link.dropdown] && (
-                    <ul className="pl-4 border-l border-[#e7cfa7] mt-1 mb-2">
-                      {link.items.map((item) => (
-                        <li
-                          key={item.label}
-                          className="py-2 text-[#09142b] font-bold"
-                        >
-                          <div
-                            className="flex items-center justify-between cursor-pointer"
-                            onClick={() =>
-                              setMobileDropdown((prev) => ({
-                                ...prev,
-                                [item.label]: !prev[item.label],
-                              }))
-                            }
-                          >
-                            <span>{t(item.label)}</span>
-                            {item.children && (
-                              <FiChevronDown
-                                className={`ml-2 transition-transform duration-200 ${
-                                  mobileDropdown[item.label]
-                                    ? "rotate-180 text-[#c8a45e]"
-                                    : "text-[#c8a45e]"
-                                }`}
-                              />
-                            )}
-                          </div>
-                          {item.children && mobileDropdown[item.label] && (
-                            <ul className="pl-4 mt-1">
-                              {item.children.map((sub) => (
-                                <li
-                                  key={sub.label}
-                                  className="py-1 text-[#09142b] font-normal whitespace-nowrap"
-                                  style={{ fontSize: "0.97em" }}
-                                >
-                                  {t(sub.label)}
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </>
-              ) : link.dropdown === "more" ? (
+              {link.dropdown === "more" ? (
                 <>
                   <button
                     className="w-full text-left py-2 font-bold text-[#09142b] hover:text-[#c8a45e] flex items-center gap-2 focus:outline-none relative cursor-pointer"
@@ -611,16 +402,86 @@ const Header = () => {
                       ref={moreMenuRef}
                     >
                       {link.items.map((item) => (
-                        <li key={item.to} role="none">
-                          <Link
-                            to={item.to}
-                            className="block py-2 text-[#09142b] hover:text-[#c8a45e] focus:outline-none transition-all duration-200 transform hover:scale-105 focus:scale-105 cursor-pointer"
-                            role="menuitem"
-                            tabIndex={0}
-                            onClick={() => setMobileMenu(false)}
-                          >
-                            {t(item.label)}
-                          </Link>
+                        <li key={item.label || item.to} role="none">
+                          {item.to ? (
+                            <Link
+                              to={item.to}
+                              className="block py-2 text-[#09142b] hover:text-[#c8a45e] focus:outline-none transition-all duration-200 transform hover:scale-105 focus:scale-105 cursor-pointer"
+                              role="menuitem"
+                              tabIndex={0}
+                              onClick={() => setMobileMenu(false)}
+                            >
+                              {t(item.label)}
+                            </Link>
+                          ) : (
+                            <div className="py-2 text-[#09142b] font-bold">
+                              <div
+                                className="flex items-center justify-between cursor-pointer"
+                                onClick={() =>
+                                  setMobileDropdown((prev) => ({
+                                    ...prev,
+                                    [item.label]: !prev[item.label],
+                                  }))
+                                }
+                              >
+                                <span>{t(item.label)}</span>
+                                {item.children && (
+                                  <FiChevronDown
+                                    className={`ml-2 transition-transform duration-200 ${
+                                      mobileDropdown[item.label]
+                                        ? "rotate-180 text-[#c8a45e]"
+                                        : "text-[#c8a45e]"
+                                    }`}
+                                  />
+                                )}
+                              </div>
+                              {item.children && mobileDropdown[item.label] && (
+                                <ul className="pl-4 mt-1">
+                                  {item.children.map((sub) => (
+                                    <li
+                                      key={sub.label}
+                                      className="py-2 text-[#09142b] font-bold"
+                                    >
+                                      <div
+                                        className="flex items-center justify-between cursor-pointer"
+                                        onClick={() =>
+                                          setMobileDropdown((prev) => ({
+                                            ...prev,
+                                            [sub.label]: !prev[sub.label],
+                                          }))
+                                        }
+                                      >
+                                        <span>{t(sub.label)}</span>
+                                        {sub.children && (
+                                          <FiChevronDown
+                                            className={`ml-2 transition-transform duration-200 ${
+                                              mobileDropdown[sub.label]
+                                                ? "rotate-180 text-[#c8a45e]"
+                                                : "text-[#c8a45e]"
+                                            }`}
+                                          />
+                                        )}
+                                      </div>
+                                      {sub.children &&
+                                        mobileDropdown[sub.label] && (
+                                          <ul className="pl-4 mt-1">
+                                            {sub.children.map((subItem) => (
+                                              <li
+                                                key={subItem.label}
+                                                className="py-1 text-[#09142b] font-normal whitespace-nowrap"
+                                                style={{ fontSize: "0.97em" }}
+                                              >
+                                                {t(subItem.label)}
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        )}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          )}
                         </li>
                       ))}
                     </ul>

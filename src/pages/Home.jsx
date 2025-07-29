@@ -1,6 +1,7 @@
 import HeroSection from "./components/HeroSection";
 import ConsultantsSection from "./components/ConsultantsSection";
 import ServicesSection from "./components/ServicesSection";
+import ConsultationBranchesSection from "./components/ConsultationBranchesSection";
 import FAQSection from "./components/FAQSection";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
@@ -8,10 +9,10 @@ import { useTranslation } from "react-i18next";
 const Home = () => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language || "en";
-  const title = t("homeSeoTitle", "SOSLAW | للاستشارات والخدمات القانونية");
+  const title = t("homeSeoTitle", "SOSLAW | Legal Consultations & Services");
   const desc = t(
     "homeSeoDesc",
-    "SOS Law ⚖ منصة جزائرية رقمية للاستشارات والخدمات القانونية اطلب استشارتك القانونية أينما كنت"
+    "SOS Law ⚖ Algerian digital platform for legal consultations and services. Request your legal consultation wherever you are."
   );
   const url = "https://soslaw.com/";
   const image = "/logo.svg";
@@ -36,6 +37,7 @@ const Home = () => {
       <HeroSection />
       <ConsultantsSection />
       <ServicesSection />
+      <ConsultationBranchesSection />
       <FAQSection />
     </main>
   );

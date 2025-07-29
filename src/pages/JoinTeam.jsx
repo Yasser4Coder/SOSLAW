@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 
@@ -14,6 +14,8 @@ import {
   FiCalendar,
   FiLinkedin,
   FiGlobe,
+  FiArrowDown,
+  FiCheck,
 } from "react-icons/fi";
 
 const JoinTeam = () => {
@@ -24,6 +26,10 @@ const JoinTeam = () => {
   const [selectedRole, setSelectedRole] = useState("");
   const [cvFile, setCvFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+
+  const formRef = useRef(null);
+  const rolesRef = useRef(null);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -43,6 +49,41 @@ const JoinTeam = () => {
     availability: "",
     additionalInfo: "",
   });
+
+  // Scroll to form when role is selected
+  useEffect(() => {
+    if (selectedRole && formRef.current) {
+      setTimeout(() => {
+        formRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 300);
+    }
+  }, [selectedRole]);
+
+  const handleRoleSelection = (roleId) => {
+    setSelectedRole(roleId);
+    setShowForm(true);
+  };
+
+  const scrollToForm = () => {
+    if (formRef.current) {
+      formRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
+
+  const scrollToRoles = () => {
+    if (rolesRef.current) {
+      rolesRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
 
   const roles = [
     {
@@ -281,7 +322,7 @@ const JoinTeam = () => {
                         ? "border-[#c8a45e] bg-gradient-to-br from-white to-[#faf6f0] shadow-lg"
                         : "border-[#e7cfa7] bg-white hover:border-[#c8a45e]"
                     }`}
-                    onClick={() => setSelectedRole(role.id)}
+                    onClick={() => handleRoleSelection(role.id)}
                   >
                     {/* Selection Indicator */}
                     {selectedRole === role.id && (
@@ -388,12 +429,63 @@ const JoinTeam = () => {
             )}
           </div>
 
-          {/* Application Form */}
+          {/* Role Selection Success Message */}
           {selectedRole && (
-            <div className="bg-white rounded-2xl p-8 shadow-xl border border-[#e7cfa7] font-arabic">
-              <h3 className="text-2xl font-bold text-[#09142b] mb-6">
-                {t("joinTeamApplicationForm", "نموذج التقديم")}
-              </h3>
+            <div className="bg-gradient-to-r from-[#c8a45e] to-[#b48b5a] text-white rounded-2xl p-6 mb-8 shadow-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4 space-x-reverse">
+                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                    <FiCheck className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-1">
+                      {t("joinTeamRoleSelected", "تم اختيار الدور بنجاح!")}
+                    </h3>
+                    <p className="text-white/90">
+                      {t("joinTeamRoleSelectedDesc", "تم اختيار دور")}{" "}
+                      {t(roles.find((r) => r.id === selectedRole)?.title || "")}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={scrollToForm}
+                  className="flex items-center space-x-2 space-x-reverse bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-all duration-300"
+                >
+                  <span>{t("joinTeamContinueToForm", "متابعة النموذج")}</span>
+                  <FiArrowDown className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Application Form */}
+          {showForm && (
+            <div
+              ref={formRef}
+              className="bg-white rounded-2xl p-8 shadow-xl border border-[#e7cfa7] font-arabic relative"
+            >
+              {/* Form Header with Role Info */}
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#e7cfa7]">
+                <div>
+                  <h3 className="text-2xl font-bold text-[#09142b] mb-2">
+                    {t("joinTeamApplicationForm", "نموذج التقديم")}
+                  </h3>
+                  <p className="text-[#6b7280]">
+                    {t(
+                      "joinTeamFormDesc",
+                      "أكمل النموذج التالي للتقديم على دور"
+                    )}{" "}
+                    {t(roles.find((r) => r.id === selectedRole)?.title || "")}
+                  </p>
+                </div>
+                <button
+                  onClick={scrollToRoles}
+                  className="text-[#c8a45e] hover:text-[#b48b5a] transition-colors duration-300"
+                  title={t("joinTeamChangeRole", "تغيير الدور")}
+                >
+                  <FiX className="w-6 h-6" />
+                </button>
+              </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Personal Information */}

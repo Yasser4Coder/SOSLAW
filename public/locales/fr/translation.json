@@ -8,6 +8,8 @@
   "phone": "+ 383 (21) 23 43984",
   "hours": "LUNDI - VENDREDI 7:30 - 18:30",
   "language": "Français",
+  "homeSeoTitle": "SOSLAW | Consultations et Services Juridiques",
+  "homeSeoDesc": "SOS Law ⚖ Plateforme numérique algérienne pour consultations et services juridiques. Demandez votre consultation juridique où que vous soyez.",
   "branch1": "Branche 1",
   "branch2": "Branche 2",
   "more1": "Lien Plus 1",
@@ -159,13 +161,71 @@
   "serviceLegalHotlineDesc": "Consultations juridiques urgentes par téléphone ou WhatsApp",
   "serviceUrgentConsultations": "Heures de travail spécifiques pour le service d'urgence juridique",
   "serviceEmergencyHours": "Heures de travail spécifiques pour le service d'urgence juridique",
-  "serviceLegalContent": "Préparation de contenu juridique pour entreprises et plateformes",
-  "serviceLegalContentDesc": "Rédaction de politiques de confidentialité et conditions d'utilisation pour sites web et applications",
+  "serviceLegalContent": "Création de Contenu Juridique et Services de Documentation",
+  "serviceLegalContentDesc": "Création professionnelle de contenu juridique pour entreprises, plateformes et organisations. Nous rédigeons des documents juridiques complets incluant les politiques de confidentialité, conditions d'utilisation, règlements internes et documentation de conformité.",
   "servicePrivacyPolicies": "Préparation de documents juridiques pour entreprises (Code de conduite, règlements internes)",
   "serviceCompanyDocuments": "Préparation de documents juridiques pour entreprises (Code de conduite, règlements internes)",
   "serviceSmartLegalNotification": "Notification juridique intelligente (Smart Legal Notification)",
   "serviceSmartLegalNotificationDesc": "Notification aux clients des changements juridiques ou mises à jour pertinentes via SMS ou email",
   "serviceLegalUpdates": "Notification aux clients des changements juridiques ou mises à jour pertinentes via SMS ou email",
+  "serviceArbitrationMediation": "Services de Résolution Alternative des Litiges",
+  "serviceArbitrationMediationDesc": "Services professionnels de médiation et d'arbitrage pour résoudre les litiges efficacement et à l'amiable. Nous facilitons le dialogue constructif entre les parties pour parvenir à des accords mutuellement bénéfiques sans la complexité et le coût de la procédure traditionnelle.",
+  "serviceLegalTemplates": "Modèles de Documents Juridiques et Formulaires",
+  "serviceLegalTemplatesDesc": "Collection complète de modèles et formulaires juridiques rédigés professionnellement. Nous fournissons des documents juridiques prêts à l'emploi incluant contrats, accords, notifications et formulaires administratifs adaptés à divers besoins juridiques.",
+  "serviceLegalTranslation": "Services de Traduction et Interprétation Juridiques",
+  "serviceLegalTranslationDesc": "Services de traduction juridique professionnels garantissant précision et exactitude dans la terminologie juridique. Nous traduisons documents juridiques, contrats, décisions de justice et documents officiels tout en préservant l'intégrité juridique et le sens du texte original.",
+  "serviceStartupAccompaniment": "Support Juridique pour Startups et Création d'Entreprise",
+  "serviceStartupAccompanimentDesc": "Support juridique complet pour startups et entreprises émergentes. Nous guidons les entrepreneurs à travers les aspects juridiques de la création, croissance et expansion d'entreprise, assurant la conformité et protégeant vos intérêts commerciaux.",
+  "serviceComprehensiveLegalAudit": "Audit Juridique Complet et Révision de Conformité",
+  "serviceComprehensiveLegalAuditDesc": "Services d'audit juridique approfondis pour évaluer la situation juridique et la conformité de votre organisation. Nous effectuons des examens détaillés des contrats, politiques internes et obligations juridiques pour identifier les risques potentiels et fournir des recommandations actionnables.",
+  "serviceLegalHotline": "Ligne d'Assistance Juridique et Consultation d'Urgence",
+  "serviceLegalHotlineDesc": "Assistance juridique immédiate et services de consultation d'urgence. Notre ligne d'assistance juridique fournit un accès rapide aux conseils juridiques pour les affaires urgentes, vous aidant à comprendre vos droits et à prendre les mesures appropriées lorsque le temps est critique.",
+  "serviceStudentElitePackage": "Support Académique Juridique et Assistance à la Recherche",
+  "serviceStudentElitePackageDesc": "Support académique complet pour étudiants en droit et chercheurs. Nous fournissons une assistance pour la recherche juridique, la rédaction de thèses, la traduction académique et le développement professionnel pour aider les étudiants à exceller dans leur formation juridique.",
+  "serviceAcademicLeadership": "Leadership Académique et Excellence en Recherche",
+  "serviceAcademicLeadershipDesc": "Support professionnel pour les leaders académiques et chercheurs dans le domaine juridique. Nous assistons avec la méthodologie de recherche, la préparation de publications, la rédaction académique et le développement institutionnel pour améliorer l'excellence académique.",
+  "consultationBranchesTitle": "Branches de Consultation Juridique Disponibles",
+  "consultationBranchesDesc": "Nous offrons une gamme complète de consultations juridiques spécialisées pour couvrir tous vos besoins juridiques",
+  "civilConsultationTitle": "Consultation en Droit Civil",
+  "commercialLawConsultationTitle": "Consultation en Droit Commercial",
+  "realEstateConsultationTitle": "Consultation en Droit Immobilier",
+  "laborLawConsultationTitle": "Consultation en Droit du Travail",
+  "criminalConsultationTitle": "Consultation en Droit Pénal",
+  "familyConsultationTitle": "Consultation en Droit de la Famille (Statut Personnel)",
+  "administrativeConsultationTitle": "Consultation en Droit Administratif",
+  "intellectualPropertyConsultationTitle": "Droit de la Propriété Intellectuelle et Technologique",
+  "publicProcurementConsultationTitle": "Droit des Marchés Publics",
+  "investmentConsultationTitle": "Consultation en Droit des Investissements et des Affaires",
+  "getLegalConsultationNow": "Obtenez Votre Consultation Juridique Maintenant",
+  "getLegalConsultationDesc": "Contactez-nous pour une consultation juridique spécialisée adaptée à vos besoins",
+  "bookConsultationNow": "Réserver une Consultation Maintenant",
+  "signIn": "Se Connecter",
+  "serviceNotFound": "Service Non Trouvé",
+  "serviceNotFoundDesc": "Le service que vous recherchez n'existe pas.",
+  "backToHome": "Retour à l'Accueil",
+  "backToServices": "Retour aux Services",
+  "requestService": "Demander le Service",
+  "services": "Services",
+  "serviceFeatures": "Caractéristiques du Service",
+  "whatWeDo": "Ce Que Nous Faisons",
+  "whatWeHelp": "Ce Avec Quoi Nous Aidons",
+  "whatWeOffer": "Ce Que Nous Offrons",
+  "forCompanies": "Pour les Entreprises",
+  "forPlatforms": "Pour les Plateformes",
+  "forEcommerce": "Pour le Commerce Électronique",
+  "serviceIncludes": "Le Service Inclut",
+  "serviceOutputs": "Résultats du Service",
+  "forWhom": "Pour Qui",
+  "serviceCases": "Cas de Service",
+  "serviceProcess": "Processus du Service",
+  "serviceAdvantages": "Avantages du Service",
+  "whatWeProvide": "Ce Que Nous Fournissons",
+  "howWeWork": "Comment Nous Travaillons",
+  "serviceLanguages": "Langues de Service",
+  "whatWeTranslate": "Ce Que Nous Traduisons",
+  "tenderPreparation": "Consultation pour la préparation des dossiers d'appels d'offres",
+  "procurementAppeals": "Recours dans les marchés publics",
+  "governmentContracting": "Suivi des procédures de contractualisation avec les administrations publiques",
   "authLoginTitle": "Se connecter",
   "authRegisterTitle": "Créer un compte",
   "authMetaDesc": "Connectez-vous ou créez votre nouveau compte dans SOSLAW pour accéder à nos services juridiques complets",
@@ -270,48 +330,28 @@
   "faqSectionTitle": "Questions fréquentes",
   "faq": [
     {
-      "q": "Qu'est-ce que le ministère public ?",
-      "a": "C'est l'autorité légalement habilitée à engager l'action publique comme première étape dans les procédures pénales.\nElle assure la fonction d'accusation et en détermine la qualification.\nElle fait partie intégrante du pouvoir judiciaire, comme le stipule l'article 30 du Code de procédure pénale, qui permet au ministre de la Justice de la saisir et de lui ordonner d'engager des poursuites."
+      "q": "Quels services juridiques SOSLAW propose-t-il ?",
+      "a": "SOSLAW propose des services juridiques complets incluant consultation, rédaction de contrats, résolution de litiges, droit des sociétés, droit de la famille, et plus encore."
     },
     {
-      "q": "Qu'est-ce qu'une action publique ?",
-      "a": "C'est l'action engagée par le ministère public en tant que détenteur du pouvoir d'accusation contre les personnes soupçonnées d'avoir commis des infractions.\nC'est la procédure légale intentée au nom de la société devant le tribunal pénal contre l'auteur de l'infraction afin d'appliquer la sanction prévue par la loi. Elle peut être exercée contre l'auteur principal et les complices."
+      "q": "Comment puis-je programmer une consultation juridique ?",
+      "a": "Vous pouvez programmer une consultation via notre site web, par téléphone, ou en visitant notre bureau. Nous proposons des consultations en personne et à distance."
     },
     {
-      "q": "Quelles sont les causes d'extinction de l'action publique ?",
-      "a": "L'action publique s'éteint pour l'une des raisons suivantes :\n- Amnistie générale\n- Retrait de la plainte si la poursuite l'exige\n- Décès de l'accusé ou des accusés\n- Prescription de la procédure\n- Classement sans suite"
+      "q": "Quels sont vos honoraires de consultation ?",
+      "a": "Nos honoraires varient selon la complexité de votre affaire et le type de service requis. Nous proposons des tarifs transparents et pouvons fournir des estimations lors des consultations initiales."
     },
     {
-      "q": "Quels sont les délais de prescription en matière pénale ?",
-      "a": "Pour l'action publique : la prescription varie selon la qualification de l'infraction :\n- Crime : 10 ans\n- Délit : 3 ans\n- Contravention : 2 ans\n\nPour la peine :\n- Crime : 20 ans à compter du jugement\n- Délit : 5 ans\n- Contravention : 2 ans"
+      "q": "Traitez-vous les affaires juridiques internationales ?",
+      "a": "Oui, nous avons une expertise en droit international et pouvons vous assister dans les affaires transfrontalières, contrats internationaux et questions d'investissement étranger."
     },
     {
-      "q": "Quand un contrat est-il nul de nullité absolue ?",
-      "a": "Un contrat est nul de nullité absolue si :\n- Il manque un élément essentiel\n- La volonté d'une partie est entachée d'un vice (folie, incapacité, etc.)\n- L'objet ou la cause du contrat est illicite\n- Le consentement est vicié par un vice du consentement (dol, violence, erreur, etc.)"
+      "q": "Quels documents dois-je apporter à ma première consultation ?",
+      "a": "Apportez tous les documents pertinents liés à votre affaire, tels que contrats, correspondance, documents judiciaires, ou tout autre document juridique que vous possédez."
     },
     {
-      "q": "Quel est l'intérêt d'utiliser différentes méthodes de recherche scientifique ?",
-      "a": "L'objectif de l'utilisation de différentes méthodes de recherche scientifique, notamment lors de la préparation d'une recherche, est :\n- La précision et la fiabilité des informations pour obtenir des résultats satisfaisants\n- Confirmer ou infirmer les théories existantes\n- S'appuyer sur des preuves et des arguments solides"
-    },
-    {
-      "q": "Quelle est la différence entre une source et une référence ?",
-      "a": "Une source est le support matériel contenant la matière originale et primaire d'un sujet donné.\nUne référence, quant à elle, s'appuie essentiellement sur la source pour en extraire la matière qu'elle adapte et formule selon un point de vue particulier.\n\nPour distinguer entre les deux, il faut examiner les termes suivants :\n- Source originale : ce qui est transmis directement de l'auteur, basé sur la confiance dans la transmission\n- Source secondaire : ce sont en fait les références qui puisent leur matière première dans les sources originales\n\nExemples de sources :\n- Le Coran ou les livres sacrés\n- Les histoires, romans et recueils de poésie\n- Les livres historiques décrivant les faits par leur auteur\n\nExemples de références :\n- Les encyclopédies générales et spécialisées\n- Les grands ouvrages, dictionnaires et lexiques\n- Les annuaires\n- Les périodiques\n- Les thèses universitaires"
-    },
-    {
-      "q": "Quelles sont les caractéristiques du droit commercial ?",
-      "a": "Le droit commercial présente plusieurs caractéristiques, notamment :\n- La solidarité entre commerçants\n- Le crédit commercial\n- La rapidité dans l'évolution et l'exécution"
-    },
-    {
-      "q": "Quelles sont les sources du droit commercial ?",
-      "a": "- La législation sous toutes ses formes\n- La coutume en l'absence de texte législatif"
-    },
-    {
-      "q": "Un mandataire désigné par les héritiers peut-il à son tour mandater une autre personne pour vendre un bien immobilier ?",
-      "a": "Selon le Code civil, le mandataire est tenu d'exécuter le mandat sans en dépasser le contenu, sauf si le mandat est rédigé de manière générale."
-    },
-    {
-      "q": "Qu'est-ce qu'un acte authentique et quelles sont les conditions requises ?",
-      "a": "Pour qu'un acte ait un caractère authentique, il doit être rédigé par un officier public ou toute personne chargée d'un service public, conformément aux formes légales et dans les limites de son autorité et de ses compétences.\n\nL'article 324 du Code civil reconnaît le caractère authentique des actes, ce qui permet d'en déduire les conditions requises :\n- Rédigé par un officier public tel qu'un notaire\n- Rédigé par l'officier public dans le cadre de ses compétences\n- Respect des formalités légales"
+      "q": "Proposez-vous des services juridiques d'urgence ?",
+      "a": "Oui, nous fournissons une assistance juridique urgente pour les situations d'urgence. Contactez-nous immédiatement pour les affaires juridiques urgentes."
     }
   ],
   "aboutPageTitle": "Qui sommes-nous",
@@ -349,5 +389,10 @@
   "contactMessage": "Votre message",
   "contactSend": "Envoyer le message",
   "contactSuccess": "Merci de nous avoir contactés ! Nous vous répondrons dès que possible.",
-  "contactError": "Une erreur s'est produite. Veuillez réessayer plus tard."
+  "contactError": "Une erreur s'est produite. Veuillez réessayer plus tard.",
+  "joinTeamRoleSelected": "Rôle Sélectionné avec Succès !",
+  "joinTeamRoleSelectedDesc": "Vous avez sélectionné le rôle",
+  "joinTeamContinueToForm": "Continuer vers le Formulaire",
+  "joinTeamFormDesc": "Complétez le formulaire suivant pour postuler au rôle",
+  "joinTeamChangeRole": "Changer de Rôle"
 }
