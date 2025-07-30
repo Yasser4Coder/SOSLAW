@@ -39,7 +39,7 @@ const AboutHero = () => {
           className="text-4xl md:text-6xl font-extrabold text-[#09142b] mb-6 leading-tight"
           dir={isRTL ? "rtl" : "ltr"}
         >
-          {t("aboutPageTitle", "من نحن")}
+          {t("aboutPageTitle", "About Us")}
         </h1>
 
         <p
@@ -48,14 +48,14 @@ const AboutHero = () => {
         >
           {t(
             "aboutPageIntro",
-            "SOS Law هي مؤسسة قانونية جزائرية ومنصة رقمية مبتكرة، تهدف إلى إحداث ثورة في كيفية الوصول إلى المعلومات والاستشارات القانونية في الجزائر والعالم العربي."
+            "SOS Law is an Algerian legal institution and innovative digital platform, aiming to revolutionize access to legal information and consultations in Algeria and the Arab world."
           )}
         </p>
 
         <div className="flex items-center justify-center gap-4">
           <FiGlobe className="text-[#c8a45e] text-3xl" aria-hidden="true" />
           <span className="text-[#c8a45e] font-semibold text-xl">
-            منصة قانونية رقمية مبتكرة
+            {t("aboutInnovativePlatform", "Innovative Digital Legal Platform")}
           </span>
         </div>
       </div>
@@ -73,7 +73,7 @@ const AboutWhoWeAre = () => {
           <div className="inline-flex items-center gap-2 bg-[#faf6f0] px-4 py-2 rounded-full mb-4">
             <FiCheckCircle className="text-[#c8a45e] text-lg" />
             <span className="text-[#09142b] font-semibold">
-              {t("aboutWhoWeAreTitle", "✅ من نحن")}
+              {t("aboutWhoWeAreTitle", "Who We Are")}
             </span>
           </div>
         </div>
@@ -86,14 +86,14 @@ const AboutWhoWeAre = () => {
             <p className="text-[#09142b] text-lg leading-relaxed">
               {t(
                 "aboutWhoWeAreDesc1",
-                "نعمل وفق نموذج مزدوج يجمع بين التواجد الفعلي عبر مؤسسة قانونية مرخصة، والتفاعل التقني من خلال منصة رقمية متكاملة، مما يمنح الأفراد والشركات وسيلة حديثة وآمنة للحصول على خدمات قانونية موثوقة."
+                "We operate under a dual model that combines physical presence through a licensed legal institution and technical interaction through an integrated digital platform, providing individuals and companies with a modern and secure way to access reliable legal services."
               )}
             </p>
 
             <p className="text-[#09142b] text-lg leading-relaxed">
               {t(
                 "aboutWhoWeAreDesc2",
-                "نحن في SOS Law نؤمن أن المعرفة القانونية ليست حكرًا على المختصين فقط، بل حق لكل فرد. ولهذا جعلنا التكنولوجيا وسيلة لنشر الوعي، وتبسيط الوصول إلى المحامين والمستشارين، وتقديم حلول قانونية سريعة وعصرية، تراعي احتياجات المجتمع الجزائري بمختلف شرائحه."
+                "At SOS Law, we believe that legal knowledge is not exclusive to specialists only, but a right for every individual. That's why we've made technology a means to spread awareness, simplify access to lawyers and consultants, and provide fast and modern legal solutions that consider the needs of Algerian society in all its segments."
               )}
             </p>
           </div>
@@ -122,32 +122,41 @@ const AboutDistinctiveFeatures = () => {
       icon: <FiZap className="text-2xl" />,
       text: t(
         "aboutFeature1",
-        "أول منصة قانونية جزائرية تقدم خدمات تفاعلية بالكامل"
+        "First Algerian legal platform offering fully interactive services"
       ),
     },
     {
       icon: <FiUsers className="text-2xl" />,
-      text: t("aboutFeature2", "توصيل مباشر بين العميل والمحامي عبر التطبيق"),
+      text: t(
+        "aboutFeature2",
+        "Direct connection between client and lawyer via the application"
+      ),
     },
     {
       icon: <FiTrendingUp className="text-2xl" />,
-      text: t("aboutFeature3", "إمكانية استشارة قانونية خلال دقائق"),
+      text: t("aboutFeature3", "Legal consultation available within minutes"),
     },
     {
       icon: <FiEye className="text-2xl" />,
-      text: t("aboutFeature4", "أسعار شفافة ومعلنة"),
+      text: t("aboutFeature4", "Transparent and announced prices"),
     },
     {
       icon: <FiGlobe className="text-2xl" />,
-      text: t("aboutFeature5", "تغطية قانونية مهنية للمناطق الداخلية والنائية"),
+      text: t(
+        "aboutFeature5",
+        "Professional legal coverage for interior and remote areas"
+      ),
     },
     {
       icon: <FiAward className="text-2xl" />,
-      text: t("aboutFeature6", "بوابة خاصة للشركات وأصحاب المشاريع الناشئة"),
+      text: t(
+        "aboutFeature6",
+        "Special portal for companies and startup owners"
+      ),
     },
     {
       icon: <FiStar className="text-2xl" />,
-      text: t("aboutFeature7", "محتوى ثلاثي عربية إنجليزية فرنسية"),
+      text: t("aboutFeature7", "Trilingual content: Arabic, English, French"),
     },
   ];
 
@@ -158,7 +167,7 @@ const AboutDistinctiveFeatures = () => {
           <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full mb-4 shadow-md">
             <FiStar className="text-[#c8a45e] text-lg" />
             <span className="text-[#09142b] font-semibold">
-              {t("aboutDistinctiveTitle", "🌟 ما الذي يميز SOS Law؟")}
+              {t("aboutDistinctiveTitle", "What Distinguishes SOS Law?")}
             </span>
           </div>
         </div>
@@ -195,28 +204,43 @@ const AboutValues = () => {
   const values = [
     {
       icon: <FiAward className="text-2xl" />,
-      title: t("aboutValue1Title", "الاحترافية"),
-      desc: t("aboutValue1Desc", "نلتزم بأعلى معايير الجودة القانونية."),
+      title: t("aboutValue1Title", "Professionalism"),
+      desc: t(
+        "aboutValue1Desc",
+        "We commit to the highest standards of legal quality."
+      ),
     },
     {
       icon: <FiZap className="text-2xl" />,
-      title: t("aboutValue2Title", "الابتكار"),
-      desc: t("aboutValue2Desc", "ندمج التكنولوجيا في خدمة القانون."),
+      title: t("aboutValue2Title", "Innovation"),
+      desc: t(
+        "aboutValue2Desc",
+        "We integrate technology in the service of law."
+      ),
     },
     {
       icon: <FiEye className="text-2xl" />,
-      title: t("aboutValue3Title", "الشفافية"),
-      desc: t("aboutValue3Desc", "نضع مصلحة العميل أولًا، ونوضح كل الإجراءات."),
+      title: t("aboutValue3Title", "Transparency"),
+      desc: t(
+        "aboutValue3Desc",
+        "We put the client's interest first and clarify all procedures."
+      ),
     },
     {
       icon: <FiLock className="text-2xl" />,
-      title: t("aboutValue4Title", "السرية"),
-      desc: t("aboutValue4Desc", "نحترم خصوصية وبيانات عملائنا."),
+      title: t("aboutValue4Title", "Confidentiality"),
+      desc: t(
+        "aboutValue4Desc",
+        "We respect the privacy and data of our clients."
+      ),
     },
     {
       icon: <FiHeart className="text-2xl" />,
-      title: t("aboutValue5Title", "الوصول العادل"),
-      desc: t("aboutValue5Desc", "نجعل القانون متاحًا للجميع، دون تعقيد."),
+      title: t("aboutValue5Title", "Fair Access"),
+      desc: t(
+        "aboutValue5Desc",
+        "We make law accessible to everyone, without complexity."
+      ),
     },
   ];
 
@@ -227,7 +251,7 @@ const AboutValues = () => {
           <div className="inline-flex items-center gap-2 bg-[#faf6f0] px-4 py-2 rounded-full mb-4">
             <FiHeart className="text-[#c8a45e] text-lg" />
             <span className="text-[#09142b] font-semibold">
-              {t("aboutValuesTitle", "💡 قيمنا")}
+              {t("aboutValuesTitle", "Our Values")}
             </span>
           </div>
         </div>
@@ -282,13 +306,13 @@ const AboutVisionMission = () => {
                 <FiTarget className="text-white text-xl" />
               </div>
               <h2 className="text-2xl font-bold text-[#09142b]">
-                {t("aboutVisionTitle", "🔭 رؤيتنا")}
+                {t("aboutVisionTitle", "Our Vision")}
               </h2>
             </div>
             <p className="text-lg leading-relaxed text-[#6b7280]">
               {t(
                 "aboutVisionDesc",
-                "أن نكون المرجع القانوني الرقمي الأول في الجزائر والمنطقة، من خلال الدمج بين الخبرة الواقعية والتكنولوجيا الحديثة."
+                "To be the first digital legal reference in Algeria and the region, by combining real-world expertise with modern technology."
               )}
             </p>
           </div>
@@ -305,13 +329,13 @@ const AboutVisionMission = () => {
                 <FiShield className="text-white text-xl" />
               </div>
               <h2 className="text-2xl font-bold text-[#09142b]">
-                {t("aboutMissionTitle", "🎯 رسالتنا")}
+                {t("aboutMissionTitle", "Our Mission")}
               </h2>
             </div>
             <p className="text-lg leading-relaxed text-[#6b7280]">
               {t(
                 "aboutMissionDesc",
-                "تقديم خدمات قانونية احترافية، مبسطة، وآمنة، تضمن وصول الأفراد والشركات إلى حقوقهم القانونية، وتساهم في بناء مجتمع أكثر وعيًا بالقانون."
+                "To provide professional, simplified, and secure legal services that ensure individuals and companies access their legal rights, and contribute to building a more law-aware society."
               )}
             </p>
           </div>
@@ -324,10 +348,13 @@ const AboutVisionMission = () => {
 const About = () => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language || "en";
-  const title = t("aboutSeoTitle", "About SOSLAW | للاستشارة القانونية");
+  const title = t(
+    "aboutSeoTitle",
+    "About SOSLAW | Legal Consultation Services"
+  );
   const desc = t(
     "aboutSeoDesc",
-    "تعرف على منصة SOSLAW - خدمات استشارية قانونية رقمية، فريق من الخبراء، وميزات حديثة لجميع الفئات."
+    "Learn about SOSLAW platform - digital legal consultation services, expert team, and modern features for all categories."
   );
   const url = "https://soslaw.com/about";
   const image = "/logo.svg";

@@ -19,10 +19,13 @@ const GOOGLE_MAPS_EMBED_URL =
 const Contact = () => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language || "en";
-  const title = t("contactSeoTitle", "Contact SOSLAW | للاستشارة القانونية");
+  const title = t(
+    "contactSeoTitle",
+    "Contact SOSLAW | Legal Consultation Services"
+  );
   const desc = t(
     "contactSeoDesc",
-    "تواصل مع فريق SOSLAW للاستشارات القانونية - موقعنا، معلومات الاتصال، ونموذج التواصل السريع."
+    "Contact SOSLAW team for legal consultations - our location, contact information, and quick contact form."
   );
   const url = "https://soslaw.com/contact";
   const image = "/logo.svg";

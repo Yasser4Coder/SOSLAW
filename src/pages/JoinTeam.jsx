@@ -207,12 +207,12 @@ const JoinTeam = () => {
     <>
       <Helmet>
         <html lang={lang} />
-        <title>{t("joinTeamPageTitle", "انضم إلى فريقنا")} | SOSLAW</title>
+        <title>{t("joinTeamPageTitle", "Join Our Team")} | SOSLAW</title>
         <meta
           name="description"
           content={t(
             "joinTeamMetaDesc",
-            "انضم إلى فريق SOSLAW وكن جزءًا من ثورة الخدمات القانونية الرقمية. نبحث عن مواهب متخصصة في مختلف المجالات"
+            "Join SOSLAW team and be part of the digital legal services revolution. We're looking for specialized talents in various fields"
           )}
         />
       </Helmet>
@@ -230,12 +230,12 @@ const JoinTeam = () => {
           dir={isRTL ? "rtl" : "ltr"}
         >
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            {t("joinTeamPageTitle", "انضم إلى فريقنا")}
+            {t("joinTeamPageTitle", "Join Our Team")}
           </h1>
           <p className="text-[#e7cfa7] text-lg md:text-xl max-w-2xl mx-auto">
             {t(
               "joinTeamHeroDesc",
-              "كن جزءًا من ثورة الخدمات القانونية الرقمية. نبحث عن مواهب متخصصة ومتحمسة لبناء مستقبل القانون"
+              "Be part of the digital legal services revolution. We're looking for specialized and passionate talents to build the future of law"
             )}
           </p>
         </div>
@@ -251,12 +251,12 @@ const JoinTeam = () => {
           <div className="mb-12 font-arabic">
             <div className="text-center mb-10">
               <h2 className="text-3xl md:text-4xl font-bold text-[#09142b] mb-4">
-                {t("joinTeamSelectRole", "اختر الدور المناسب لك")}
+                {t("joinTeamSelectRole", "Choose the Right Role for You")}
               </h2>
               <p className="text-[#6b7280] text-lg max-w-2xl mx-auto">
                 {t(
                   "joinTeamSelectRoleDesc",
-                  "اختر الدور الذي يناسب مهاراتك وخبراتك. يمكنك الاطلاع على تفاصيل كل دور قبل التقديم"
+                  "Choose the role that matches your skills and experience. You can review the details of each role before applying"
                 )}
               </p>
             </div>
@@ -272,7 +272,7 @@ const JoinTeam = () => {
                       : "bg-white text-[#6b7280] border-2 border-[#e7cfa7] hover:border-[#c8a45e] hover:text-[#09142b]"
                   }`}
                 >
-                  {t("joinTeamAllRoles", "جميع الأدوار")}
+                  {t("joinTeamAllRoles", "All Roles")}
                 </button>
                 <button
                   onClick={() => setSelectedRole("content")}
@@ -282,7 +282,7 @@ const JoinTeam = () => {
                       : "bg-white text-[#6b7280] border-2 border-[#e7cfa7] hover:border-[#c8a45e] hover:text-[#09142b]"
                   }`}
                 >
-                  {t("joinTeamContentRoles", "أدوار المحتوى")}
+                  {t("joinTeamContentRoles", "Content Roles")}
                 </button>
                 <button
                   onClick={() => setSelectedRole("administrative")}
@@ -292,7 +292,7 @@ const JoinTeam = () => {
                       : "bg-white text-[#6b7280] border-2 border-[#e7cfa7] hover:border-[#c8a45e] hover:text-[#09142b]"
                   }`}
                 >
-                  {t("joinTeamAdministrativeRoles", "الأدوار الإدارية")}
+                  {t("joinTeamAdministrativeRoles", "Administrative Roles")}
                 </button>
                 <button
                   onClick={() => setSelectedRole("training")}
@@ -302,7 +302,7 @@ const JoinTeam = () => {
                       : "bg-white text-[#6b7280] border-2 border-[#e7cfa7] hover:border-[#c8a45e] hover:text-[#09142b]"
                   }`}
                 >
-                  {t("joinTeamTrainingRoles", "أدوار التدريب")}
+                  {t("joinTeamTrainingRoles", "Training Roles")}
                 </button>
               </div>
             </div>
@@ -379,15 +379,21 @@ const JoinTeam = () => {
                     <div className="space-y-2">
                       <div className="flex items-center text-sm text-[#6b7280]">
                         <div className="w-2 h-2 bg-[#c8a45e] rounded-full mr-2"></div>
-                        {t(`${role.id}Feature1`, "خبرة في المجال القانوني")}
+                        {t(`${role.id}Feature1`, "Experience in legal field")}
                       </div>
                       <div className="flex items-center text-sm text-[#6b7280]">
                         <div className="w-2 h-2 bg-[#c8a45e] rounded-full mr-2"></div>
-                        {t(`${role.id}Feature2`, "مهارات تواصل ممتازة")}
+                        {t(
+                          `${role.id}Feature2`,
+                          "Excellent communication skills"
+                        )}
                       </div>
                       <div className="flex items-center text-sm text-[#6b7280]">
                         <div className="w-2 h-2 bg-[#c8a45e] rounded-full mr-2"></div>
-                        {t(`${role.id}Feature3`, "عمل في فريق متعدد التخصصات")}
+                        {t(
+                          `${role.id}Feature3`,
+                          "Teamwork in multidisciplinary environment"
+                        )}
                       </div>
                     </div>
 
@@ -402,8 +408,8 @@ const JoinTeam = () => {
                         }`}
                       >
                         {selectedRole === role.id
-                          ? t("joinTeamSelected", "تم الاختيار")
-                          : t("joinTeamSelect", "اختر هذا الدور")}
+                          ? t("joinTeamSelected", "Selected")
+                          : t("joinTeamSelect", "Select This Role")}
                       </button>
                     </div>
                   </div>
@@ -435,12 +441,12 @@ const JoinTeam = () => {
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">🔍</div>
                 <h3 className="text-xl font-semibold text-[#09142b] mb-2">
-                  {t("joinTeamNoRolesFound", "لا توجد أدوار متاحة")}
+                  {t("joinTeamNoRolesFound", "No Roles Available")}
                 </h3>
                 <p className="text-[#6b7280]">
                   {t(
                     "joinTeamNoRolesDesc",
-                    "جرب اختيار فئة مختلفة أو تحقق من الأدوار المتاحة"
+                    "Try selecting a different category or check available roles"
                   )}
                 </p>
               </div>
@@ -457,10 +463,13 @@ const JoinTeam = () => {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold mb-1">
-                      {t("joinTeamRoleSelected", "تم اختيار الدور بنجاح!")}
+                      {t("joinTeamRoleSelected", "Role Selected Successfully!")}
                     </h3>
                     <p className="text-white/90">
-                      {t("joinTeamRoleSelectedDesc", "تم اختيار دور")}{" "}
+                      {t(
+                        "joinTeamRoleSelectedDesc",
+                        "You have selected the role"
+                      )}{" "}
                       {t(roles.find((r) => r.id === selectedRole)?.title || "")}
                     </p>
                   </div>
@@ -469,7 +478,7 @@ const JoinTeam = () => {
                   onClick={scrollToForm}
                   className="flex items-center space-x-2 space-x-reverse bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-all duration-300"
                 >
-                  <span>{t("joinTeamContinueToForm", "متابعة النموذج")}</span>
+                  <span>{t("joinTeamContinueToForm", "Continue to Form")}</span>
                   <FiArrowDown className="w-4 h-4" />
                 </button>
               </div>
@@ -486,12 +495,12 @@ const JoinTeam = () => {
               <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#e7cfa7]">
                 <div>
                   <h3 className="text-2xl font-bold text-[#09142b] mb-2">
-                    {t("joinTeamApplicationForm", "نموذج التقديم")}
+                    {t("joinTeamApplicationForm", "Application Form")}
                   </h3>
                   <p className="text-[#6b7280]">
                     {t(
                       "joinTeamFormDesc",
-                      "أكمل النموذج التالي للتقديم على دور"
+                      "Complete the following form to apply for the role"
                     )}{" "}
                     {t(roles.find((r) => r.id === selectedRole)?.title || "")}
                   </p>
@@ -499,7 +508,7 @@ const JoinTeam = () => {
                 <button
                   onClick={scrollToRoles}
                   className="text-[#c8a45e] hover:text-[#b48b5a] transition-colors duration-300"
-                  title={t("joinTeamChangeRole", "تغيير الدور")}
+                  title={t("joinTeamChangeRole", "Change Role")}
                 >
                   <FiX className="w-6 h-6" />
                 </button>
@@ -510,7 +519,7 @@ const JoinTeam = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-[#09142b] font-semibold mb-2">
-                      {t("joinTeamFullName", "الاسم الكامل")} *
+                      {t("joinTeamFullName", "Full Name")} *
                     </label>
                     <div className="relative">
                       <FiUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6b7280]" />
@@ -522,7 +531,7 @@ const JoinTeam = () => {
                         className="w-full pl-10 pr-4 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
                         placeholder={t(
                           "joinTeamFullNamePlaceholder",
-                          "أدخل اسمك الكامل"
+                          "Enter your full name"
                         )}
                         required
                       />
@@ -531,7 +540,7 @@ const JoinTeam = () => {
 
                   <div>
                     <label className="block text-[#09142b] font-semibold mb-2">
-                      {t("joinTeamEmail", "البريد الإلكتروني")} *
+                      {t("joinTeamEmail", "Email")} *
                     </label>
                     <div className="relative">
                       <FiMail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6b7280]" />
@@ -543,7 +552,7 @@ const JoinTeam = () => {
                         className="w-full pl-10 pr-4 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
                         placeholder={t(
                           "joinTeamEmailPlaceholder",
-                          "أدخل بريدك الإلكتروني"
+                          "Enter your email"
                         )}
                         required
                       />
@@ -552,7 +561,7 @@ const JoinTeam = () => {
 
                   <div>
                     <label className="block text-[#09142b] font-semibold mb-2">
-                      {t("joinTeamPhone", "رقم الهاتف")} *
+                      {t("joinTeamPhone", "Phone Number")} *
                     </label>
                     <div className="relative">
                       <FiPhone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6b7280]" />
@@ -564,7 +573,7 @@ const JoinTeam = () => {
                         className="w-full pl-10 pr-4 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
                         placeholder={t(
                           "joinTeamPhonePlaceholder",
-                          "أدخل رقم هاتفك"
+                          "Enter your phone number"
                         )}
                         required
                       />
@@ -573,7 +582,7 @@ const JoinTeam = () => {
 
                   <div>
                     <label className="block text-[#09142b] font-semibold mb-2">
-                      {t("joinTeamDateOfBirth", "تاريخ الميلاد")}
+                      {t("joinTeamDateOfBirth", "Date of Birth")}
                     </label>
                     <div className="relative">
                       <FiCalendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6b7280]" />
@@ -592,7 +601,7 @@ const JoinTeam = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <label className="block text-[#09142b] font-semibold mb-2">
-                      {t("joinTeamAddress", "العنوان")} *
+                      {t("joinTeamAddress", "Address")} *
                     </label>
                     <div className="relative">
                       <FiMapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6b7280]" />
@@ -604,7 +613,7 @@ const JoinTeam = () => {
                         className="w-full pl-10 pr-4 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
                         placeholder={t(
                           "joinTeamAddressPlaceholder",
-                          "أدخل عنوانك"
+                          "Enter your address"
                         )}
                         required
                       />
@@ -613,7 +622,7 @@ const JoinTeam = () => {
 
                   <div>
                     <label className="block text-[#09142b] font-semibold mb-2">
-                      {t("joinTeamCity", "المدينة")} *
+                      {t("joinTeamCity", "City")} *
                     </label>
                     <input
                       type="text"
@@ -621,14 +630,17 @@ const JoinTeam = () => {
                       value={formData.city}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
-                      placeholder={t("joinTeamCityPlaceholder", "أدخل مدينتك")}
+                      placeholder={t(
+                        "joinTeamCityPlaceholder",
+                        "Enter your city"
+                      )}
                       required
                     />
                   </div>
 
                   <div>
                     <label className="block text-[#09142b] font-semibold mb-2">
-                      {t("joinTeamCountry", "البلد")} *
+                      {t("joinTeamCountry", "Country")} *
                     </label>
                     <input
                       type="text"
@@ -636,7 +648,10 @@ const JoinTeam = () => {
                       value={formData.country}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
-                      placeholder={t("joinTeamCountryPlaceholder", "أدخل بلدك")}
+                      placeholder={t(
+                        "joinTeamCountryPlaceholder",
+                        "Enter your country"
+                      )}
                       required
                     />
                   </div>
@@ -658,7 +673,7 @@ const JoinTeam = () => {
                         className="w-full pl-10 pr-4 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
                         placeholder={t(
                           "joinTeamLinkedinPlaceholder",
-                          "رابط LinkedIn"
+                          "LinkedIn profile URL"
                         )}
                       />
                     </div>
@@ -666,7 +681,7 @@ const JoinTeam = () => {
 
                   <div>
                     <label className="block text-[#09142b] font-semibold mb-2">
-                      {t("joinTeamWebsite", "الموقع الإلكتروني")}
+                      {t("joinTeamWebsite", "Website")}
                     </label>
                     <div className="relative">
                       <FiGlobe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6b7280]" />
@@ -678,7 +693,7 @@ const JoinTeam = () => {
                         className="w-full pl-10 pr-4 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
                         placeholder={t(
                           "joinTeamWebsitePlaceholder",
-                          "رابط موقعك الإلكتروني"
+                          "Your website URL"
                         )}
                       />
                     </div>
@@ -689,7 +704,7 @@ const JoinTeam = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-[#09142b] font-semibold mb-2">
-                      {t("joinTeamExperience", "الخبرة العملية")} *
+                      {t("joinTeamExperience", "Work Experience")} *
                     </label>
                     <textarea
                       name="experience"
@@ -699,7 +714,7 @@ const JoinTeam = () => {
                       className="w-full px-4 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
                       placeholder={t(
                         "joinTeamExperiencePlaceholder",
-                        "صف خبرتك العملية السابقة"
+                        "Describe your previous work experience"
                       )}
                       required
                     />
@@ -707,7 +722,7 @@ const JoinTeam = () => {
 
                   <div>
                     <label className="block text-[#09142b] font-semibold mb-2">
-                      {t("joinTeamEducation", "المؤهلات التعليمية")} *
+                      {t("joinTeamEducation", "Education")} *
                     </label>
                     <textarea
                       name="education"
@@ -717,7 +732,7 @@ const JoinTeam = () => {
                       className="w-full px-4 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
                       placeholder={t(
                         "joinTeamEducationPlaceholder",
-                        "صف مؤهلاتك التعليمية"
+                        "Describe your educational qualifications"
                       )}
                       required
                     />
@@ -726,7 +741,7 @@ const JoinTeam = () => {
 
                 <div>
                   <label className="block text-[#09142b] font-semibold mb-2">
-                    {t("joinTeamSkills", "المهارات")} *
+                    {t("joinTeamSkills", "Skills")} *
                   </label>
                   <textarea
                     name="skills"
@@ -736,7 +751,7 @@ const JoinTeam = () => {
                     className="w-full px-4 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
                     placeholder={t(
                       "joinTeamSkillsPlaceholder",
-                      "اذكر مهاراتك الرئيسية"
+                      "List your main skills"
                     )}
                     required
                   />
@@ -744,7 +759,7 @@ const JoinTeam = () => {
 
                 <div>
                   <label className="block text-[#09142b] font-semibold mb-2">
-                    {t("joinTeamMotivation", "الدافع للانضمام")} *
+                    {t("joinTeamMotivation", "Motivation to Join")} *
                   </label>
                   <textarea
                     name="motivation"
@@ -754,7 +769,7 @@ const JoinTeam = () => {
                     className="w-full px-4 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
                     placeholder={t(
                       "joinTeamMotivationPlaceholder",
-                      "اشرح لماذا تريد الانضمام إلى فريقنا"
+                      "Explain why you want to join our team"
                     )}
                     required
                   />
@@ -764,7 +779,7 @@ const JoinTeam = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-[#09142b] font-semibold mb-2">
-                      {t("joinTeamExpectedSalary", "الراتب المتوقع")}
+                      {t("joinTeamExpectedSalary", "Expected Salary")}
                     </label>
                     <input
                       type="text"
@@ -774,14 +789,14 @@ const JoinTeam = () => {
                       className="w-full px-4 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
                       placeholder={t(
                         "joinTeamExpectedSalaryPlaceholder",
-                        "اذكر راتبك المتوقع"
+                        "Mention your expected salary"
                       )}
                     />
                   </div>
 
                   <div>
                     <label className="block text-[#09142b] font-semibold mb-2">
-                      {t("joinTeamAvailability", "تاريخ التوفر")}
+                      {t("joinTeamAvailability", "Availability Date")}
                     </label>
                     <input
                       type="date"
@@ -796,7 +811,7 @@ const JoinTeam = () => {
                 {/* CV Upload */}
                 <div>
                   <label className="block text-[#09142b] font-semibold mb-2">
-                    {t("joinTeamCvUpload", "رفع السيرة الذاتية")} *
+                    {t("joinTeamCvUpload", "Upload CV")} *
                   </label>
                   {!cvFile ? (
                     <div className="border-2 border-dashed border-[#e7cfa7] rounded-xl p-8 text-center hover:border-[#c8a45e] transition-colors">
@@ -804,12 +819,12 @@ const JoinTeam = () => {
                       <p className="text-[#6b7280] mb-2">
                         {t(
                           "joinTeamCvUploadText",
-                          "اسحب وأفلت ملف السيرة الذاتية هنا أو"
+                          "Drag and drop your CV file here or"
                         )}
                       </p>
                       <label className="cursor-pointer">
                         <span className="text-[#c8a45e] font-semibold hover:text-[#09142b] transition-colors">
-                          {t("joinTeamCvUploadButton", "اختر ملف")}
+                          {t("joinTeamCvUploadButton", "Choose File")}
                         </span>
                         <input
                           type="file"
@@ -822,7 +837,7 @@ const JoinTeam = () => {
                       <p className="text-sm text-[#6b7280] mt-2">
                         {t(
                           "joinTeamCvUploadFormat",
-                          "PDF, DOC, DOCX (الحد الأقصى 5MB)"
+                          "PDF, DOC, DOCX (Max 5MB)"
                         )}
                       </p>
                     </div>
@@ -855,7 +870,7 @@ const JoinTeam = () => {
                 {/* Additional Information */}
                 <div>
                   <label className="block text-[#09142b] font-semibold mb-2">
-                    {t("joinTeamAdditionalInfo", "معلومات إضافية")}
+                    {t("joinTeamAdditionalInfo", "Additional Information")}
                   </label>
                   <textarea
                     name="additionalInfo"
@@ -865,7 +880,7 @@ const JoinTeam = () => {
                     className="w-full px-4 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
                     placeholder={t(
                       "joinTeamAdditionalInfoPlaceholder",
-                      "أي معلومات إضافية تريد إضافتها"
+                      "Any additional information you want to add"
                     )}
                   />
                 </div>
@@ -877,8 +892,8 @@ const JoinTeam = () => {
                   className="w-full bg-gradient-to-r from-[#09142b] to-[#1a2a4a] text-white py-4 px-6 rounded-xl font-semibold text-lg hover:from-[#1a2a4a] hover:to-[#09142b] transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting
-                    ? t("joinTeamSubmitting", "جاري الإرسال...")
-                    : t("joinTeamSubmit", "إرسال الطلب")}
+                    ? t("joinTeamSubmitting", "Submitting...")
+                    : t("joinTeamSubmit", "Submit Application")}
                 </button>
               </form>
             </div>
