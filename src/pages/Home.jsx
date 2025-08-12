@@ -1,6 +1,7 @@
 import HeroSection from "./components/HeroSection";
 import ConsultantsSection from "./components/ConsultantsSection";
 import ServicesSection from "./components/ServicesSection";
+import TestimonialsSection from "./components/TestimonialsSection";
 import ConsultationBranchesSection from "./components/ConsultationBranchesSection";
 import FAQSection from "./components/FAQSection";
 import { Helmet } from "react-helmet-async";
@@ -37,6 +38,7 @@ const Home = () => {
       <HeroSection />
       <ConsultantsSection />
       <ServicesSection />
+      <TestimonialsSection />
       <ConsultationBranchesSection />
       <FAQSection />
     </main>

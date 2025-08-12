@@ -278,7 +278,7 @@
   "bookConsultationNow": "Book Consultation Now",
   "signIn": "Sign In",
   "serviceNotFound": "Service Not Found",
-  "serviceNotFoundDesc": "The service you are looking for does not exist.",
+  "serviceNotFoundDesc": "The service you're looking for doesn't exist or has been moved.",
   "backToHome": "Back to Home",
   "backToServices": "Back to Services",
   "requestService": "Request Service",
@@ -359,22 +359,16 @@
   "joinTeamUploadCvError": "Please upload your CV",
   "joinTeamFileSizeError": "File size must be less than 5MB",
   "joinTeamSuccessMessage": "Your application has been submitted successfully!",
-  "legalWriter": "Legal Writer",
-  "legalWriterDesc": "Preparing articles, simplified guides, legal content for the website. Translating and simplifying legal texts for citizens' benefit",
   "administrativeManager": "Administrative Manager",
   "administrativeManagerDesc": "Managing contracts, invoices, following up on administrative procedures for the institution",
   "legalTranslator": "Legal Translator",
   "legalTranslatorDesc": "Legal translator (Arabic – French – Amazigh). Smart contracts designer (if there's a blockchain direction). Legal expert in a specific sector (real estate, contracting, associations...)",
-  "legalTrainer": "Legal Trainer/Instructor",
-  "legalTrainerDesc": "Preparing workshops for associations, youth, women, and emerging companies",
   "legalContentCreator": "Legal Content Creator",
   "legalContentCreatorDesc": "Designing short videos, infographics, podcasts to explain legal concepts",
   "digitalPlatformManager": "Digital Platform & Communication Manager",
   "digitalPlatformManagerDesc": "Managing social media accounts. Publishing content, responding to messages, organizing advertising campaigns. Coordinating electronic booking for services. Background in digital marketing + knowledge of legal institution terminology",
   "legalContentEditor": "Legal Writer/Content Editor",
   "legalContentEditorDesc": "Writing legal and educational articles for the website. Simplifying legal concepts for students and followers. Preparing service and offer texts. Mastery of Arabic writing (French is an additional advantage) + good legal understanding",
-  "legalInstructor": "Legal Instructor/Trainer",
-  "legalInstructorDesc": "Providing courses and workshops (legal writing, competition preparation, business law...). Preparing scientific and training content. Working with students and professors within training programs. Lawyer, university professor, or certified trainer with experience in the field",
   "professionalLegalTranslator": "Professional Legal Translator",
   "professionalLegalTranslatorDesc": "Translating contracts and legal documents (Arabic ⇄ French ⇄ English). Understanding local and international legal terminology. Reviewing and proofreading team translations. Translation certificate + strong legal background + writing skills",
   "graphicDesigner": "Graphic Designer",
@@ -383,5 +377,346 @@
   "legalAccountingSpecialistDesc": "Preparing and tracking invoices, expenses, and income. Organizing monthly and annual financial reports for the institution. Preparing and following up on financial registration files (CNAS, CASNOS, NIF...). Providing financial and tax support for institutional and emerging company clients. Supporting financial feasibility studies and funding files (ANADE, ANGEM, FONAREF...). Coordinating with external accountant and account managers when needed. Contributing to preparing financial offers for seminars and training courses",
   "heroTagline": "Algerian Digital Platform for Legal Consultations and Services",
   "heroTaglineSubtitle": "📲 Your Legal Consultation Wherever You Are",
-  "aboutInnovativePlatform": "Innovative Digital Legal Platform"
+  "aboutInnovativePlatform": "Innovative Digital Legal Platform",
+  "seeMore": "See More",
+  "backToRoles": "Back to Roles",
+  "roleDetails": {
+    "location": "Location",
+    "type": "Type",
+    "experience": "Experience",
+    "salary": "Salary",
+    "overview": "Overview",
+    "requirements": "Requirements",
+    "responsibilities": "Responsibilities",
+    "benefits": "Benefits",
+    "roleOverview": "Role Overview",
+    "keySkills": "Key Skills",
+    "growthOpportunities": "Growth Opportunities",
+    "growthOpportunitiesDesc": "This role offers excellent opportunities for professional growth, skill development, and career advancement within our dynamic legal services platform.",
+    "workEnvironment": "Work Environment",
+    "workEnvironmentDesc": "Join a collaborative, innovative team in a modern work environment that values creativity, professionalism, and continuous learning.",
+    "requirementsQualifications": "Requirements & Qualifications",
+    "keyResponsibilities": "Key Responsibilities",
+    "benefitsPerks": "Benefits & Perks",
+    "readyToJoin": "Ready to Join Our Team?",
+    "readyToJoinDesc": "Take the next step in your career and become part of our innovative legal services platform.",
+    "applyNow": "Apply Now",
+    "viewAllRoles": "View All Roles",
+    "loading": "Loading..."
+  },
+  "lawyer": "Lawyer",
+  "lawyerDesc": "Join our team as a qualified lawyer to provide expert legal services, represent clients in court proceedings, and offer comprehensive legal consultations. This role requires strong legal expertise, excellent communication skills, and a commitment to upholding justice and legal standards.",
+  "legalAdvisor": "Legal Advisor",
+  "legalAdvisorDesc": "Providing legal consultations and advice to clients, analyzing legal documents and contracts, participating in legal research and case preparation",
+  "legalInstructorNew": "Legal Instructor/Trainer",
+  "legalInstructorNewDesc": "Delivering courses and workshops (legal drafting, competition preparation, business law...), preparing scientific and training content, working with students and professors within training programs. 📌 Lawyer, university professor, or certified trainer with experience in the field",
+  "roleRequirements": {
+    "administrativeManager": {
+      "req1": "Bachelor's degree in Business Administration or related field",
+      "req2": "Minimum 5 years of administrative experience",
+      "req3": "Strong organizational and leadership skills",
+      "req4": "Experience in contract management",
+      "req5": "Knowledge of financial procedures"
+    },
+    "legalTranslator": {
+      "req1": "Degree in Translation or Law",
+      "req2": "Minimum 4 years of legal translation experience",
+      "req3": "Native Arabic speaker with excellent French/English",
+      "req4": "Certification in legal translation",
+      "req5": "Knowledge of legal terminology"
+    },
+    "legalContentCreator": {
+      "req1": "Degree in Media, Law, or related field",
+      "req2": "Minimum 3 years of content creation experience",
+      "req3": "Experience with video editing and design tools",
+      "req4": "Creative mindset with legal understanding",
+      "req5": "Knowledge of social media platforms"
+    },
+    "digitalPlatformManager": {
+      "req1": "Degree in Digital Marketing or related field",
+      "req2": "Minimum 4 years of digital marketing experience",
+      "req3": "Experience with social media management",
+      "req4": "Knowledge of legal industry terminology",
+      "req5": "Strong analytical skills"
+    },
+    "legalContentEditor": {
+      "req1": "Degree in Law, Journalism, or related field",
+      "req2": "Minimum 4 years of editing experience",
+      "req3": "Excellent Arabic writing skills",
+      "req4": "Strong legal knowledge",
+      "req5": "Experience in educational content"
+    },
+    "professionalLegalTranslator": {
+      "req1": "Degree in Translation or Law",
+      "req2": "Minimum 5 years of professional translation",
+      "req3": "Certification in legal translation",
+      "req4": "Native proficiency in Arabic, French, English",
+      "req5": "Experience in contract translation"
+    },
+    "graphicDesigner": {
+      "req1": "Degree in Graphic Design or related field",
+      "req2": "Minimum 3 years of design experience",
+      "req3": "Proficiency in Adobe Creative Suite",
+      "req4": "Experience in legal industry design",
+      "req5": "Strong portfolio"
+    },
+    "legalAccountingSpecialist": {
+      "req1": "Degree in Accounting or Finance",
+      "req2": "Minimum 5 years of accounting experience",
+      "req3": "Knowledge of legal industry accounting",
+      "req4": "Experience with financial software",
+      "req5": "Understanding of tax regulations"
+    },
+    "lawyer": {
+      "req1": "Bachelor's degree in Law from accredited university",
+      "req2": "Minimum 5 years of legal practice experience",
+      "req3": "Valid lawyer license and professional registration",
+      "req4": "Experience in civil, commercial, and administrative law",
+      "req5": "Excellent Arabic and French language skills",
+      "req6": "Strong analytical and problem-solving abilities"
+    },
+    "legalAdvisor": {
+      "req1": "Advanced degree in Law or related legal field",
+      "req2": "Minimum 7 years of legal advisory experience",
+      "req3": "Specialization in corporate or commercial law preferred",
+      "req4": "Experience in legal consulting and strategic planning",
+      "req5": "Strong business acumen and analytical skills",
+      "req6": "Excellent communication and presentation abilities"
+    },
+    "legalInstructorNew": {
+      "req1": "Bachelor's degree in Law or related field",
+      "req2": "Minimum 5-7 years of teaching or training experience",
+      "req3": "Experience in curriculum development and educational content creation",
+      "req4": "Strong presentation and communication skills",
+      "req5": "Certification in training or education is preferred"
+    }
+  },
+  "roleResponsibilities": {
+    "administrativeManager": {
+      "resp1": "Manage contracts and invoices",
+      "resp2": "Oversee administrative procedures",
+      "resp3": "Coordinate with different departments",
+      "resp4": "Handle financial documentation",
+      "resp5": "Supervise administrative staff"
+    },
+    "legalTranslator": {
+      "resp1": "Translate legal documents and contracts",
+      "resp2": "Ensure accuracy of legal terminology",
+      "resp3": "Review and proofread translations",
+      "resp4": "Maintain translation quality standards",
+      "resp5": "Collaborate with legal team"
+    },
+    "legalContentCreator": {
+      "resp1": "Create engaging legal content videos",
+      "resp2": "Design infographics and visual content",
+      "resp3": "Produce educational podcasts",
+      "resp4": "Manage social media content",
+      "resp5": "Collaborate with legal experts"
+    },
+    "digitalPlatformManager": {
+      "resp1": "Manage social media accounts",
+      "resp2": "Create and publish content",
+      "resp3": "Organize advertising campaigns",
+      "resp4": "Coordinate electronic booking system",
+      "resp5": "Analyze platform performance"
+    },
+    "legalContentEditor": {
+      "resp1": "Write legal and educational articles",
+      "resp2": "Simplify legal concepts for students",
+      "resp3": "Prepare service and offer texts",
+      "resp4": "Edit and review content",
+      "resp5": "Maintain content quality"
+    },
+    "professionalLegalTranslator": {
+      "resp1": "Translate contracts and legal documents",
+      "resp2": "Review and proofread team translations",
+      "resp3": "Maintain translation standards",
+      "resp4": "Provide quality assurance",
+      "resp5": "Train junior translators"
+    },
+    "graphicDesigner": {
+      "resp1": "Design professional publications",
+      "resp2": "Create presentations and profiles",
+      "resp3": "Develop digital legal brochures",
+      "resp4": "Support marketing campaigns",
+      "resp5": "Maintain brand consistency"
+    },
+    "legalAccountingSpecialist": {
+      "resp1": "Prepare and track invoices",
+      "resp2": "Organize financial reports",
+      "resp3": "Handle financial registration",
+      "resp4": "Provide financial support",
+      "resp5": "Coordinate with external accountants"
+    },
+    "lawyer": {
+      "resp1": "Provide legal consultations and advice to clients",
+      "resp2": "Represent clients in court proceedings and legal matters",
+      "resp3": "Draft and review legal documents, contracts, and agreements",
+      "resp4": "Conduct legal research and case analysis",
+      "resp5": "Negotiate settlements and legal arrangements",
+      "resp6": "Maintain client relationships and case documentation",
+      "resp7": "Stay updated with legal developments and regulations"
+    },
+    "legalAdvisor": {
+      "resp1": "Provide strategic legal advice to businesses and organizations",
+      "resp2": "Develop legal strategies and risk management plans",
+      "resp3": "Review and analyze complex legal documents and contracts",
+      "resp4": "Advise on regulatory compliance and legal frameworks",
+      "resp5": "Conduct legal due diligence for business transactions",
+      "resp6": "Train and mentor junior legal professionals",
+      "resp7": "Participate in legal policy development and advocacy"
+    },
+    "legalInstructorNew": {
+      "resp1": "Deliver comprehensive legal courses and workshops (legal drafting, competition preparation, business law)",
+      "resp2": "Prepare scientific and training content for various legal topics",
+      "resp3": "Work with students and professors within training programs",
+      "resp4": "Develop curriculum and educational materials",
+      "resp5": "Conduct assessments and provide feedback to participants"
+    }
+  },
+  "roleBenefits": {
+    "administrativeManager": {
+      "ben1": "Attractive salary package",
+      "ben2": "Comprehensive benefits",
+      "ben3": "Leadership development",
+      "ben4": "Performance incentives",
+      "ben5": "Work-life balance"
+    },
+    "legalTranslator": {
+      "ben1": "Competitive compensation",
+      "ben2": "Professional certification support",
+      "ben3": "Flexible schedule",
+      "ben4": "International exposure",
+      "ben5": "Skill development"
+    },
+    "legalContentCreator": {
+      "ben1": "Creative freedom",
+      "ben2": "Modern tools and equipment",
+      "ben3": "Professional development",
+      "ben4": "Competitive salary",
+      "ben5": "Flexible work environment"
+    },
+    "digitalPlatformManager": {
+      "ben1": "Competitive salary",
+      "ben2": "Digital marketing tools",
+      "ben3": "Professional development",
+      "ben4": "Performance bonuses",
+      "ben5": "Modern work environment"
+    },
+    "legalContentEditor": {
+      "ben1": "Competitive compensation",
+      "ben2": "Professional writing tools",
+      "ben3": "Skill development",
+      "ben4": "Flexible schedule",
+      "ben5": "Impactful work"
+    },
+    "professionalLegalTranslator": {
+      "ben1": "Competitive compensation",
+      "ben2": "Professional development",
+      "ben3": "International projects",
+      "ben4": "Quality tools",
+      "ben5": "Career advancement"
+    },
+    "graphicDesigner": {
+      "ben1": "Creative environment",
+      "ben2": "Professional tools",
+      "ben3": "Portfolio development",
+      "ben4": "Competitive salary",
+      "ben5": "Flexible schedule"
+    },
+    "legalAccountingSpecialist": {
+      "ben1": "Competitive salary",
+      "ben2": "Professional development",
+      "ben3": "Financial tools",
+      "ben4": "Performance bonuses",
+      "ben5": "Stable career path"
+    },
+    "lawyer": {
+      "ben1": "Competitive salary with performance bonuses",
+      "ben2": "Professional development and continuing education",
+      "ben3": "Health insurance and comprehensive benefits",
+      "ben4": "Flexible work arrangements",
+      "ben5": "Opportunities for career advancement",
+      "ben6": "Professional networking and recognition"
+    },
+    "legalAdvisor": {
+      "ben1": "Attractive compensation package with equity options",
+      "ben2": "Professional development and leadership training",
+      "ben3": "Comprehensive health and wellness benefits",
+      "ben4": "Flexible work environment and remote options",
+      "ben5": "Opportunities for partnership and ownership",
+      "ben6": "International exposure and networking"
+    },
+    "legalInstructorNew": {
+      "ben1": "Competitive salary with performance bonuses",
+      "ben2": "Professional development and teaching certification support",
+      "ben3": "Flexible schedule and remote teaching options",
+      "ben4": "Opportunities to impact legal education",
+      "ben5": "Access to educational resources and tools"
+    }
+  },
+  "serviceDetails": "Service Details",
+  "serviceTags": "Service Categories",
+  "libraryPageTitle": "Legal Library",
+  "libraryPageDesc": "Comprehensive legal resource center - Coming soon",
+  "libraryComingSoon": "Legal Library",
+  "libraryComingSoonDesc": "Our comprehensive legal resource center is currently under development. We're building something extraordinary for legal professionals, students, and anyone seeking legal knowledge.",
+  "libraryFeature1Title": "Legal Resources",
+  "libraryFeature1Desc": "Comprehensive collection of legal documents, templates, and guides",
+  "libraryFeature2Title": "Multilingual",
+  "libraryFeature2Desc": "Legal resources available in Arabic, French, and English",
+  "libraryFeature3Title": "Expert Content",
+  "libraryFeature3Desc": "Curated by legal professionals and experts",
+  "libraryFeature4Title": "Quick Access",
+  "libraryFeature4Desc": "Fast and easy access to legal information",
+  "libraryProgressTitle": "Development Progress",
+  "libraryProgressDesc": "We're working hard to bring you the best legal resource center",
+  "libraryProgressLabel": "Development Progress",
+  "libraryWhatsComingTitle": "What's Coming",
+  "libraryWhatsComingDesc": "Discover what we're building for you",
+  "libraryComing1Title": "Legal Document Templates",
+  "libraryComing1Desc": "Ready-to-use templates for contracts, agreements, and legal documents",
+  "libraryComing2Title": "Case Studies",
+  "libraryComing2Desc": "Real-world legal cases with analysis and insights",
+  "libraryComing3Title": "Legal Updates",
+  "libraryComing3Desc": "Stay updated with the latest legal developments and changes",
+  "libraryComing4Title": "Educational Resources",
+  "libraryComing4Desc": "Comprehensive guides and tutorials for legal professionals",
+  "libraryCTATitle": "Stay Updated",
+  "libraryCTADesc": "Be the first to know when our legal library launches. Get early access and exclusive content.",
+  "libraryCTAButton": "Get Early Access",
+  "testimonialsTitle": "What Our Clients Say",
+  "testimonialsDesc": "Discover why thousands of clients trust SOS Law for their legal needs. Read authentic reviews from satisfied customers across various industries.",
+  "averageRating": "Average Rating",
+  "totalReviews": "Total Reviews",
+  "satisfiedClients": "Satisfied Clients",
+  "yearsOfService": "Years of Service",
+  "allReviews": "All Reviews",
+  "stars": "Stars",
+  "outOf": "out of",
+  "reviews": "reviews",
+  "testimonialsCTA": "Join Our Satisfied Clients",
+  "testimonialsCTADesc": "Experience the same level of excellence that our clients rave about. Get started with SOS Law today.",
+  "viewServices": "View Services",
+  "getStarted": "Get Started",
+  "whatWeTranslate": "What We Translate",
+  "whatWeProvide": "What We Provide",
+  "keyFeatures": "Key Features",
+  "ourProcess": "Our Process",
+  "differenceBetween": "Difference Between",
+  "casesWeHandle": "Cases We Handle",
+  "advantages": "Advantages",
+  "mainServices": "Main Services",
+  "additionalFeature": "Additional Feature",
+  "howWeDeliver": "How We Deliver",
+  "whyChooseUs": "Why Choose Us",
+  "supervision": "Supervision",
+  "howToBenefit": "How to Benefit",
+  "serviceModes": "Service Modes",
+  "deliverables": "Deliverables",
+  "targetAudience": "Target Audience",
+  "whatWeOffer": "What We Offer",
+  "formats": "Formats",
+  "servicesTitle": "Our Legal Services",
+  "servicesDesc": "Comprehensive legal services tailored to meet your specific needs. From consultation to document preparation, we've got you covered."
 }

@@ -3,93 +3,171 @@ import { useParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 import { useScrollToTop } from "../hooks/useScrollToTop";
-import { services } from "./components/servicesData";
 import {
   FiArrowLeft,
-  FiBriefcase,
-  FiSearch,
-  FiPhone,
-  FiBook,
-  FiGlobe,
+  FiArrowRight,
   FiCheck,
+  FiClock,
   FiUsers,
+  FiFileText,
+  FiTarget,
   FiAward,
-  FiTrendingUp,
-  FiFileText,
-  FiEdit,
-  FiBell,
   FiShield,
-} from "react-icons/fi";
-import { FaGavel } from "react-icons/fa";
-
-const iconMap = {
-  FiBriefcase,
-  FaGavel,
-  FiUsers,
-  FiShield,
-  FiFileText,
-  FiPhone,
-  FiEdit,
-  FiBell,
   FiGlobe,
-  FiSearch,
   FiBook,
-  FiAward,
-  FiTrendingUp,
-};
+  FiBriefcase,
+  FiStar,
+  FiPhone,
+  FiMail,
+  FiMapPin,
+} from "react-icons/fi";
+import { services } from "./components/servicesData";
 
 const ServicePage = () => {
   const { serviceId } = useParams();
   const { t, i18n } = useTranslation();
-  const isRTL = i18n.language === "ar";
+  const currentLanguage = i18n.language;
+  const isRTL = currentLanguage === "ar";
   useScrollToTop();
 
-  // Find the service by route
-  const service = services.find((s) => s.route === `/services/${serviceId}`);
+  // Find the service by ID
+  const service = services.find((s) => s.id === serviceId);
 
   if (!service) {
     return (
-      <div className="min-h-screen bg-[#faf6f0] flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-[#09142b] mb-4">
-            {t("serviceNotFound")}
-          </h1>
-          <p className="text-[#6b7280] mb-6">{t("serviceNotFoundDesc")}</p>
-          <Link
-            to="/"
-            className="inline-flex items-center px-6 py-3 bg-[#c8a45e] text-white font-semibold rounded-lg hover:bg-[#b48b5a] transition-colors duration-200"
-          >
-            <FiArrowLeft className="mr-2" />
-            {t("backToHome")}
-          </Link>
+      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <div className="bg-white rounded-lg p-8 shadow-lg">
+            <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <FiTarget className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold text-[#09142b] mb-4">
+              Service Not Found
+            </h1>
+            <p className="text-[#6b7280] mb-8 leading-relaxed">
+              The requested service could not be found.
+            </p>
+            <Link
+              to="/"
+              className="inline-flex items-center px-6 py-3 bg-[#c8a45e] text-white font-semibold rounded-lg hover:bg-[#b48b5a] transition-colors duration-200"
+            >
+              <FiArrowLeft className={`mr-2 ${isRTL ? "rotate-180" : ""}`} />
+              Back to Home
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
-  const IconComponent =
-    service.icon === "FaGavel" ? iconMap.FaGavel : iconMap[service.icon];
+  // Get localized content
+  const getLocalizedContent = (field) => {
+    if (typeof field === "string") return field;
+    if (typeof field === "object" && field[currentLanguage]) {
+      return field[currentLanguage];
+    }
+    return field.en || field.ar || field.fr || "";
+  };
+
+  const title = getLocalizedContent(service.title);
+  const description = getLocalizedContent(service.description);
+  const details = getLocalizedContent(service.details);
+  const availability = getLocalizedContent(service.availability);
+
+  // Helper function to render lists
+  const renderList = (items) => {
+    if (!items || !Array.isArray(items)) return null;
+
+    return (
+      <div className="space-y-3">
+        {items.map((item, index) => (
+          <div key={index} className="flex items-start">
+            <div className="w-5 h-5 bg-[#c8a45e] rounded-full flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
+              <FiCheck className="w-3 h-3 text-white" />
+            </div>
+            <p className="text-[#09142b] leading-relaxed">{item}</p>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // Helper function to render process steps
+  const renderProcess = (steps) => {
+    if (!steps || !Array.isArray(steps)) return null;
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {steps.map((step, index) => (
+          <div
+            key={index}
+            className="bg-white rounded-lg p-6 shadow-sm border border-gray-200"
+          >
+            <div className="flex items-center mb-4">
+              <div className="w-8 h-8 bg-[#c8a45e] rounded-full flex items-center justify-center mr-3">
+                <span className="text-white font-bold text-sm">
+                  {index + 1}
+                </span>
+              </div>
+              <h4 className="font-semibold text-[#09142b]">Step {index + 1}</h4>
+            </div>
+            <p className="text-[#6b7280] text-sm leading-relaxed">{step}</p>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // Helper function to render difference comparison
+  const renderDifferenceComparison = (differenceData) => {
+    if (!differenceData || typeof differenceData !== "object") return null;
+
+    const keys = Object.keys(differenceData);
+    if (keys.length === 0) return null;
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {keys.map((key) => (
+          <div
+            key={key}
+            className="bg-white rounded-lg p-6 shadow-sm border border-gray-200"
+          >
+            <h4 className="font-semibold text-[#09142b] mb-3 text-lg">{key}</h4>
+            <p className="text-[#6b7280] leading-relaxed">
+              {getLocalizedContent(differenceData[key])}
+            </p>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <>
       <Helmet>
-        <title>{t(service.titleKey)} - SOSLAW</title>
-        <meta name="description" content={t(service.descKey)} />
-        <html lang={i18n.language} dir={isRTL ? "rtl" : "ltr"} />
+        <title>{title} - SOSLAW</title>
+        <meta name="description" content={description} />
+        <html lang={currentLanguage} dir={isRTL ? "rtl" : "ltr"} />
       </Helmet>
 
-      <div className="min-h-screen bg-[#faf6f0]">
-        {/* Header */}
-        <div className="bg-white shadow-sm border-b border-[#e7cfa7]">
-          <div className="max-w-6xl mx-auto px-4 md:px-8 py-6">
+      <div className="min-h-screen bg-[#f5f5f5]">
+        {/* Header Navigation */}
+        <div className="bg-white shadow-sm border-b border-gray-200">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
+              <Link
+                to="/"
+                className="inline-flex items-center px-4 py-2 text-[#09142b] hover:text-[#c8a45e] transition-colors duration-200"
+              >
+                <FiArrowLeft className={`mr-2 ${isRTL ? "rotate-180" : ""}`} />
+                {t("backToHome", "Back to Home")}
+              </Link>
               <div className="flex items-center space-x-4 space-x-reverse">
                 <Link
-                  to="/"
-                  className="inline-flex items-center px-4 py-2 text-[#09142b] hover:text-[#c8a45e] transition-colors duration-200"
+                  to="/contact"
+                  className="inline-flex items-center px-6 py-2 bg-[#09142b] text-white font-semibold rounded-lg hover:bg-[#1a2a4a] transition-colors duration-200"
                 >
-                  <FiArrowLeft className="mr-2" />
-                  {t("backToServices")}
+                  {t("getStarted", "Get Started")}
                 </Link>
               </div>
             </div>
@@ -97,365 +175,272 @@ const ServicePage = () => {
         </div>
 
         {/* Main Content */}
-        <div className="max-w-6xl mx-auto px-4 md:px-8 py-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           {/* Service Header */}
-          <div className="bg-white rounded-2xl p-8 md:p-12 shadow-lg border border-[#e7cfa7] mb-8">
-            <div className="flex flex-col md:flex-row items-start gap-8">
-              {/* Icon */}
-              <div className="bg-[#c8a45e] text-white p-6 rounded-2xl shadow-lg">
-                <IconComponent size={48} />
+          <div className="bg-gradient-to-r from-[#2d3748] to-[#1a2a4a] text-white rounded-lg p-8 mb-8">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-[#c8a45e] rounded-full flex items-center justify-center mx-auto mb-6">
+                <FiBriefcase className="w-10 h-10 text-white" />
               </div>
-
-              {/* Content */}
-              <div className="flex-1">
-                <h1 className="text-3xl md:text-4xl font-bold text-[#09142b] mb-4">
-                  {t(service.titleKey)}
-                </h1>
-                <p className="text-[#6b7280] text-lg leading-relaxed mb-6">
-                  {t(service.descKey)}
-                </p>
-
-                {/* CTA Button */}
-                <Link
-                  to="/contact"
-                  className="inline-flex items-center px-8 py-3 bg-[#c8a45e] text-white font-semibold rounded-lg hover:bg-[#b48b5a] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#c8a45e] focus:ring-offset-2"
-                >
-                  {t("requestService")}
-                </Link>
+              <h1 className="text-3xl md:text-4xl font-bold mb-4">{title}</h1>
+              <p className="text-lg text-gray-300 leading-relaxed max-w-3xl mx-auto mb-4">
+                {description}
+              </p>
+              <div className="flex items-center justify-center text-sm text-gray-300">
+                <FiClock className="mr-2" />
+                {availability}
               </div>
             </div>
           </div>
 
           {/* Service Details */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Column */}
-            <div className="space-y-8">
-              {/* Features Section */}
-              {service.features && (
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7]">
-                  <h2 className="text-2xl font-bold text-[#09142b] mb-6 flex items-center gap-3">
-                    <FiCheck className="text-[#c8a45e]" />
-                    {t("serviceFeatures")}
-                  </h2>
-                  <div className="space-y-4">
-                    {service.features.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-[#c8a45e] rounded-full mt-2 flex-shrink-0"></div>
-                        <p className="text-[#09142b] leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+          <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
+            <h2 className="text-2xl font-bold text-[#09142b] mb-6">
+              {t("serviceDetails", "Service Details")}
+            </h2>
+            <p className="text-[#6b7280] leading-relaxed text-lg">{details}</p>
+          </div>
 
-              {/* Services Section */}
-              {service.services && (
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7]">
-                  <h2 className="text-2xl font-bold text-[#09142b] mb-6 flex items-center gap-3">
-                    <FiBriefcase className="text-[#c8a45e]" />
-                    {t("services")}
-                  </h2>
-                  <div className="space-y-4">
-                    {service.services.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-[#c8a45e] rounded-full mt-2 flex-shrink-0"></div>
-                        <p className="text-[#09142b] leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+          {/* What We Translate/Provide Section */}
+          {service.what_we_translate && (
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
+              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
+                {t("whatWeTranslate", "What We Translate")}
+              </h2>
+              {renderList(getLocalizedContent(service.what_we_translate))}
+            </div>
+          )}
 
-              {/* What We Do Section */}
-              {service.whatWeDo && (
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7]">
-                  <h2 className="text-2xl font-bold text-[#09142b] mb-6 flex items-center gap-3">
-                    <FiSearch className="text-[#c8a45e]" />
-                    {t("whatWeDo")}
-                  </h2>
-                  <div className="space-y-4">
-                    {service.whatWeDo.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-[#c8a45e] rounded-full mt-2 flex-shrink-0"></div>
-                        <p className="text-[#09142b] leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+          {service.what_we_provide && (
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
+              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
+                {t("whatWeProvide", "What We Provide")}
+              </h2>
+              {renderList(getLocalizedContent(service.what_we_provide))}
+            </div>
+          )}
 
-              {/* What We Help Section */}
-              {service.whatWeHelp && (
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7]">
-                  <h2 className="text-2xl font-bold text-[#09142b] mb-6 flex items-center gap-3">
-                    <FiPhone className="text-[#c8a45e]" />
-                    {t("whatWeHelp")}
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {service.whatWeHelp.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <FiCheck className="text-[#c8a45e] mt-1 flex-shrink-0" />
-                        <p className="text-[#09142b] leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+          {/* Features Section */}
+          {service.features && (
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
+              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
+                {t("keyFeatures", "Key Features")}
+              </h2>
+              {renderList(getLocalizedContent(service.features))}
+            </div>
+          )}
 
-              {/* What We Offer Section */}
-              {service.whatWeOffer && (
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7]">
-                  <h2 className="text-2xl font-bold text-[#09142b] mb-6 flex items-center gap-3">
-                    <FiBook className="text-[#c8a45e]" />
-                    {t("whatWeOffer")}
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {service.whatWeOffer.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <FiCheck className="text-[#c8a45e] mt-1 flex-shrink-0" />
-                        <p className="text-[#09142b] leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+          {/* Process Section */}
+          {service.process && (
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
+              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
+                {t("ourProcess", "Our Process")}
+              </h2>
+              {renderProcess(getLocalizedContent(service.process))}
+            </div>
+          )}
 
-              {/* For Companies Section */}
-              {service.forCompanies && (
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7]">
-                  <h2 className="text-2xl font-bold text-[#09142b] mb-6 flex items-center gap-3">
-                    <FiBriefcase className="text-[#c8a45e]" />
-                    {t("forCompanies")}
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {service.forCompanies.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <FiCheck className="text-[#c8a45e] mt-1 flex-shrink-0" />
-                        <p className="text-[#09142b] leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+          {/* Difference Between Section */}
+          {service.difference_between && (
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
+              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
+                {t("differenceBetween", "Difference Between")}
+              </h2>
+              {renderDifferenceComparison(service.difference_between)}
+            </div>
+          )}
 
-              {/* For Platforms Section */}
-              {service.forPlatforms && (
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7]">
-                  <h2 className="text-2xl font-bold text-[#09142b] mb-6 flex items-center gap-3">
-                    <FiGlobe className="text-[#c8a45e]" />
-                    {t("forPlatforms")}
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {service.forPlatforms.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <FiCheck className="text-[#c8a45e] mt-1 flex-shrink-0" />
-                        <p className="text-[#09142b] leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+          {/* Cases We Handle Section */}
+          {service.cases_we_handle && (
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
+              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
+                {t("casesWeHandle", "Cases We Handle")}
+              </h2>
+              {renderList(getLocalizedContent(service.cases_we_handle))}
+            </div>
+          )}
 
-              {/* For E-commerce Section */}
-              {service.forEcommerce && (
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7]">
-                  <h2 className="text-2xl font-bold text-[#09142b] mb-6 flex items-center gap-3">
-                    <FiTrendingUp className="text-[#c8a45e]" />
-                    {t("forEcommerce")}
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {service.forEcommerce.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <FiCheck className="text-[#c8a45e] mt-1 flex-shrink-0" />
-                        <p className="text-[#09142b] leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+          {/* Advantages Section */}
+          {service.advantages && (
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
+              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
+                {t("advantages", "Advantages")}
+              </h2>
+              {renderList(getLocalizedContent(service.advantages))}
+            </div>
+          )}
+
+          {/* Main Services Section (for nursery package) */}
+          {service.main_services && (
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
+              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
+                {t("mainServices", "Main Services")}
+              </h2>
+              {renderList(getLocalizedContent(service.main_services))}
+            </div>
+          )}
+
+          {/* Additional Features */}
+          {service.additional_feature && (
+            <div className="bg-gradient-to-r from-[#c8a45e] to-[#b48b5a] rounded-lg p-8 text-white mb-8">
+              <h3 className="text-xl font-bold mb-4">
+                {t("additionalFeature", "Additional Feature")}
+              </h3>
+              <p className="text-lg opacity-90">
+                {getLocalizedContent(service.additional_feature)}
+              </p>
+            </div>
+          )}
+
+          {/* How We Deliver Section */}
+          {service.how_we_deliver && (
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
+              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
+                {t("howWeDeliver", "How We Deliver")}
+              </h2>
+              <p className="text-[#6b7280] leading-relaxed text-lg">
+                {getLocalizedContent(service.how_we_deliver)}
+              </p>
+            </div>
+          )}
+
+          {/* Why Choose Us Section */}
+          {service.why_choose && (
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
+              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
+                {t("whyChooseUs", "Why Choose Us")}
+              </h2>
+              <p className="text-[#6b7280] leading-relaxed text-lg">
+                {getLocalizedContent(service.why_choose)}
+              </p>
+            </div>
+          )}
+
+          {/* Supervision Section */}
+          {service.supervision && (
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
+              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
+                {t("supervision", "Supervision")}
+              </h2>
+              <p className="text-[#6b7280] leading-relaxed text-lg">
+                {getLocalizedContent(service.supervision)}
+              </p>
+            </div>
+          )}
+
+          {/* How to Benefit Section */}
+          {service.how_to_benefit && (
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
+              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
+                {t("howToBenefit", "How to Benefit")}
+              </h2>
+              <p className="text-[#6b7280] leading-relaxed text-lg">
+                {getLocalizedContent(service.how_to_benefit)}
+              </p>
+            </div>
+          )}
+
+          {/* Modes Section */}
+          {service.modes && (
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
+              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
+                {t("serviceModes", "Service Modes")}
+              </h2>
+              {renderList(getLocalizedContent(service.modes))}
+            </div>
+          )}
+
+          {/* Deliverables Section */}
+          {service.deliverables && (
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
+              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
+                {t("deliverables", "Deliverables")}
+              </h2>
+              {renderList(getLocalizedContent(service.deliverables))}
+            </div>
+          )}
+
+          {/* Target Audience Section */}
+          {service.target_audience && (
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
+              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
+                {t("targetAudience", "Target Audience")}
+              </h2>
+              {renderList(getLocalizedContent(service.target_audience))}
+            </div>
+          )}
+
+          {/* What We Offer Section */}
+          {service.what_we_offer && (
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
+              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
+                {t("whatWeOffer", "What We Offer")}
+              </h2>
+              {renderList(getLocalizedContent(service.what_we_offer))}
+            </div>
+          )}
+
+          {/* Formats Section */}
+          {service.formats && (
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
+              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
+                {t("formats", "Formats")}
+              </h2>
+              {typeof service.formats === "string" ? (
+                <p className="text-[#6b7280] leading-relaxed text-lg">
+                  {getLocalizedContent(service.formats)}
+                </p>
+              ) : (
+                renderList(getLocalizedContent(service.formats))
               )}
             </div>
+          )}
 
-            {/* Right Column */}
-            <div className="space-y-8">
-              {/* Includes Section */}
-              {service.includes && (
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7]">
-                  <h2 className="text-2xl font-bold text-[#09142b] mb-6 flex items-center gap-3">
-                    <FiCheck className="text-[#c8a45e]" />
-                    {t("serviceIncludes")}
-                  </h2>
-                  <div className="space-y-4">
-                    {service.includes.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-[#c8a45e] rounded-full mt-2 flex-shrink-0"></div>
-                        <p className="text-[#09142b] leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+          {/* Tags Section */}
+          {service.tags && (
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
+              <h3 className="text-xl font-bold text-[#09142b] mb-4">
+                {t("serviceTags", "Service Categories")}
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {service.tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-[#c8a45e] text-white text-sm rounded-full"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
-              {/* Outputs Section */}
-              {service.outputs && (
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7]">
-                  <h2 className="text-2xl font-bold text-[#09142b] mb-6 flex items-center gap-3">
-                    <FiFileText className="text-[#c8a45e]" />
-                    {t("serviceOutputs")}
-                  </h2>
-                  <div className="space-y-4">
-                    {service.outputs.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-[#c8a45e] rounded-full mt-2 flex-shrink-0"></div>
-                        <p className="text-[#09142b] leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+          {/* CTA Section */}
+          <div className="bg-gradient-to-r from-[#c8a45e] to-[#b48b5a] rounded-lg p-8 text-white text-center">
+            <h2 className="text-2xl font-bold mb-4">
+              {t("readyToGetStarted", "Ready to Get Started?")}
+            </h2>
+            <p className="text-lg mb-6 opacity-90">
+              {t(
+                "contactUsToday",
+                "Contact us today to discuss your legal needs and get started with our professional services."
               )}
-
-              {/* For Whom Section */}
-              {service.forWhom && (
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7]">
-                  <h2 className="text-2xl font-bold text-[#09142b] mb-6 flex items-center gap-3">
-                    <FiUsers className="text-[#c8a45e]" />
-                    {t("forWhom")}
-                  </h2>
-                  <div className="space-y-4">
-                    {service.forWhom.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-[#c8a45e] rounded-full mt-2 flex-shrink-0"></div>
-                        <p className="text-[#09142b] leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Cases Section */}
-              {service.cases && (
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7]">
-                  <h2 className="text-2xl font-bold text-[#09142b] mb-6 flex items-center gap-3">
-                    <FiBriefcase className="text-[#c8a45e]" />
-                    {t("serviceCases")}
-                  </h2>
-                  <div className="space-y-4">
-                    {service.cases.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-[#c8a45e] rounded-full mt-2 flex-shrink-0"></div>
-                        <p className="text-[#09142b] leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Process Section */}
-              {service.process && (
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7]">
-                  <h2 className="text-2xl font-bold text-[#09142b] mb-6 flex items-center gap-3">
-                    <FiAward className="text-[#c8a45e]" />
-                    {t("serviceProcess")}
-                  </h2>
-                  <div className="space-y-4">
-                    {service.process.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-[#c8a45e] rounded-full mt-2 flex-shrink-0"></div>
-                        <p className="text-[#09142b] leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Advantages Section */}
-              {service.advantages && (
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7]">
-                  <h2 className="text-2xl font-bold text-[#09142b] mb-6 flex items-center gap-3">
-                    <FiCheck className="text-[#c8a45e]" />
-                    {t("serviceAdvantages")}
-                  </h2>
-                  <div className="space-y-4">
-                    {service.advantages.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-[#c8a45e] rounded-full mt-2 flex-shrink-0"></div>
-                        <p className="text-[#09142b] leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* What We Provide Section */}
-              {service.whatWeProvide && (
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7]">
-                  <h2 className="text-2xl font-bold text-[#09142b] mb-6 flex items-center gap-3">
-                    <FiFileText className="text-[#c8a45e]" />
-                    {t("whatWeProvide")}
-                  </h2>
-                  <div className="space-y-4">
-                    {service.whatWeProvide.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-[#c8a45e] rounded-full mt-2 flex-shrink-0"></div>
-                        <p className="text-[#09142b] leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* How We Work Section */}
-              {service.howWeWork && (
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7]">
-                  <h2 className="text-2xl font-bold text-[#09142b] mb-6 flex items-center gap-3">
-                    <FiAward className="text-[#c8a45e]" />
-                    {t("howWeWork")}
-                  </h2>
-                  <div className="space-y-4">
-                    {service.howWeWork.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-[#c8a45e] rounded-full mt-2 flex-shrink-0"></div>
-                        <p className="text-[#09142b] leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Languages Section */}
-              {service.languages && (
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7]">
-                  <h2 className="text-2xl font-bold text-[#09142b] mb-6 flex items-center gap-3">
-                    <FiGlobe className="text-[#c8a45e]" />
-                    {t("serviceLanguages")}
-                  </h2>
-                  <div className="space-y-4">
-                    {service.languages.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-[#c8a45e] rounded-full mt-2 flex-shrink-0"></div>
-                        <p className="text-[#09142b] leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* What We Translate Section */}
-              {service.whatWeTranslate && (
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7]">
-                  <h2 className="text-2xl font-bold text-[#09142b] mb-6 flex items-center gap-3">
-                    <FiEdit className="text-[#c8a45e]" />
-                    {t("whatWeTranslate")}
-                  </h2>
-                  <div className="space-y-4">
-                    {service.whatWeTranslate.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-[#c8a45e] rounded-full mt-2 flex-shrink-0"></div>
-                        <p className="text-[#09142b] leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/contact"
+                className="inline-flex items-center px-8 py-3 bg-white text-[#c8a45e] font-semibold rounded-lg hover:bg-gray-100 transition-colors duration-200 text-lg"
+              >
+                <FiPhone className="mr-2" />
+                {t("requestService", "Request Service Now")}
+              </Link>
+              <Link
+                to="/"
+                className="inline-flex items-center px-8 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-[#c8a45e] transition-colors duration-200 text-lg"
+              >
+                <FiArrowRight className={`mr-2 ${isRTL ? "rotate-180" : ""}`} />
+                {t("backToHome", "Back to Home")}
+              </Link>
             </div>
           </div>
         </div>

@@ -36,6 +36,7 @@ const NAV_LINKS = [
     label: "more",
     items: [
       { to: "/library", label: "legalLibrary" },
+      { to: "/#testimonials", label: "testimonialsTitle" },
       { to: "/#consultants", label: "consultantsTitle" },
       { to: "/#consultation-branches", label: "consulting" },
       { to: "/#faq", label: "faqSectionTitle" },

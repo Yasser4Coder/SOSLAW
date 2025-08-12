@@ -201,7 +201,7 @@
   "bookConsultationNow": "Réserver une Consultation Maintenant",
   "signIn": "Se Connecter",
   "serviceNotFound": "Service Non Trouvé",
-  "serviceNotFoundDesc": "Le service que vous recherchez n'existe pas.",
+  "serviceNotFoundDesc": "Le service que vous recherchez n'existe pas ou a été déplacé.",
   "backToHome": "Retour à l'Accueil",
   "backToServices": "Retour aux Services",
   "requestService": "Demander le Service",
@@ -398,22 +398,37 @@
   "joinTeamContentRoles": "Rôles de Contenu",
   "joinTeamAdministrativeRoles": "Rôles Administratifs",
   "joinTeamTrainingRoles": "Rôles de Formation",
-  "legalWriter": "Rédacteur Juridique",
-  "legalWriterDesc": "Préparation d'articles, guides simplifiés, contenu juridique pour le site web. Traduction et simplification des textes juridiques au profit des citoyens",
+  "overview": "Aperçu",
+  "features": "Fonctionnalités",
+  "process": "Processus",
+  "benefits": "Avantages",
+  "experienceYears": "Années d'Expérience",
+  "clientsServed": "Clients Servis",
+  "successRate": "Taux de Réussite",
+  "responseTime": "Temps de Réponse",
+  "serviceOverview": "Aperçu du Service",
+  "keyFeatures": "Fonctionnalités Clés",
+  "ourProcess": "Notre Processus",
+  "readyToGetStarted": "Prêt à Commencer ?",
+  "contactUsToday": "Contactez-nous aujourd'hui pour discuter de vos besoins juridiques et commencer avec nos services professionnels.",
+  "contactUs": "Contactez-nous",
+  "viewAllServices": "Voir Tous les Services",
+  "getStarted": "Commencer",
+  "learnMore": "En Savoir Plus",
+  "backToServices": "Retour aux Services",
+  "serviceNotFound": "Service Non Trouvé",
+  "serviceNotFoundDesc": "Le service que vous recherchez n'existe pas ou a été déplacé.",
+  "backToHome": "Retour à l'Accueil",
   "administrativeManager": "Gestionnaire Administratif",
   "administrativeManagerDesc": "Gestion des contrats, factures, suivi des procédures administratives de l'institution",
   "legalTranslator": "Traducteur Juridique",
   "legalTranslatorDesc": "Traducteur juridique (Arabe – Français – Amazigh). Concepteur de contrats intelligents (si orientation blockchain). Expert juridique dans un secteur spécifique (immobilier, entreprise, associations...)",
-  "legalTrainer": "Formateur/Instructeur Juridique",
-  "legalTrainerDesc": "Préparation d'ateliers pour associations, jeunes, femmes et entreprises émergentes",
   "legalContentCreator": "Créateur de Contenu Juridique",
   "legalContentCreatorDesc": "Conception de vidéos courtes, infographies, podcasts pour expliquer les concepts juridiques",
   "digitalPlatformManager": "Gestionnaire de Plateforme Numérique et Communication",
   "digitalPlatformManagerDesc": "Gestion des comptes de réseaux sociaux. Publication de contenu, réponse aux messages, organisation de campagnes publicitaires. Coordination de la réservation électronique des services. Formation en marketing digital + connaissance de la terminologie institutionnelle juridique",
   "legalContentEditor": "Rédacteur Juridique/Éditeur de Contenu",
   "legalContentEditorDesc": "Rédaction d'articles juridiques et éducatifs pour le site web. Simplification des concepts juridiques pour étudiants et suiveurs. Préparation des textes d'offres et de services. Maîtrise de la rédaction en arabe (français avantage supplémentaire) + bonne compréhension juridique",
-  "legalInstructor": "Instructeur/Formateur en Droit",
-  "legalInstructorDesc": "Fourniture de cours et ateliers (rédaction juridique, préparation aux concours, droit des affaires...). Préparation de contenu scientifique et de formation. Travail avec étudiants et professeurs dans des programmes de formation. Avocat, professeur universitaire ou formateur certifié avec expérience dans le domaine",
   "professionalLegalTranslator": "Traducteur Juridique Professionnel",
   "professionalLegalTranslatorDesc": "Traduction de contrats et documents juridiques (Arabe ⇄ Français ⇄ Anglais). Compréhension de la terminologie juridique locale et internationale. Révision et relecture des traductions d'équipe. Certificat de traduction + solide formation juridique + compétences rédactionnelles",
   "graphicDesigner": "Designer Graphique",
@@ -422,5 +437,345 @@
   "legalAccountingSpecialistDesc": "Préparation et suivi des factures, dépenses et revenus. Organisation des rapports financiers mensuels et annuels de l'institution. Préparation et suivi des dossiers d'enregistrement financier (CNAS, CASNOS, NIF...). Fourniture d'un soutien financier et fiscal aux clients institutionnels et aux entreprises émergentes. Soutien aux études de faisabilité financière et aux dossiers de financement (ANADE, ANGEM, FONAREF...). Coordination avec le comptable externe et les gestionnaires de comptes si nécessaire. Contribution à la préparation des offres financières pour séminaires et cours de formation",
   "heroTagline": "Plateforme Numérique Algérienne pour Consultations et Services Juridiques",
   "heroTaglineSubtitle": "📲 Votre Consultation Juridique Où Que Vous Soyez",
-  "aboutInnovativePlatform": "Plateforme Juridique Numérique Innovante"
+  "aboutInnovativePlatform": "Plateforme Juridique Numérique Innovante",
+  "seeMore": "Voir Plus",
+  "backToRoles": "Retour aux Rôles",
+  "roleDetails": {
+    "location": "Localisation",
+    "type": "Type",
+    "experience": "Expérience",
+    "salary": "Salaire",
+    "overview": "Aperçu",
+    "requirements": "Exigences",
+    "responsibilities": "Responsabilités",
+    "benefits": "Avantages",
+    "roleOverview": "Aperçu du Rôle",
+    "keySkills": "Compétences Clés",
+    "growthOpportunities": "Opportunités de Croissance",
+    "growthOpportunitiesDesc": "Ce rôle offre d'excellentes opportunités de croissance professionnelle, de développement des compétences et d'avancement de carrière au sein de notre plateforme de services juridiques dynamique.",
+    "workEnvironment": "Environnement de Travail",
+    "workEnvironmentDesc": "Rejoignez une équipe collaborative et innovante dans un environnement de travail moderne qui valorise la créativité, le professionnalisme et l'apprentissage continu.",
+    "requirementsQualifications": "Exigences et Qualifications",
+    "keyResponsibilities": "Responsabilités Clés",
+    "benefitsPerks": "Avantages et Privilèges",
+    "readyToJoin": "Prêt à Rejoindre Notre Équipe ?",
+    "readyToJoinDesc": "Faites le prochain pas dans votre carrière et devenez partie intégrante de notre plateforme de services juridiques innovante.",
+    "applyNow": "Postuler Maintenant",
+    "viewAllRoles": "Voir Tous les Rôles",
+    "loading": "Chargement..."
+  },
+  "lawyer": "Avocat",
+  "lawyerDesc": "Rejoignez notre équipe en tant qu'avocat qualifié pour fournir des services juridiques spécialisés, représenter les clients dans les procédures judiciaires et offrir des consultations juridiques complètes. Ce rôle nécessite une expertise juridique solide, d'excellentes compétences en communication et un engagement à défendre la justice et les normes juridiques.",
+  "legalAdvisor": "Conseiller Juridique",
+  "legalAdvisorDesc": "Fournir des consultations et conseils juridiques aux clients, analyser les documents et contrats juridiques, participer à la recherche juridique et à la préparation des dossiers",
+  "legalInstructorNew": "Formateur/Instructeur en Droit",
+  "legalInstructorNewDesc": "Dispenser des cours et ateliers (rédaction juridique, préparation aux concours, droit des affaires...), préparer du contenu scientifique et de formation, travailler avec les étudiants et professeurs dans le cadre de programmes de formation. 📌 Avocat, professeur universitaire, ou formateur certifié avec expérience dans le domaine",
+  "roleRequirements": {
+    "administrativeManager": {
+      "req1": "Licence en Administration des Affaires ou domaine connexe",
+      "req2": "Minimum 5 ans d'expérience administrative",
+      "req3": "Solides compétences organisationnelles et de leadership",
+      "req4": "Expérience en gestion de contrats",
+      "req5": "Connaissance des procédures financières"
+    },
+    "legalTranslator": {
+      "req1": "Diplôme en Traduction ou Droit",
+      "req2": "Minimum 4 ans d'expérience en traduction juridique",
+      "req3": "Locuteur natif arabe avec excellent français/anglais",
+      "req4": "Certification en traduction juridique",
+      "req5": "Connaissance de la terminologie juridique"
+    },
+    "legalContentCreator": {
+      "req1": "Diplôme en Médias, Droit ou domaine connexe",
+      "req2": "Minimum 3 ans d'expérience en création de contenu",
+      "req3": "Expérience avec les outils d'édition vidéo et de design",
+      "req4": "Esprit créatif avec compréhension juridique",
+      "req5": "Connaissance des plateformes de médias sociaux"
+    },
+    "digitalPlatformManager": {
+      "req1": "Diplôme en Marketing Numérique ou domaine connexe",
+      "req2": "Minimum 4 ans d'expérience en marketing numérique",
+      "req3": "Expérience en gestion de médias sociaux",
+      "req4": "Connaissance de la terminologie de l'industrie juridique",
+      "req5": "Solides compétences analytiques"
+    },
+    "legalContentEditor": {
+      "req1": "Diplôme en Droit, Journalisme ou domaine connexe",
+      "req2": "Minimum 4 ans d'expérience en édition",
+      "req3": "Excellentes compétences en rédaction arabe",
+      "req4": "Solide connaissance juridique",
+      "req5": "Expérience en contenu éducatif"
+    },
+    "professionalLegalTranslator": {
+      "req1": "Diplôme en Traduction ou Droit",
+      "req2": "Minimum 5 ans de traduction professionnelle",
+      "req3": "Certification en traduction juridique",
+      "req4": "Maîtrise native arabe, française, anglaise",
+      "req5": "Expérience en traduction de contrats"
+    },
+    "graphicDesigner": {
+      "req1": "Diplôme en Design Graphique ou domaine connexe",
+      "req2": "Minimum 3 ans d'expérience en design",
+      "req3": "Maîtrise d'Adobe Creative Suite",
+      "req4": "Expérience en design de l'industrie juridique",
+      "req5": "Portfolio solide"
+    },
+    "legalAccountingSpecialist": {
+      "req1": "Diplôme en Comptabilité ou Finance",
+      "req2": "Minimum 5 ans d'expérience en comptabilité",
+      "req3": "Connaissance de la comptabilité de l'industrie juridique",
+      "req4": "Expérience avec les logiciels financiers",
+      "req5": "Compréhension des réglementations fiscales"
+    },
+    "lawyer": {
+      "req1": "Licence en Droit d'une université accréditée",
+      "req2": "Minimum 5 ans d'expérience en pratique juridique",
+      "req3": "Licence d'avocat valide et enregistrement professionnel",
+      "req4": "Expérience en droit civil, commercial et administratif",
+      "req5": "Excellentes compétences en langues arabe et française",
+      "req6": "Solides capacités d'analyse et de résolution de problèmes"
+    },
+    "legalAdvisor": {
+      "req1": "Diplôme universitaire en Droit ou domaine connexe",
+      "req2": "Minimum 3-5 ans d'expérience en conseil juridique",
+      "req3": "Compétences analytiques et de résolution de problèmes solides",
+      "req4": "Excellentes compétences en communication et relations interpersonnelles",
+      "req5": "Connaissance des cadres juridiques locaux et internationaux"
+    },
+    "legalInstructorNew": {
+      "req1": "Diplôme universitaire en Droit ou domaine connexe",
+      "req2": "Minimum 5-7 ans d'expérience en enseignement ou formation",
+      "req3": "Expérience en développement de programmes et création de contenu éducatif",
+      "req4": "Compétences solides en présentation et communication",
+      "req5": "Certification en formation ou éducation préférée"
+    }
+  },
+  "roleResponsibilities": {
+    "administrativeManager": {
+      "resp1": "Gérer les contrats et factures",
+      "resp2": "Superviser les procédures administratives",
+      "resp3": "Coordonner avec différents départements",
+      "resp4": "Gérer la documentation financière",
+      "resp5": "Superviser le personnel administratif"
+    },
+    "legalTranslator": {
+      "resp1": "Traduire des documents et contrats juridiques",
+      "resp2": "Assurer l'exactitude de la terminologie juridique",
+      "resp3": "Réviser et corriger les traductions",
+      "resp4": "Maintenir les normes de qualité de traduction",
+      "resp5": "Collaborer avec l'équipe juridique"
+    },
+    "legalContentCreator": {
+      "resp1": "Créer des vidéos de contenu juridique engageantes",
+      "resp2": "Concevoir des infographies et du contenu visuel",
+      "resp3": "Produire des podcasts éducatifs",
+      "resp4": "Gérer le contenu des médias sociaux",
+      "resp5": "Collaborer avec des experts juridiques"
+    },
+    "digitalPlatformManager": {
+      "resp1": "Gérer les comptes de médias sociaux",
+      "resp2": "Créer et publier du contenu",
+      "resp3": "Organiser des campagnes publicitaires",
+      "resp4": "Coordonner le système de réservation électronique",
+      "resp5": "Analyser les performances de la plateforme"
+    },
+    "legalContentEditor": {
+      "resp1": "Rédiger des articles juridiques et éducatifs",
+      "resp2": "Simplifier les concepts juridiques pour les étudiants",
+      "resp3": "Préparer les textes de services et d'offres",
+      "resp4": "Éditer et réviser le contenu",
+      "resp5": "Maintenir la qualité du contenu"
+    },
+    "professionalLegalTranslator": {
+      "resp1": "Traduire des contrats et documents juridiques",
+      "resp2": "Réviser et corriger les traductions de l'équipe",
+      "resp3": "Maintenir les normes de traduction",
+      "resp4": "Fournir l'assurance qualité",
+      "resp5": "Former les traducteurs juniors"
+    },
+    "graphicDesigner": {
+      "resp1": "Concevoir des publications professionnelles",
+      "resp2": "Créer des présentations et profils",
+      "resp3": "Développer des brochures juridiques numériques",
+      "resp4": "Soutenir les campagnes marketing",
+      "resp5": "Maintenir la cohérence de la marque"
+    },
+    "legalAccountingSpecialist": {
+      "resp1": "Préparer et suivre les factures",
+      "resp2": "Organiser les rapports financiers",
+      "resp3": "Gérer l'enregistrement financier",
+      "resp4": "Fournir un soutien financier",
+      "resp5": "Coordonner avec les comptables externes"
+    },
+    "lawyer": {
+      "resp1": "Fournir des consultations et conseils juridiques aux clients",
+      "resp2": "Représenter les clients dans les procédures judiciaires et affaires juridiques",
+      "resp3": "Rédiger et réviser des documents, contrats et accords juridiques",
+      "resp4": "Conduire des recherches juridiques et analyses de cas",
+      "resp5": "Négocier des règlements et arrangements juridiques",
+      "resp6": "Maintenir les relations clients et documentation des cas",
+      "resp7": "Rester à jour avec les développements et réglementations juridiques"
+    },
+    "legalAdvisor": {
+      "resp1": "Fournir des conseils juridiques stratégiques aux entreprises et organisations",
+      "resp2": "Développer des stratégies juridiques et plans de gestion des risques",
+      "resp3": "Réviser et analyser des documents et contrats juridiques complexes",
+      "resp4": "Conseiller sur la conformité réglementaire et cadres juridiques",
+      "resp5": "Conduire la diligence raisonnable juridique pour transactions commerciales",
+      "resp6": "Former et encadrer les professionnels juridiques juniors",
+      "resp7": "Participer au développement de politiques juridiques et plaidoyer"
+    },
+    "legalInstructorNew": {
+      "resp1": "Dispenser des cours et ateliers juridiques complets (rédaction juridique, préparation aux concours, droit des affaires)",
+      "resp2": "Préparer du contenu scientifique et de formation pour divers sujets juridiques",
+      "resp3": "Travailler avec les étudiants et professeurs dans le cadre de programmes de formation",
+      "resp4": "Développer des programmes et matériels éducatifs",
+      "resp5": "Conduire des évaluations et fournir des retours aux participants"
+    }
+  },
+  "roleBenefits": {
+    "administrativeManager": {
+      "ben1": "Package salarial attractif",
+      "ben2": "Avantages complets",
+      "ben3": "Développement du leadership",
+      "ben4": "Incitations de performance",
+      "ben5": "Équilibre travail-vie"
+    },
+    "legalTranslator": {
+      "ben1": "Compensation concurrentielle",
+      "ben2": "Soutien à la certification professionnelle",
+      "ben3": "Horaire flexible",
+      "ben4": "Exposition internationale",
+      "ben5": "Développement des compétences"
+    },
+    "legalContentCreator": {
+      "ben1": "Liberté créative",
+      "ben2": "Outils et équipements modernes",
+      "ben3": "Développement professionnel",
+      "ben4": "Salaire concurrentiel",
+      "ben5": "Environnement de travail flexible"
+    },
+    "digitalPlatformManager": {
+      "ben1": "Salaire concurrentiel",
+      "ben2": "Outils de marketing numérique",
+      "ben3": "Développement professionnel",
+      "ben4": "Bonus de performance",
+      "ben5": "Environnement de travail moderne"
+    },
+    "legalContentEditor": {
+      "ben1": "Compensation concurrentielle",
+      "ben2": "Outils de rédaction professionnels",
+      "ben3": "Développement des compétences",
+      "ben4": "Horaire flexible",
+      "ben5": "Travail impactant"
+    },
+    "professionalLegalTranslator": {
+      "ben1": "Compensation concurrentielle",
+      "ben2": "Développement professionnel",
+      "ben3": "Projets internationaux",
+      "ben4": "Outils de qualité",
+      "ben5": "Avancement de carrière"
+    },
+    "graphicDesigner": {
+      "ben1": "Environnement créatif",
+      "ben2": "Outils professionnels",
+      "ben3": "Développement du portfolio",
+      "ben4": "Salaire concurrentiel",
+      "ben5": "Horaire flexible"
+    },
+    "legalAccountingSpecialist": {
+      "ben1": "Salaire concurrentiel",
+      "ben2": "Développement professionnel",
+      "ben3": "Outils financiers",
+      "ben4": "Bonus de performance",
+      "ben5": "Chemin de carrière stable"
+    },
+    "lawyer": {
+      "ben1": "Salaire concurrentiel avec bonus de performance",
+      "ben2": "Développement professionnel et éducation continue",
+      "ben3": "Assurance santé et avantages complets",
+      "ben4": "Arrangements de travail flexibles",
+      "ben5": "Opportunités d'avancement de carrière",
+      "ben6": "Réseautage professionnel et reconnaissance"
+    },
+    "legalAdvisor": {
+      "ben1": "Package de compensation attractif avec options d'actions",
+      "ben2": "Développement professionnel et formation en leadership",
+      "ben3": "Avantages de santé et bien-être complets",
+      "ben4": "Environnement de travail flexible et options de travail à distance",
+      "ben5": "Opportunités de partenariat et propriété",
+      "ben6": "Exposition internationale et réseautage"
+    },
+    "legalInstructorNew": {
+      "ben1": "Salaire concurrentiel avec primes de performance",
+      "ben2": "Développement professionnel et soutien aux certifications d'enseignement",
+      "ben3": "Horaire flexible et options d'enseignement à distance",
+      "ben4": "Opportunités d'impacter l'éducation juridique",
+      "ben5": "Accès aux ressources et outils éducatifs"
+    }
+  },
+  "serviceDetails": "Détails du service",
+  "serviceTags": "Catégories de service",
+  "libraryPageTitle": "Bibliothèque juridique",
+  "libraryPageDesc": "Centre de ressources juridiques complet - En développement",
+  "libraryComingSoon": "Bibliothèque juridique",
+  "libraryComingSoonDesc": "Notre centre de ressources juridiques complet est actuellement en cours de développement. Nous construisons quelque chose d'extraordinaire pour les professionnels du droit, les étudiants et toute personne cherchant des connaissances juridiques.",
+  "libraryFeature1Title": "Ressources juridiques",
+  "libraryFeature1Desc": "Collection complète de documents, modèles et guides juridiques",
+  "libraryFeature2Title": "Multilingue",
+  "libraryFeature2Desc": "Ressources juridiques disponibles en arabe, français et anglais",
+  "libraryFeature3Title": "Contenu expert",
+  "libraryFeature3Desc": "Sélectionné par des professionnels et experts juridiques",
+  "libraryFeature4Title": "Accès rapide",
+  "libraryFeature4Desc": "Accès rapide et facile aux informations juridiques",
+  "libraryProgressTitle": "Progrès du développement",
+  "libraryProgressDesc": "Nous travaillons dur pour vous apporter le meilleur centre de ressources juridiques",
+  "libraryProgressLabel": "Progrès du développement",
+  "libraryWhatsComingTitle": "Ce qui arrive",
+  "libraryWhatsComingDesc": "Découvrez ce que nous construisons pour vous",
+  "libraryComing1Title": "Modèles de documents juridiques",
+  "libraryComing1Desc": "Modèles prêts à l'emploi pour contrats, accords et documents juridiques",
+  "libraryComing2Title": "Études de cas",
+  "libraryComing2Desc": "Cas juridiques réels avec analyse et insights",
+  "libraryComing3Title": "Mises à jour juridiques",
+  "libraryComing3Desc": "Restez informé des derniers développements et changements juridiques",
+  "libraryComing4Title": "Ressources éducatives",
+  "libraryComing4Desc": "Guides complets et tutoriels pour les professionnels du droit",
+  "libraryCTATitle": "Restez informé",
+  "libraryCTADesc": "Soyez le premier à savoir quand notre bibliothèque juridique sera lancée. Obtenez un accès anticipé et du contenu exclusif.",
+  "libraryCTAButton": "Obtenir un accès anticipé",
+  "testimonialsTitle": "Avis des clients",
+  "testimonialsDesc": "Découvrez pourquoi des milliers de clients font confiance à SOS Law pour leurs besoins juridiques. Lisez des avis authentiques de clients satisfaits dans diverses industries.",
+  "averageRating": "Note moyenne",
+  "totalReviews": "Total des avis",
+  "satisfiedClients": "Clients satisfaits",
+  "yearsOfService": "Années de service",
+  "allReviews": "Tous les avis",
+  "stars": "étoiles",
+  "outOf": "sur",
+  "reviews": "avis",
+  "testimonialsCTA": "Rejoignez nos clients satisfaits",
+  "testimonialsCTADesc": "Vivez le même niveau d'excellence dont parlent nos clients. Commencez avec SOS Law aujourd'hui.",
+  "viewServices": "Voir les services",
+  "getStarted": "Commencer",
+  "whatWeTranslate": "Ce que nous traduisons",
+  "whatWeProvide": "Ce que nous fournissons",
+  "keyFeatures": "Caractéristiques principales",
+  "ourProcess": "Notre processus",
+  "differenceBetween": "Différence entre",
+  "casesWeHandle": "Cas que nous traitons",
+  "advantages": "Avantages",
+  "mainServices": "Services principaux",
+  "additionalFeature": "Fonctionnalité supplémentaire",
+  "howWeDeliver": "Comment nous livrons",
+  "whyChooseUs": "Pourquoi nous choisir",
+  "supervision": "Supervision",
+  "howToBenefit": "Comment en bénéficier",
+  "serviceModes": "Modes de service",
+  "deliverables": "Livrables",
+  "targetAudience": "Public cible",
+  "whatWeOffer": "Ce que nous offrons",
+  "formats": "Formats",
+  "servicesTitle": "Nos services juridiques",
+  "servicesDesc": "Services juridiques complets adaptés à vos besoins spécifiques. De la consultation à la préparation de documents, nous vous couvrons."
 }

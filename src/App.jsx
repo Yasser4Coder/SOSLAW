@@ -6,8 +6,10 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import JoinTeam from "./pages/JoinTeam";
+import RoleDetails from "./pages/RoleDetails";
 import Dashboard from "./pages/Dashboard";
 import ServicePage from "./pages/ServicePage";
+import Library from "./pages/Library";
 import { HelmetProvider } from "react-helmet-async";
 import "./App.css";
 
@@ -30,7 +32,9 @@ function App() {
                   element={<Navigate to="/join-team" replace />}
                 />
                 <Route path="/join-team" element={<JoinTeam />} />
+                <Route path="/role/:roleId" element={<RoleDetails />} />
                 <Route path="/services/:serviceId" element={<ServicePage />} />
+                <Route path="/library" element={<Library />} />
               </Routes>
             </MainLayout>
           }

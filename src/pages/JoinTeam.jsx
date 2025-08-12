@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
 
 import {
   FiUser,
@@ -87,70 +88,81 @@ const JoinTeam = () => {
 
   const roles = [
     {
-      id: "legal-writer",
-      title: "legalWriter",
-      description: "legalWriterDesc",
-      icon: "✍️",
-    },
-    {
       id: "administrative-manager",
       title: "administrativeManager",
       description: "administrativeManagerDesc",
       icon: "📋",
+      category: "administrative",
     },
     {
       id: "legal-translator",
       title: "legalTranslator",
       description: "legalTranslatorDesc",
       icon: "🌐",
-    },
-    {
-      id: "legal-trainer",
-      title: "legalTrainer",
-      description: "legalTrainerDesc",
-      icon: "🎓",
+      category: "content",
     },
     {
       id: "legal-content-creator",
       title: "legalContentCreator",
       description: "legalContentCreatorDesc",
       icon: "🎬",
+      category: "content",
     },
     {
       id: "digital-platform-manager",
       title: "digitalPlatformManager",
       description: "digitalPlatformManagerDesc",
       icon: "📱",
+      category: "administrative",
     },
     {
       id: "legal-content-editor",
       title: "legalContentEditor",
       description: "legalContentEditorDesc",
       icon: "📝",
-    },
-    {
-      id: "legal-instructor",
-      title: "legalInstructor",
-      description: "legalInstructorDesc",
-      icon: "👨‍🏫",
+      category: "content",
     },
     {
       id: "professional-legal-translator",
       title: "professionalLegalTranslator",
       description: "professionalLegalTranslatorDesc",
       icon: "🔤",
+      category: "content",
     },
     {
       id: "graphic-designer",
       title: "graphicDesigner",
       description: "graphicDesignerDesc",
       icon: "🎨",
+      category: "content",
     },
     {
       id: "legal-accounting-specialist",
       title: "legalAccountingSpecialist",
       description: "legalAccountingSpecialistDesc",
       icon: "💰",
+      category: "administrative",
+    },
+    {
+      id: "lawyer",
+      title: "lawyer",
+      description: "lawyerDesc",
+      icon: "⚖️",
+      category: "legal",
+    },
+    {
+      id: "legal-advisor",
+      title: "legalAdvisor",
+      description: "legalAdvisorDesc",
+      icon: "🎯",
+      category: "legal",
+    },
+    {
+      id: "legal-instructor-new",
+      title: "legalInstructorNew",
+      description: "legalInstructorNewDesc",
+      icon: "🎓",
+      category: "training",
     },
   ];
 
@@ -308,13 +320,12 @@ const JoinTeam = () => {
             </div>
 
             {/* Roles Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
               {roles
                 .filter((role) => {
                   if (selectedRole === "") return true;
                   if (selectedRole === "content") {
                     return [
-                      "legal-writer",
                       "legal-content-creator",
                       "legal-content-editor",
                       "graphic-designer",
@@ -327,27 +338,24 @@ const JoinTeam = () => {
                     ].includes(role.id);
                   }
                   if (selectedRole === "training") {
-                    return ["legal-trainer", "legal-instructor"].includes(
-                      role.id
-                    );
+                    return ["legal-instructor-new"].includes(role.id);
                   }
                   return true;
                 })
                 .map((role) => (
                   <div
                     key={role.id}
-                    className={`group relative p-6 rounded-2xl border-2 cursor-pointer transition-all duration-500 transform hover:scale-105 hover:shadow-xl ${
+                    className={`group relative p-3 sm:p-4 rounded-xl border-2 transition-all duration-300 hover:shadow-lg min-h-[300px] sm:min-h-[320px] flex flex-col ${
                       selectedRole === role.id
-                        ? "border-[#c8a45e] bg-gradient-to-br from-white to-[#faf6f0] shadow-lg"
+                        ? "border-[#c8a45e] bg-gradient-to-br from-white to-[#faf6f0] shadow-md"
                         : "border-[#e7cfa7] bg-white hover:border-[#c8a45e]"
                     }`}
-                    onClick={() => handleRoleSelection(role.id)}
                   >
                     {/* Selection Indicator */}
                     {selectedRole === role.id && (
-                      <div className="absolute -top-2 -right-2 w-8 h-8 bg-[#c8a45e] rounded-full flex items-center justify-center shadow-lg">
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-[#c8a45e] rounded-full flex items-center justify-center shadow-lg">
                         <svg
-                          className="w-5 h-5 text-white"
+                          className="w-4 h-4 text-white"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -361,47 +369,45 @@ const JoinTeam = () => {
                     )}
 
                     {/* Role Icon */}
-                    <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <div className="text-2xl sm:text-3xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300">
                       {role.icon}
                     </div>
 
                     {/* Role Title */}
-                    <h3 className="text-xl font-bold text-[#09142b] mb-3 group-hover:text-[#c8a45e] transition-colors duration-300">
+                    <h3 className="text-base sm:text-lg font-bold text-[#09142b] mb-2 group-hover:text-[#c8a45e] transition-colors duration-300">
                       {t(role.title)}
                     </h3>
 
-                    {/* Role Description */}
-                    <p className="text-[#6b7280] text-base leading-relaxed mb-4">
-                      {t(role.description)}
+                    {/* Role Description - Truncated */}
+                    <p className="text-[#6b7280] text-xs sm:text-sm leading-relaxed mb-2 sm:mb-3 line-clamp-3 flex-grow">
+                      {t(role.description).length > 120
+                        ? `${t(role.description).substring(0, 120)}...`
+                        : t(role.description)}
                     </p>
 
-                    {/* Role Features */}
-                    <div className="space-y-2">
-                      <div className="flex items-center text-sm text-[#6b7280]">
-                        <div className="w-2 h-2 bg-[#c8a45e] rounded-full mr-2"></div>
-                        {t(`${role.id}Feature1`, "Experience in legal field")}
-                      </div>
-                      <div className="flex items-center text-sm text-[#6b7280]">
-                        <div className="w-2 h-2 bg-[#c8a45e] rounded-full mr-2"></div>
-                        {t(
-                          `${role.id}Feature2`,
-                          "Excellent communication skills"
-                        )}
-                      </div>
-                      <div className="flex items-center text-sm text-[#6b7280]">
-                        <div className="w-2 h-2 bg-[#c8a45e] rounded-full mr-2"></div>
-                        {t(
-                          `${role.id}Feature3`,
-                          "Teamwork in multidisciplinary environment"
-                        )}
-                      </div>
+                    {/* Quick Info */}
+                    <div className="flex items-center justify-between text-xs text-[#6b7280] mb-2 sm:mb-3">
+                      <span className="flex items-center gap-1">
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#c8a45e] rounded-full"></div>
+                        <span className="text-xs">
+                          {role.category === "content"
+                            ? "Content"
+                            : role.category === "administrative"
+                            ? "Admin"
+                            : role.category === "legal"
+                            ? "Legal"
+                            : "Training"}
+                        </span>
+                      </span>
+                      <span className="text-xs">Full-time</span>
                     </div>
 
-                    {/* Select Button */}
-                    <div className="mt-4 pt-4 border-t border-[#e7cfa7]">
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-2 mt-auto">
                       <button
                         type="button"
-                        className={`w-full py-2 px-4 rounded-lg font-semibold transition-all duration-300 ${
+                        onClick={() => handleRoleSelection(role.id)}
+                        className={`flex-1 py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300 ${
                           selectedRole === role.id
                             ? "bg-[#09142b] text-white"
                             : "bg-[#faf6f0] text-[#09142b] hover:bg-[#c8a45e] hover:text-white"
@@ -409,8 +415,14 @@ const JoinTeam = () => {
                       >
                         {selectedRole === role.id
                           ? t("joinTeamSelected", "Selected")
-                          : t("joinTeamSelect", "Select This Role")}
+                          : t("joinTeamSelect", "Select")}
                       </button>
+                      <Link
+                        to={`/role/${role.id}`}
+                        className="flex-1 py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-semibold bg-[#09142b] text-white hover:bg-[#1a2a4a] transition-all duration-300 text-center"
+                      >
+                        {t("seeMore", "See More")}
+                      </Link>
                     </div>
                   </div>
                 ))}
@@ -421,7 +433,6 @@ const JoinTeam = () => {
               if (selectedRole === "") return true;
               if (selectedRole === "content") {
                 return [
-                  "legal-writer",
                   "legal-content-creator",
                   "legal-content-editor",
                   "graphic-designer",
@@ -434,7 +445,10 @@ const JoinTeam = () => {
                 ].includes(role.id);
               }
               if (selectedRole === "training") {
-                return ["legal-trainer", "legal-instructor"].includes(role.id);
+                return ["legal-instructor-new"].includes(role.id);
+              }
+              if (selectedRole === "legal") {
+                return ["lawyer", "legal-advisor"].includes(role.id);
               }
               return true;
             }).length === 0 && (

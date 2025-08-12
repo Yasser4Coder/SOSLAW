@@ -198,3 +198,11 @@ body[lang="ar"] *,
 .font-arabic * {
   font-family: "Readex Pro", "Segoe UI", "Tahoma", "Arial", sans-serif !important;
 }
+
+/* Line clamp utility for text truncation */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
