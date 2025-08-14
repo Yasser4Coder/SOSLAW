@@ -32,6 +32,9 @@ const ServicesSection = () => {
     "legal-consultation": FiPhone,
     "nursery-legal-package": FiHome,
     "legal-training": FiBook,
+    "comprehensive-business-support": FiTrendingUp,
+    "elite-legal-package-students": FiUsers,
+    "academic-leadership-support": FiAward,
   };
 
   return (

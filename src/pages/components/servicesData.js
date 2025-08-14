@@ -679,4 +679,218 @@ export const services = [
       en: "In person or remote",
     },
   },
+
+  {
+    id: "comprehensive-business-support",
+    title: {
+      ar: "مرافقة شاملة للمؤسسات الاقتصادية والناشئة",
+      fr: "Accompagnement complet des entreprises et startups",
+      en: "Comprehensive Business & Startup Support",
+    },
+    description: {
+      ar: "من الفكرة إلى النجاح - نُرافقكم بثقة واستقرار.",
+      fr: "De l'idée au succès - nous vous accompagnons avec confiance et stabilité.",
+      en: "From idea to success - we accompany you with confidence and stability.",
+    },
+    details: {
+      ar: "في بيئة أعمال تتغيّر بسرعة، تحتاج المؤسسات الناشئة والصغيرة إلى أكثر من مجرد فكرة جيدة. تحتاج إلى توجيه قانوني، إداري واستراتيجي يُساعدها على النمو بثقة واستقرار.",
+      fr: "Dans un environnement commercial en évolution rapide, les startups et PME ont besoin de plus qu'une bonne idée. Elles ont besoin d'un accompagnement juridique, administratif et stratégique pour croître avec confiance et stabilité.",
+      en: "In a rapidly changing business environment, startups and small businesses need more than just a good idea. They need legal, administrative and strategic guidance to help them grow with confidence and stability.",
+    },
+    what_we_provide: {
+      ar: [
+        "التأسيس القانوني للشركة (اختيار الشكل القانوني، صياغة العقود الأساسية...)",
+        "إعداد ومراجعة العقود التجارية والإدارية",
+        "التوجيه القانوني خلال مراحل النمو والتوسع",
+        "المساعدة في الحصول على التمويل أو تسجيل العلامات التجارية",
+        "الاستشارة في التعامل مع الإدارات والهيئات الرسمية",
+      ],
+      fr: [
+        "Création juridique de l'entreprise (choix de la forme juridique, rédaction des contrats de base...)",
+        "Préparation et révision des contrats commerciaux et administratifs",
+        "Accompagnement juridique pendant les phases de croissance et d'expansion",
+        "Aide pour obtenir du financement ou enregistrer des marques",
+        "Conseils pour traiter avec les administrations et organismes officiels",
+      ],
+      en: [
+        "Legal company formation (choosing legal structure, drafting basic contracts...)",
+        "Preparation and review of commercial and administrative contracts",
+        "Legal guidance during growth and expansion phases",
+        "Assistance in obtaining funding or registering trademarks",
+        "Consultation on dealing with administrations and official bodies",
+      ],
+    },
+    target_audience: {
+      ar: [
+        "روّاد الأعمال وأصحاب المشاريع الناشئة",
+        "المؤسسات الصغيرة والمتوسطة",
+        "حاملي الأفكار والمبادرات الاقتصادية",
+        "المستثمرين المحليين والدوليين",
+      ],
+      fr: [
+        "Entrepreneurs et porteurs de projets naissants",
+        "Petites et moyennes entreprises",
+        "Porteurs d'idées et d'initiatives économiques",
+        "Investisseurs locaux et internationaux",
+      ],
+      en: [
+        "Entrepreneurs and startup project owners",
+        "Small and medium enterprises",
+        "Idea holders and economic initiatives",
+        "Local and international investors",
+      ],
+    },
+    why_choose: {
+      ar: "خبرة قانونية وتجارية متكاملة، فهم عميق لمنظومة ريادة الأعمال في الجزائر، دعم مُستمر ومُخصّص حسب طبيعة النشاط، سرية تامة وحماية كاملة لأعمالك الفكرية، نتائج ملموسة تثبت جودة خدماتنا.",
+      fr: "Expertise juridique et commerciale intégrée, compréhension approfondie de l'écosystème entrepreneurial en Algérie, accompagnement continu et personnalisé selon la nature de l'activité, confidentialité totale et protection complète de vos travaux intellectuels, résultats tangibles prouvant la qualité de nos services.",
+      en: "Integrated legal and commercial expertise, deep understanding of the entrepreneurial ecosystem in Algeria, continuous and customized support according to the nature of the activity, total confidentiality and complete protection of your intellectual work, tangible results proving the quality of our services.",
+    },
+    tags: ["business", "startup", "corporate"],
+    availability: {
+      ar: "حضوريًا أو عن بُعد",
+      fr: "Présentiel ou à distance",
+      en: "In person or remote",
+    },
+  },
+
+  {
+    id: "elite-legal-package-students",
+    title: {
+      ar: "بــاقــة الـنـخـبــة الـقـانـونـيـة للطلبة",
+      fr: "Pack Élite Juridique pour Étudiants",
+      en: "Elite Legal Package for Students",
+    },
+    description: {
+      ar: "رفيقك الأكاديمي والمهني - من لحظة انطلاق بحثك حتى يوم دفاعك.",
+      fr: "Votre compagnon académique et professionnel - du début de votre recherche jusqu'à la défense.",
+      en: "Your academic and professional companion - from the start of your research until defense day.",
+    },
+    details: {
+      ar: "هل تشعر أحيانًا أن عبء الدراسة والبحوث القانونية يثقل كاهلك؟ هل تخشى من اختيار موضوع خاطئ، أو تائه بين المصطلحات والقوانين؟ مع 'بــاقة النخبة القانونية للطلبة'، أنت لست وحدك!",
+      fr: "Vous sentez-vous parfois accablé par le fardeau des études et de la recherche juridique ? Craignez-vous de choisir un mauvais sujet ou d'être perdu entre terminologie et lois ? Avec le 'Pack Élite Juridique pour Étudiants', vous n'êtes pas seul !",
+      en: "Do you sometimes feel burdened by the weight of legal studies and research? Are you afraid of choosing the wrong topic or getting lost between terminology and laws? With the 'Elite Legal Package for Students', you are not alone!",
+    },
+    what_we_offer: {
+      ar: [
+        "اختيار موضوع بحث يناسب طموحاتك، مع توفير مصادر قانونية رصينة",
+        "ترجمة أكاديمية متقنة، بدقة في المصطلحات القانونية",
+        "دروس دعم مخصصة: حصص فردية وجماعية",
+        "تدريب عملي على التحرير القانوني",
+        "مرافقة شاملة لمشروع التخرج",
+        "دعم خاص للطلبة المغتربين",
+        "تصحيح وتنسيق نصوصك الأكاديمية",
+        "ورش عمل تفاعلية تشمل التحرير القانوني والصياغة",
+      ],
+      fr: [
+        "Sélection d'un sujet de recherche adapté à vos ambitions, avec sources juridiques fiables",
+        "Traduction académique soignée, précision terminologique juridique",
+        "Cours de soutien personnalisés : séances individuelles et collectives",
+        "Formation pratique à la rédaction juridique",
+        "Accompagnement complet du projet de fin d'études",
+        "Soutien spécial pour étudiants expatriés",
+        "Correction et formatage de vos textes académiques",
+        "Ateliers interactifs incluant rédaction juridique et formulation",
+      ],
+      en: [
+        "Selection of research topic matching your ambitions, with reliable legal sources",
+        "Careful academic translation, precise legal terminology",
+        "Personalized support courses: individual and group sessions",
+        "Practical training in legal drafting",
+        "Comprehensive support for graduation project",
+        "Special support for expatriate students",
+        "Correction and formatting of your academic texts",
+        "Interactive workshops including legal drafting and formulation",
+      ],
+    },
+    target_audience: {
+      ar: [
+        "طلبة الليسانس الذين يريدون بناء أساس قوي",
+        "طلبة الماستر الباحثين عن التفوق في بحوثهم وأطروحاتهم",
+        "طلبة الدكتوراه الذين يسعون إلى تميز أكاديمي رفيع",
+        "الخريجون المقبلون على مسابقات المحاماة، القضاء، والماستر المهنية",
+      ],
+      fr: [
+        "Étudiants en licence souhaitant construire une base solide",
+        "Étudiants en master cherchant l'excellence dans leurs recherches et mémoires",
+        "Étudiants en doctorat visant l'excellence académique",
+        "Diplômés se préparant aux concours d'avocat, magistrature et master professionnel",
+      ],
+      en: [
+        "Bachelor students wanting to build a strong foundation",
+        "Master students seeking excellence in their research and theses",
+        "PhD students aiming for high academic distinction",
+        "Graduates preparing for bar, judiciary, and professional master competitions",
+      ],
+    },
+    why_choose: {
+      ar: "فريق من خبراء القانون والأساتذة المتمرسين، دعم شخصي ومرن يتناسب مع جدولك الدراسي، أسعار مميزة تناسب ميزانية الطلبة، سرية تامة وحماية كاملة لأعمالك الفكرية، نتائج ملموسة تثبت جودة خدماتنا.",
+      fr: "Équipe d'experts juridiques et professeurs expérimentés, soutien personnel et flexible adapté à votre emploi du temps, tarifs avantageux adaptés au budget étudiant, confidentialité totale et protection complète de vos travaux intellectuels, résultats tangibles prouvant la qualité de nos services.",
+      en: "Experienced legal and academic team combining scientific and practical expertise in law, deep understanding of the specificities of the academic and legal context in Algeria and the Arab world, strict commitment to confidentiality and protection of intellectual property rights, personal and continuous support meeting your needs quickly and professionally, flexible working methods adapted to your intensive academic schedule, tangible results strengthening your scientific position.",
+    },
+    tags: ["students", "academic", "education"],
+    availability: {
+      ar: "حضوريًا أو عن بُعد",
+      fr: "Présentiel ou à distance",
+      en: "In person or remote",
+    },
+  },
+
+  {
+    id: "academic-leadership-support",
+    title: {
+      ar: "الريادة الأكاديمية – دعم الأساتذة الباحثين والمحاضرين",
+      fr: "Leadership Académique – Soutien aux Professeurs-Chercheurs",
+      en: "Academic Leadership – Support for Professors & Lecturers",
+    },
+    description: {
+      ar: "ارفع مستوى أبحاثك، وارفع صوتك العلمي، وكن الأستاذ الملهم الذي يصنع الفرق.",
+      fr: "Élevez le niveau de vos recherches, élevez votre voix scientifique, soyez le professeur inspirant qui fait la différence.",
+      en: "Raise the level of your research, raise your scientific voice, be the inspiring professor who makes a difference.",
+    },
+    details: {
+      ar: "في عالم القانون، لا يكفي أن تكون خبيرًا فقط، بل عليك أن تبرز وتترك بصمة بحثية وتعليمية قوية. مع خدمة 'الريادة الأكاديمية'، نقدم لك الدعم المتكامل الذي يرفع من جودة أبحاثك، يعزز من تأثيرك العلمي، ويرفد محاضراتك بأحدث الوسائل التعليمية.",
+      fr: "Dans le monde du droit, il ne suffit pas d'être expert, il faut aussi se démarquer et laisser une empreinte de recherche et d'enseignement forte. Avec le service 'Leadership Académique', nous vous offrons un soutien intégré qui élève la qualité de vos recherches, renforce votre impact scientifique et enrichit vos cours avec les derniers outils pédagogiques.",
+      en: "In the world of law, it's not enough to just be an expert, you must also stand out and leave a strong research and teaching mark. With the 'Academic Leadership' service, we provide you with integrated support that elevates the quality of your research, strengthens your scientific impact, and enriches your lectures with the latest educational tools.",
+    },
+    what_we_offer: {
+      ar: [
+        "تدقيق أكاديمي ولغوي دقيق لأبحاثك ومقالاتك العلمية",
+        "ترجمة قانونية محترفة تضمن وصول أفكارك لمجتمع دولي بأفضل صورة",
+        "إعداد مواد تعليمية وتدريبية مخصصة تضفي حيوية على محاضراتك ودروسك",
+        "ورشات تطوير مهارات التدريس الجامعي والمنهجيات البحثية",
+        "دعم احترافي في إعداد مقترحات المشاريع البحثية والمنح العلمية",
+        "استشارات قانونية مهنية حول النشر، حقوق الملكية الفكرية، وتنظيم العمل الأكاديمي",
+        "تأطير شامل لتنظيم الملتقيات، الأيام الدراسية، والندوات البيداغوجية",
+      ],
+      fr: [
+        "Révision académique et linguistique rigoureuse de vos recherches et articles",
+        "Traduction juridique professionnelle assurant la diffusion internationale de vos idées",
+        "Préparation de supports pédagogiques personnalisés dynamisant vos cours",
+        "Ateliers de développement des compétences d'enseignement universitaire et méthodologies",
+        "Soutien professionnel pour préparer des propositions de projets de recherche et bourses",
+        "Conseils juridiques professionnels sur publication, propriété intellectuelle, organisation académique",
+        "Encadrement complet pour organiser colloques, journées d'études et séminaires pédagogiques",
+      ],
+      en: [
+        "Rigorous academic and linguistic review of your research and articles",
+        "Professional legal translation ensuring international dissemination of your ideas",
+        "Preparation of personalized educational materials enlivening your courses",
+        "Workshops on developing university teaching skills and research methodologies",
+        "Professional support in preparing research project proposals and scholarships",
+        "Professional legal advice on publishing, intellectual property, academic organization",
+        "Complete supervision for organizing conferences, study days and pedagogical seminars",
+      ],
+    },
+    why_choose: {
+      ar: "فريق قانوني وأكاديمي متمرس يجمع بين الخبرة العلمية والعملية في القانون، فهم عميق لخصوصيات السياق الأكاديمي والقانوني في الجزائر والعالم العربي، التزام صارم بالسرية وحماية حقوق الملكية الفكرية، دعم شخصي ومتواصل يلبي احتياجاتكم بسرعة واحترافية، أساليب عمل مرنة تناسب جدولكم الأكاديمي المكثف، نتائج ملموسة تعزز مكانتكم العلمية.",
+      fr: "Équipe juridique et académique expérimentée combinant expertise scientifique et pratique en droit, compréhension approfondie des spécificités du contexte académique et juridique en Algérie et dans le monde arabe, engagement strict à la confidentialité et protection des droits de propriété intellectuelle, soutien personnel et continu répondant à vos besoins rapidement et professionnellement, méthodes de travail flexibles adaptées à votre emploi du temps académique intensif, résultats tangibles renforçant votre position scientifique.",
+      en: "Experienced legal and academic team combining scientific and practical expertise in law, deep understanding of the specificities of the academic and legal context in Algeria and the Arab world, strict commitment to confidentiality and protection of intellectual property rights, personal and continuous support meeting your needs quickly and professionally, flexible working methods adapted to your intensive academic schedule, tangible results strengthening your scientific position.",
+    },
+    tags: ["academic", "research", "professors"],
+    availability: {
+      ar: "حضوريًا أو عن بُعد",
+      fr: "Présentiel ou à distance",
+      en: "In person or remote",
+    },
+  },
 ];

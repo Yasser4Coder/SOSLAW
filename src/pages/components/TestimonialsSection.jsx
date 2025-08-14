@@ -7,11 +7,13 @@ import {
   FiClock,
   FiMessageSquare,
 } from "react-icons/fi";
+import { useSmoothScroll } from "../../hooks/useSmoothScroll";
 import TestimonialCard from "./TestimonialCard";
 import { testimonials, testimonialsStats } from "./testimonialsData";
 
 const TestimonialsSection = () => {
   const { t, i18n } = useTranslation();
+  const { scrollToSection } = useSmoothScroll();
   const currentLanguage = i18n.language;
   const isRTL = currentLanguage === "ar";
 
@@ -173,19 +175,19 @@ const TestimonialsSection = () => {
               )}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="#contact"
+              <button
+                onClick={() => scrollToSection("contact")}
                 className="inline-flex items-center px-8 py-3 bg-white text-[#c8a45e] font-semibold rounded-lg hover:bg-gray-100 transition-colors duration-200"
               >
                 <FiUsers className={`${isRTL ? "ml-2" : "mr-2"}`} />
                 {t("getStarted", "Get Started")}
-              </a>
-              <a
-                href="#services"
+              </button>
+              <button
+                onClick={() => scrollToSection("services")}
                 className="inline-flex items-center px-8 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-[#c8a45e] transition-colors duration-200"
               >
                 {t("viewServices", "View Services")}
-              </a>
+              </button>
             </div>
           </div>
         </div>

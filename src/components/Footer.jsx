@@ -74,10 +74,10 @@ const Footer = () => {
               {t("phone")}
             </span>
             <a
-              href="mailto:contact@soslaw-dz.com"
+              href="mailto:Sos.law.35@gmail.com"
               className="block text-sm text-[#e7cfa7] hover:text-white transition-colors focus:underline"
             >
-              contact@soslaw-dz.com
+              Sos.law.35@gmail.com
             </a>
           </div>
           <div className="flex gap-4 mt-2">

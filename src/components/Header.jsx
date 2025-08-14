@@ -11,6 +11,7 @@ import {
 import { FaInstagram, FaFacebook, FaLinkedin } from "react-icons/fa";
 import logo from "../assets/logo.svg";
 import { useTranslation } from "react-i18next";
+import { useSmoothScroll } from "../hooks/useSmoothScroll";
 
 const LANGUAGES = [
   { code: "en", label: "EN" },
@@ -47,6 +48,7 @@ const NAV_LINKS = [
 const Header = () => {
   const { t, i18n } = useTranslation();
   const location = useLocation();
+  const { scrollToSection } = useSmoothScroll();
   const [lang, setLang] = useState(i18n.language || "en");
   const [showLang, setShowLang] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
@@ -60,6 +62,35 @@ const Header = () => {
   const langRef = useRef();
   const moreMenuRef = useRef();
   const moreTriggerRef = useRef();
+
+  // Handle navigation with smooth scrolling for anchor links
+  const handleNavigation = (to, closeMenu = false) => {
+    if (to.startsWith("/#")) {
+      // Handle anchor links with smooth scrolling
+      const sectionId = to.substring(2); // Remove '/#' prefix
+      scrollToSection(sectionId);
+      if (closeMenu) {
+        setMobileMenu(false);
+        setOpenDropdown(null);
+      }
+    } else if (to === "/") {
+      // Handle home page navigation
+      if (closeMenu) {
+        setMobileMenu(false);
+        setOpenDropdown(null);
+      }
+      // If we're already on home page, scroll to top
+      if (location.pathname === "/") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    } else {
+      // Handle regular page navigation
+      if (closeMenu) {
+        setMobileMenu(false);
+        setOpenDropdown(null);
+      }
+    }
+  };
 
   // Handle language change and RTL
   const handleLangChange = (code) => {
@@ -275,7 +306,7 @@ const Header = () => {
                             className="block px-4 py-2 text-[#09142b] hover:bg-[#e7cfa7]/20 rounded focus:outline-none transition-all duration-200 transform hover:scale-105 focus:scale-105 hover:text-[#c8a45e] focus:text-[#c8a45e] cursor-pointer"
                             role="menuitem"
                             tabIndex={0}
-                            onClick={() => setOpenDropdown(null)}
+                            onClick={() => handleNavigation(item.to, true)}
                           >
                             {t(item.label)}
                           </Link>
@@ -410,7 +441,7 @@ const Header = () => {
                               className="block py-2 text-[#09142b] hover:text-[#c8a45e] focus:outline-none transition-all duration-200 transform hover:scale-105 focus:scale-105 cursor-pointer"
                               role="menuitem"
                               tabIndex={0}
-                              onClick={() => setMobileMenu(false)}
+                              onClick={() => handleNavigation(item.to, true)}
                             >
                               {t(item.label)}
                             </Link>
@@ -501,7 +532,7 @@ const Header = () => {
                   aria-current={
                     location.pathname === link.to ? "page" : undefined
                   }
-                  onClick={() => setMobileMenu(false)}
+                  onClick={() => handleNavigation(link.to, true)}
                 >
                   <span className="relative after:absolute after:left-0 after:-bottom-1 after:w-full after:h-0.5 after:bg-[#c8a45e] after:scale-x-0 group-hover:after:scale-x-100 group-focus:after:scale-x-100 after:origin-left after:transition-transform after:duration-300">
                     {t(link.label)}

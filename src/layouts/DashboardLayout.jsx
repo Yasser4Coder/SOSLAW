@@ -18,6 +18,7 @@ import {
 } from "react-icons/fi";
 import { useFontLoader } from "../hooks/useFontLoader";
 import { useScrollToTop } from "../hooks/useScrollToTop";
+import BackToTop from "../components/BackToTop";
 
 // Dashboard Pages
 import DashboardOverview from "../components/dashboard/DashboardOverview";
@@ -254,6 +255,7 @@ const DashboardLayout = () => {
           </button>
         </div>
       </div>
+      <BackToTop />
     </div>
   );
 };

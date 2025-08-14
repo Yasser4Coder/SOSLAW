@@ -206,3 +206,47 @@ body[lang="ar"] *,
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Smooth scrolling behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c8a45e;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b48b5a;
+}
+
+/* Smooth scroll for anchor links */
+.smooth-scroll {
+  scroll-behavior: smooth;
+}
+
+/* Custom scroll animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scroll-fade-in {
+  animation: fadeInUp 0.6s ease-out;
+}

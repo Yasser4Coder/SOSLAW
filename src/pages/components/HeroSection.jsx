@@ -2,6 +2,7 @@ import bg from "../../assets/bgs/heroBG1.webp";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { useEffect, useRef } from "react";
+import { useSmoothScroll } from "../../hooks/useSmoothScroll";
 import heroLawyerImg from "../../assets/heroLawyer1.webp";
 
 const JusticeIcon = ({ className = "" }) => (
@@ -25,6 +26,7 @@ const JusticeIcon = ({ className = "" }) => (
 
 const HeroSection = () => {
   const { t, i18n } = useTranslation();
+  const { scrollToSection } = useSmoothScroll();
   const lang = i18n.language || "en";
   const isRTL = lang === "ar";
   const contentRef = useRef(null);
@@ -154,13 +156,13 @@ const HeroSection = () => {
               >
                 {t("heroRequestNow")}
               </Link>
-              <a
-                href="#services"
+              <button
+                onClick={() => scrollToSection("services")}
                 className="px-8 py-3 bg-white/20 text-white font-semibold rounded border border-white/40 hover:bg-white/30 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#b48b5a] text-lg cursor-pointer backdrop-blur-sm"
                 aria-label={t("learnMore") || "Learn More"}
               >
                 {t("learnMore") || "Learn More"}
-              </a>
+              </button>
             </div>
             {/* Slider Dots */}
             <div className="flex items-center gap-3 mt-2 md:mt-4">
