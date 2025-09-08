@@ -7,13 +7,22 @@ import {
   FiChevronRight,
 } from "react-icons/fi";
 
-const DataTable = ({ data, columns, searchTerm = "" }) => {
+const DataTable = ({ data, columns, searchTerm = "", pagination = null }) => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language || "en";
   const isRTL = lang === "ar";
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+
+  // Use external pagination if provided, otherwise use internal
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+
+  // If external pagination is provided, use it
+  const hasExternalPagination = pagination && pagination.total !== undefined;
+  const totalItems = hasExternalPagination ? pagination.total : data.length;
+  const totalPages = Math.ceil(
+    totalItems / (hasExternalPagination ? pagination.limit : itemsPerPage)
+  );
 
   const handleSort = (key) => {
     let direction = "asc";
@@ -24,9 +33,10 @@ const DataTable = ({ data, columns, searchTerm = "" }) => {
   };
 
   const sortedData = React.useMemo(() => {
-    if (!sortConfig.key) return data;
+    const safeData = Array.isArray(data) ? data : [];
+    if (!sortConfig.key) return safeData;
 
-    return [...data].sort((a, b) => {
+    return [...safeData].sort((a, b) => {
       const aValue = a[sortConfig.key];
       const bValue = b[sortConfig.key];
 
@@ -41,21 +51,59 @@ const DataTable = ({ data, columns, searchTerm = "" }) => {
   }, [data, sortConfig]);
 
   const filteredData = React.useMemo(() => {
-    if (!searchTerm) return sortedData;
+    // Ensure data is always an array
+    const safeData = Array.isArray(data) ? data : [];
 
-    return sortedData.filter((item) =>
+    if (hasExternalPagination) {
+      // For external pagination, return data as-is since backend handles filtering
+      return safeData;
+    }
+    if (!searchTerm) return Array.isArray(sortedData) ? sortedData : [];
+
+    return (Array.isArray(sortedData) ? sortedData : []).filter((item) =>
       Object.values(item).some((value) =>
         value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
       )
     );
-  }, [sortedData, searchTerm]);
+  }, [sortedData, searchTerm, hasExternalPagination, data]);
 
+  // Only use internal pagination if no external pagination is provided
   const paginatedData = React.useMemo(() => {
+    if (hasExternalPagination) {
+      // For external pagination, return the data as-is since backend handles pagination
+      return Array.isArray(data) ? data : [];
+    }
     const startIndex = (currentPage - 1) * itemsPerPage;
     return filteredData.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredData, currentPage, itemsPerPage]);
+  }, [data, filteredData, currentPage, itemsPerPage, hasExternalPagination]);
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const handlePageChange = (page) => {
+    if (hasExternalPagination && pagination.onPageChange) {
+      // Calculate offset for external pagination
+      const offset = (page - 1) * pagination.limit;
+      pagination.onPageChange(offset);
+    } else {
+      setCurrentPage(page);
+    }
+  };
+
+  const getCurrentPageInfo = () => {
+    if (hasExternalPagination) {
+      const currentPageNumber =
+        Math.floor(pagination.offset / pagination.limit) + 1;
+      const startItem = pagination.offset + 1;
+      const endItem = Math.min(
+        pagination.offset + pagination.limit,
+        pagination.total
+      );
+      return { currentPageNumber, startItem, endItem };
+    }
+    const startItem = (currentPage - 1) * itemsPerPage + 1;
+    const endItem = Math.min(currentPage * itemsPerPage, filteredData.length);
+    return { currentPageNumber: currentPage, startItem, endItem };
+  };
+
+  const { currentPageNumber, startItem, endItem } = getCurrentPageInfo();
 
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) {
@@ -129,17 +177,19 @@ const DataTable = ({ data, columns, searchTerm = "" }) => {
         <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
           <div className="flex-1 flex justify-between sm:hidden">
             <button
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1}
+              onClick={() =>
+                handlePageChange(Math.max(1, currentPageNumber - 1))
+              }
+              disabled={currentPageNumber === 1}
               className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {t("previous", "السابق")}
             </button>
             <button
               onClick={() =>
-                setCurrentPage(Math.min(totalPages, currentPage + 1))
+                handlePageChange(Math.min(totalPages, currentPageNumber + 1))
               }
-              disabled={currentPage === totalPages}
+              disabled={currentPageNumber === totalPages}
               className={`${
                 isRTL ? "mr-3" : "ml-3"
               } relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed`}
@@ -151,15 +201,10 @@ const DataTable = ({ data, columns, searchTerm = "" }) => {
             <div>
               <p className="text-sm text-gray-700">
                 {t("showing", "عرض")}{" "}
-                <span className="font-medium">
-                  {(currentPage - 1) * itemsPerPage + 1}
-                </span>{" "}
-                {t("to", "إلى")}{" "}
-                <span className="font-medium">
-                  {Math.min(currentPage * itemsPerPage, filteredData.length)}
-                </span>{" "}
+                <span className="font-medium">{startItem}</span>{" "}
+                {t("to", "إلى")} <span className="font-medium">{endItem}</span>{" "}
                 {t("of", "من")}{" "}
-                <span className="font-medium">{filteredData.length}</span>{" "}
+                <span className="font-medium">{totalItems}</span>{" "}
                 {t("results", "نتيجة")}
               </p>
             </div>
@@ -169,8 +214,10 @@ const DataTable = ({ data, columns, searchTerm = "" }) => {
                 aria-label="Pagination"
               >
                 <button
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
+                  onClick={() =>
+                    handlePageChange(Math.max(1, currentPageNumber - 1))
+                  }
+                  disabled={currentPageNumber === 1}
                   className={`relative inline-flex items-center px-2 py-2 ${
                     isRTL ? "rounded-l-md" : "rounded-r-md"
                   } border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed`}
@@ -185,9 +232,9 @@ const DataTable = ({ data, columns, searchTerm = "" }) => {
                   (page) => (
                     <button
                       key={page}
-                      onClick={() => setCurrentPage(page)}
+                      onClick={() => handlePageChange(page)}
                       className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                        currentPage === page
+                        currentPageNumber === page
                           ? "z-10 bg-[#09142b] border-[#09142b] text-white"
                           : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
                       }`}
@@ -198,9 +245,11 @@ const DataTable = ({ data, columns, searchTerm = "" }) => {
                 )}
                 <button
                   onClick={() =>
-                    setCurrentPage(Math.min(totalPages, currentPage + 1))
+                    handlePageChange(
+                      Math.min(totalPages, currentPageNumber + 1)
+                    )
                   }
-                  disabled={currentPage === totalPages}
+                  disabled={currentPageNumber === totalPages}
                   className={`relative inline-flex items-center px-2 py-2 ${
                     isRTL ? "rounded-r-md" : "rounded-l-md"
                   } border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed`}

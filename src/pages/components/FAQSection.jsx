@@ -1,21 +1,106 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { FiLoader } from "react-icons/fi";
 import FAQItem from "./FAQItem";
+import publicFaqService from "../../services/publicFaqService";
+import categoryService from "../../services/categoryService";
 
 const FAQSection = () => {
   const { t, i18n } = useTranslation();
-  let faqs = t("faq", { returnObjects: true }) || [];
   const isRTL = i18n.language === "ar";
   const [openIndex, setOpenIndex] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
-  // Ensure faqs is always an array
-  if (!Array.isArray(faqs)) {
-    faqs = [];
-  }
+  // Get current language
+  const lang = i18n.language || "ar";
+
+  // Fetch FAQ categories
+  const { data: categoriesData } = useQuery({
+    queryKey: ["faqCategories"],
+    queryFn: categoryService.getPublicCategories,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+
+  // Fetch FAQs from API
+  const {
+    data: faqsData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["publicFAQs", lang, selectedCategory],
+    queryFn: async () => {
+      const result = await publicFaqService.getPublicFAQs({
+        language: lang,
+        limit: 10,
+        category: selectedCategory === "all" ? undefined : selectedCategory,
+      });
+      return result;
+    },
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
+
+  // Extract FAQs from API response
+  const faqs = faqsData?.data || [];
+  const categories = categoriesData?.data || [];
 
   const handleToggle = (idx) => {
     setOpenIndex(openIndex === idx ? null : idx);
   };
+
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category);
+    setOpenIndex(null); // Reset open FAQ when changing category
+  };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <section
+        id="faq"
+        className="w-full bg-[#faf6f0] py-16 px-4 md:px-8 border-t border-[#e7cfa7]"
+      >
+        <div className="max-w-3xl mx-auto text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-[#09142b] mb-4">
+            {t("faqSectionTitle")}
+          </h2>
+        </div>
+        <div className="max-w-3xl mx-auto flex items-center justify-center py-8">
+          <FiLoader className="animate-spin text-4xl text-[#c8a45e]" />
+          <span className="mr-3 text-lg text-[#09142b]">
+            {t("loading", "جاري التحميل...")}
+          </span>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <section
+        id="faq"
+        className="w-full bg-[#faf6f0] py-16 px-4 md:px-8 border-t border-[#e7cfa7]"
+      >
+        <div className="max-w-3xl mx-auto text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-[#09142b] mb-4">
+            {t("faqSectionTitle")}
+          </h2>
+        </div>
+        <div className="max-w-3xl mx-auto text-center py-8">
+          <div className="text-red-600 text-lg mb-2">
+            {t("errorLoadingData", "خطأ في تحميل البيانات")}
+          </div>
+          <div className="text-gray-600">
+            {error.message ||
+              t("tryAgainLater", "يرجى المحاولة مرة أخرى لاحقاً")}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -26,20 +111,69 @@ const FAQSection = () => {
         <h2 className="text-3xl md:text-4xl font-extrabold text-[#09142b] mb-4">
           {t("faqSectionTitle")}
         </h2>
+        <p className="text-lg text-[#09142b] opacity-80">
+          {t("faqSectionSubtitle", "إجابات على الأسئلة الأكثر شيوعاً")}
+        </p>
       </div>
-      <div className="max-w-3xl mx-auto flex flex-col gap-4">
-        {Array.isArray(faqs) &&
-          faqs.length > 0 &&
-          faqs.map((faq, idx) => (
-            <FAQItem
-              key={idx}
-              idx={idx}
-              faq={faq}
-              isOpen={openIndex === idx}
-              onToggle={() => handleToggle(idx)}
-              isRTL={isRTL}
-            />
-          ))}
+
+      {/* Category Filter */}
+      {categories.length > 0 && (
+        <div className="max-w-3xl mx-auto mb-8">
+          <div className="flex flex-wrap justify-center gap-2">
+            <button
+              onClick={() => handleCategoryChange("all")}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                selectedCategory === "all"
+                  ? "bg-[#c8a45e] text-white"
+                  : "bg-white text-[#09142b] hover:bg-[#e7cfa7] border border-[#e7cfa7]"
+              }`}
+            >
+              {t("allCategories", "جميع الفئات")}
+            </button>
+            {categories.map((category) => (
+              <button
+                key={category.slug}
+                onClick={() => handleCategoryChange(category.slug)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  selectedCategory === category.slug
+                    ? "bg-[#c8a45e] text-white"
+                    : "bg-white text-[#09142b] hover:bg-[#e7cfa7] border border-[#e7cfa7]"
+                }`}
+              >
+                {category.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* FAQs List */}
+      <div className="max-w-3xl mx-auto">
+        {faqs.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="text-gray-600 text-lg">
+              {selectedCategory === "all"
+                ? t("noFAQsAvailable", "لا توجد أسئلة شائعة متاحة حالياً")
+                : t("noFAQsInCategory", "لا توجد أسئلة في هذه الفئة")}
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {faqs.map((faq, idx) => (
+              <FAQItem
+                key={faq.id}
+                idx={idx}
+                faq={{
+                  q: faq.question,
+                  a: faq.answer,
+                }}
+                isOpen={openIndex === idx}
+                onToggle={() => handleToggle(idx)}
+                isRTL={isRTL}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

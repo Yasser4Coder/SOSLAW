@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
-
+import { useQuery } from "@tanstack/react-query";
 import {
   FiUser,
   FiPhone,
@@ -17,7 +17,10 @@ import {
   FiGlobe,
   FiArrowDown,
   FiCheck,
+  FiLoader,
 } from "react-icons/fi";
+import publicRoleService from "../services/publicRoleService";
+import joinTeamApplicationService from "../services/joinTeamApplicationService";
 
 const JoinTeam = () => {
   const { t, i18n } = useTranslation();
@@ -28,9 +31,32 @@ const JoinTeam = () => {
   const [cvFile, setCvFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   const formRef = useRef(null);
   const rolesRef = useRef(null);
+
+  // Fetch roles from API
+  const {
+    data: rolesData,
+    isLoading: rolesLoading,
+    error: rolesError,
+  } = useQuery({
+    queryKey: ["publicRoles", lang],
+    queryFn: () => publicRoleService.getPublicRoles({ language: lang }),
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+
+  // Fetch role categories
+  const { data: categoriesData } = useQuery({
+    queryKey: ["roleCategories", lang],
+    queryFn: () =>
+      publicRoleService.getPublicRoleCategories({ language: lang }),
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+
+  const roles = rolesData?.data || [];
+  const categories = categoriesData?.data?.categories || [];
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -86,86 +112,6 @@ const JoinTeam = () => {
     }
   };
 
-  const roles = [
-    {
-      id: "administrative-manager",
-      title: "administrativeManager",
-      description: "administrativeManagerDesc",
-      icon: "📋",
-      category: "administrative",
-    },
-    {
-      id: "legal-translator",
-      title: "legalTranslator",
-      description: "legalTranslatorDesc",
-      icon: "🌐",
-      category: "content",
-    },
-    {
-      id: "legal-content-creator",
-      title: "legalContentCreator",
-      description: "legalContentCreatorDesc",
-      icon: "🎬",
-      category: "content",
-    },
-    {
-      id: "digital-platform-manager",
-      title: "digitalPlatformManager",
-      description: "digitalPlatformManagerDesc",
-      icon: "📱",
-      category: "administrative",
-    },
-    {
-      id: "legal-content-editor",
-      title: "legalContentEditor",
-      description: "legalContentEditorDesc",
-      icon: "📝",
-      category: "content",
-    },
-    {
-      id: "professional-legal-translator",
-      title: "professionalLegalTranslator",
-      description: "professionalLegalTranslatorDesc",
-      icon: "🔤",
-      category: "content",
-    },
-    {
-      id: "graphic-designer",
-      title: "graphicDesigner",
-      description: "graphicDesignerDesc",
-      icon: "🎨",
-      category: "content",
-    },
-    {
-      id: "legal-accounting-specialist",
-      title: "legalAccountingSpecialist",
-      description: "legalAccountingSpecialistDesc",
-      icon: "💰",
-      category: "administrative",
-    },
-    {
-      id: "lawyer",
-      title: "lawyer",
-      description: "lawyerDesc",
-      icon: "⚖️",
-      category: "legal",
-    },
-    {
-      id: "legal-advisor",
-      title: "legalAdvisor",
-      description: "legalAdvisorDesc",
-      icon: "🎯",
-      category: "legal",
-    },
-    {
-      id: "legal-instructor-new",
-      title: "legalInstructorNew",
-      description: "legalInstructorNewDesc",
-      icon: "🎓",
-      category: "training",
-    },
-  ];
-
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
@@ -202,17 +148,87 @@ const JoinTeam = () => {
 
     setIsSubmitting(true);
 
-    // Simulate form submission
-    setTimeout(() => {
-      console.log("Application submitted:", { selectedRole, formData, cvFile });
-      setIsSubmitting(false);
-      alert(
-        t(
-          "joinTeamSuccessMessage",
-          "Your application has been submitted successfully!"
-        )
+    try {
+      // Submit application
+      const formDataToSend = new FormData();
+      formDataToSend.append("roleId", selectedRole);
+      formDataToSend.append("fullName", formData.fullName);
+      formDataToSend.append("email", formData.email);
+      formDataToSend.append("phoneNumber", formData.phone);
+      formDataToSend.append("address", formData.address);
+      formDataToSend.append("city", formData.city);
+      formDataToSend.append("country", formData.country);
+      formDataToSend.append("dateOfBirth", formData.dateOfBirth);
+      formDataToSend.append("linkedin", formData.linkedin);
+      formDataToSend.append("website", formData.website);
+      formDataToSend.append("experience", formData.experience);
+      formDataToSend.append("education", formData.education);
+      formDataToSend.append("skills", formData.skills);
+      formDataToSend.append("motivation", formData.motivation);
+      formDataToSend.append("expectedSalary", formData.expectedSalary);
+      formDataToSend.append("availability", formData.availability);
+      formDataToSend.append("additionalInfo", formData.additionalInfo);
+      if (cvFile) {
+        formDataToSend.append("cv", cvFile);
+      }
+
+      const response = await joinTeamApplicationService.createApplication(
+        formDataToSend
       );
-    }, 2000);
+
+      // Check if the response is successful
+      if (response.data && response.data.success) {
+        // Reset form
+        setFormData({
+          fullName: "",
+          email: "",
+          phone: "",
+          address: "",
+          city: "",
+          country: "",
+          dateOfBirth: "",
+          linkedin: "",
+          website: "",
+          experience: "",
+          education: "",
+          skills: "",
+          motivation: "",
+          expectedSalary: "",
+          availability: "",
+          additionalInfo: "",
+        });
+        setSelectedRole("");
+        setCvFile(null);
+        setShowForm(false);
+
+        alert(
+          t(
+            "joinTeamSuccessMessage",
+            "Your application has been submitted successfully! We will review it and get back to you soon."
+          )
+        );
+      } else {
+        throw new Error(response.data?.message || "Unknown error occurred");
+      }
+    } catch (error) {
+      console.error("Application submission error:", error);
+
+      // Handle different types of errors
+      let errorMessage = t(
+        "joinTeamErrorMessage",
+        "Failed to submit application. Please try again."
+      );
+
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      alert(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -275,158 +291,146 @@ const JoinTeam = () => {
 
             {/* Role Categories */}
             <div className="mb-8">
-              <div className="flex flex-wrap justify-center gap-4 mb-8">
-                <button
-                  onClick={() => setSelectedRole("")}
-                  className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                    selectedRole === ""
-                      ? "bg-[#09142b] text-white shadow-lg"
-                      : "bg-white text-[#6b7280] border-2 border-[#e7cfa7] hover:border-[#c8a45e] hover:text-[#09142b]"
-                  }`}
-                >
-                  {t("joinTeamAllRoles", "All Roles")}
-                </button>
-                <button
-                  onClick={() => setSelectedRole("content")}
-                  className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                    selectedRole === "content"
-                      ? "bg-[#09142b] text-white shadow-lg"
-                      : "bg-white text-[#6b7280] border-2 border-[#e7cfa7] hover:border-[#c8a45e] hover:text-[#09142b]"
-                  }`}
-                >
-                  {t("joinTeamContentRoles", "Content Roles")}
-                </button>
-                <button
-                  onClick={() => setSelectedRole("administrative")}
-                  className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                    selectedRole === "administrative"
-                      ? "bg-[#09142b] text-white shadow-lg"
-                      : "bg-white text-[#6b7280] border-2 border-[#e7cfa7] hover:border-[#c8a45e] hover:text-[#09142b]"
-                  }`}
-                >
-                  {t("joinTeamAdministrativeRoles", "Administrative Roles")}
-                </button>
-                <button
-                  onClick={() => setSelectedRole("training")}
-                  className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                    selectedRole === "training"
-                      ? "bg-[#09142b] text-white shadow-lg"
-                      : "bg-white text-[#6b7280] border-2 border-[#e7cfa7] hover:border-[#c8a45e] hover:text-[#09142b]"
-                  }`}
-                >
-                  {t("joinTeamTrainingRoles", "Training Roles")}
-                </button>
-              </div>
+              {rolesLoading ? (
+                <div className="flex justify-center items-center py-8">
+                  <FiLoader className="animate-spin text-[#c8a45e] text-2xl" />
+                  <span className="mr-3 text-[#6b7280]">
+                    {t("loading", "Loading...")}
+                  </span>
+                </div>
+              ) : rolesError ? (
+                <div className="text-center py-8">
+                  <p className="text-red-600 mb-4">
+                    {t("errorLoadingData", "Error loading data")}
+                  </p>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="px-4 py-2 bg-[#09142b] text-white rounded-lg hover:bg-[#1a2a4a] transition-colors"
+                  >
+                    {t("tryAgainLater", "Try Again")}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex flex-wrap justify-center gap-4 mb-8">
+                    <button
+                      onClick={() => setSelectedCategory("")}
+                      className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+                        selectedCategory === ""
+                          ? "bg-[#09142b] text-white shadow-lg"
+                          : "bg-white text-[#6b7280] border-2 border-[#e7cfa7] hover:border-[#c8a45e] hover:text-[#09142b]"
+                      }`}
+                    >
+                      {t("joinTeamAllRoles", "All Roles")}
+                    </button>
+                    {categories.map((category) => (
+                      <button
+                        key={category}
+                        onClick={() => setSelectedCategory(category)}
+                        className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+                          selectedCategory === category
+                            ? "bg-[#09142b] text-white shadow-lg"
+                            : "bg-white text-[#6b7280] border-2 border-[#e7cfa7] hover:border-[#c8a45e] hover:text-[#09142b]"
+                        }`}
+                      >
+                        {t(`roleCategory.${category}`, category)}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Roles Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-              {roles
-                .filter((role) => {
-                  if (selectedRole === "") return true;
-                  if (selectedRole === "content") {
-                    return [
-                      "legal-content-creator",
-                      "legal-content-editor",
-                      "graphic-designer",
-                    ].includes(role.id);
-                  }
-                  if (selectedRole === "administrative") {
-                    return [
-                      "administrative-manager",
-                      "legal-accounting-specialist",
-                    ].includes(role.id);
-                  }
-                  if (selectedRole === "training") {
-                    return ["legal-instructor-new"].includes(role.id);
-                  }
-                  return true;
-                })
-                .map((role) => (
-                  <div
-                    key={role.id}
-                    className={`group relative p-3 sm:p-4 rounded-xl border-2 transition-all duration-300 hover:shadow-lg min-h-[300px] sm:min-h-[320px] flex flex-col ${
-                      selectedRole === role.id
-                        ? "border-[#c8a45e] bg-gradient-to-br from-white to-[#faf6f0] shadow-md"
-                        : "border-[#e7cfa7] bg-white hover:border-[#c8a45e]"
-                    }`}
-                  >
-                    {/* Selection Indicator */}
-                    {selectedRole === role.id && (
-                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-[#c8a45e] rounded-full flex items-center justify-center shadow-lg">
-                        <svg
-                          className="w-4 h-4 text-white"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
+            {!rolesLoading && !rolesError && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+                {roles
+                  .filter((role) => {
+                    if (selectedCategory === "") return true;
+                    return role.category === selectedCategory;
+                  })
+                  .map((role) => (
+                    <div
+                      key={role.id}
+                      className={`group relative p-3 sm:p-4 rounded-xl border-2 transition-all duration-300 hover:shadow-lg min-h-[300px] sm:min-h-[320px] flex flex-col ${
+                        selectedRole === role.id
+                          ? "border-[#c8a45e] bg-gradient-to-br from-white to-[#faf6f0] shadow-md"
+                          : "border-[#e7cfa7] bg-white hover:border-[#c8a45e]"
+                      }`}
+                    >
+                      {/* Selection Indicator */}
+                      {selectedRole === role.id && (
+                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-[#c8a45e] rounded-full flex items-center justify-center shadow-lg">
+                          <svg
+                            className="w-4 h-4 text-white"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                      )}
+
+                      {/* Role Icon */}
+                      <div className="text-2xl sm:text-3xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300">
+                        {role.icon}
                       </div>
-                    )}
 
-                    {/* Role Icon */}
-                    <div className="text-2xl sm:text-3xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300">
-                      {role.icon}
-                    </div>
+                      {/* Role Title */}
+                      <h3 className="text-base sm:text-lg font-bold text-[#09142b] mb-2 group-hover:text-[#c8a45e] transition-colors duration-300">
+                        {role.title}
+                      </h3>
 
-                    {/* Role Title */}
-                    <h3 className="text-base sm:text-lg font-bold text-[#09142b] mb-2 group-hover:text-[#c8a45e] transition-colors duration-300">
-                      {t(role.title)}
-                    </h3>
+                      {/* Role Description - Truncated */}
+                      <p className="text-[#6b7280] text-xs sm:text-sm leading-relaxed mb-2 sm:mb-3 line-clamp-3 flex-grow">
+                        {role.description.length > 120
+                          ? `${role.description.substring(0, 120)}...`
+                          : role.description}
+                      </p>
 
-                    {/* Role Description - Truncated */}
-                    <p className="text-[#6b7280] text-xs sm:text-sm leading-relaxed mb-2 sm:mb-3 line-clamp-3 flex-grow">
-                      {t(role.description).length > 120
-                        ? `${t(role.description).substring(0, 120)}...`
-                        : t(role.description)}
-                    </p>
-
-                    {/* Quick Info */}
-                    <div className="flex items-center justify-between text-xs text-[#6b7280] mb-2 sm:mb-3">
-                      <span className="flex items-center gap-1">
-                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#c8a45e] rounded-full"></div>
-                        <span className="text-xs">
-                          {role.category === "content"
-                            ? "Content"
-                            : role.category === "administrative"
-                            ? "Admin"
-                            : role.category === "legal"
-                            ? "Legal"
-                            : "Training"}
+                      {/* Quick Info */}
+                      <div className="flex items-center justify-between text-xs text-[#6b7280] mb-2 sm:mb-3">
+                        <span className="flex items-center gap-1">
+                          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#c8a45e] rounded-full"></div>
+                          <span className="text-xs">
+                            {t(`roleCategory.${role.category}`, role.category)}
+                          </span>
                         </span>
-                      </span>
-                      <span className="text-xs">Full-time</span>
-                    </div>
+                        <span className="text-xs">
+                          {role.type || "Full-time"}
+                        </span>
+                      </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-2 mt-auto">
-                      <button
-                        type="button"
-                        onClick={() => handleRoleSelection(role.id)}
-                        className={`flex-1 py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300 ${
-                          selectedRole === role.id
-                            ? "bg-[#09142b] text-white"
-                            : "bg-[#faf6f0] text-[#09142b] hover:bg-[#c8a45e] hover:text-white"
-                        }`}
-                      >
-                        {selectedRole === role.id
-                          ? t("joinTeamSelected", "Selected")
-                          : t("joinTeamSelect", "Select")}
-                      </button>
-                      <Link
-                        to={`/role/${role.id}`}
-                        className="flex-1 py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-semibold bg-[#09142b] text-white hover:bg-[#1a2a4a] transition-all duration-300 text-center"
-                      >
-                        {t("seeMore", "See More")}
-                      </Link>
+                      {/* Action Buttons */}
+                      <div className="flex flex-col sm:flex-row gap-2 mt-auto">
+                        <button
+                          type="button"
+                          onClick={() => handleRoleSelection(role.id)}
+                          className={`flex-1 py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300 ${
+                            selectedRole === role.id
+                              ? "bg-[#09142b] text-white"
+                              : "bg-[#faf6f0] text-[#09142b] hover:bg-[#c8a45e] hover:text-white"
+                          }`}
+                        >
+                          {selectedRole === role.id
+                            ? t("joinTeamSelected", "Selected")
+                            : t("joinTeamSelect", "Select")}
+                        </button>
+                        <Link
+                          to={`/role/${role.slug}`}
+                          className="flex-1 py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-semibold bg-[#09142b] text-white hover:bg-[#1a2a4a] transition-all duration-300 text-center"
+                        >
+                          {t("seeMore", "See More")}
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                ))}
-            </div>
+                  ))}
+              </div>
+            )}
 
             {/* No Roles Message */}
             {roles.filter((role) => {

@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 import {
   FiStar,
   FiUsers,
   FiAward,
   FiClock,
   FiMessageSquare,
+  FiLoader,
 } from "react-icons/fi";
 import { useSmoothScroll } from "../../hooks/useSmoothScroll";
 import TestimonialCard from "./TestimonialCard";
-import { testimonials, testimonialsStats } from "./testimonialsData";
+import testimonialService from "../../services/testimonialService";
 
 const TestimonialsSection = () => {
   const { t, i18n } = useTranslation();
@@ -19,12 +21,45 @@ const TestimonialsSection = () => {
 
   const [activeTab, setActiveTab] = useState("all");
 
-  const filteredTestimonials =
-    activeTab === "all"
-      ? testimonials
-      : testimonials.filter((t) => t.rating === parseInt(activeTab));
+  // Fetch testimonials from API
+  const {
+    data: testimonialsData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["publicTestimonials", currentLanguage, activeTab],
+    queryFn: () => {
+      const options = {
+        language: currentLanguage,
+        limit: 10,
+      };
+
+      if (activeTab !== "all") {
+        options.rating = parseInt(activeTab);
+      }
+
+      return testimonialService.getPublicTestimonials(options);
+    },
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+
+  // Fetch testimonial statistics
+  const {
+    data: statsData,
+    isLoading: statsLoading,
+    error: statsError,
+  } = useQuery({
+    queryKey: ["testimonialStats"],
+    queryFn: testimonialService.getTestimonialStats,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+
+  // Extract testimonials from API response
+  const testimonials = testimonialsData?.data || [];
+  const testimonialsStats = statsData?.data;
 
   const renderStars = (rating) => {
+    if (!rating || rating === 0) return null;
     return Array.from({ length: 5 }, (_, index) => (
       <FiStar
         key={index}
@@ -34,6 +69,56 @@ const TestimonialsSection = () => {
       />
     ));
   };
+
+  // Loading state
+  if (isLoading || statsLoading) {
+    return (
+      <section
+        id="testimonials"
+        className="w-full bg-[#f8fafc] py-16 px-4 md:px-8"
+      >
+        <div className="max-w-6xl mx-auto text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#c8a45e] rounded-full mb-6">
+            <FiMessageSquare className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#09142b] mb-4">
+            {t("testimonialsTitle", "What Our Clients Say")}
+          </h2>
+          <div className="flex items-center justify-center h-64">
+            <FiLoader className="animate-spin text-4xl text-blue-600" />
+            <span className="mr-3 text-lg text-gray-600">
+              جاري تحميل التوصيات...
+            </span>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error || statsError) {
+    return (
+      <section
+        id="testimonials"
+        className="w-full bg-[#f8fafc] py-16 px-4 md:px-8"
+      >
+        <div className="max-w-6xl mx-auto text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#c8a45e] rounded-full mb-6">
+            <FiMessageSquare className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#09142b] mb-4">
+            {t("testimonialsTitle", "What Our Clients Say")}
+          </h2>
+          <div className="text-center py-8">
+            <div className="text-red-600 text-lg mb-2">
+              خطأ في تحميل البيانات
+            </div>
+            <div className="text-gray-600">{error.message}</div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -58,55 +143,70 @@ const TestimonialsSection = () => {
         </div>
 
         {/* Statistics */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-          <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-200">
-            <div className="w-12 h-12 bg-[#c8a45e] rounded-full flex items-center justify-center mx-auto mb-3">
-              <FiStar className="w-6 h-6 text-white" />
-            </div>
-            <div className="text-2xl font-bold text-[#09142b] mb-1">
-              {testimonialsStats.averageRating}
-            </div>
-            <div className="text-sm text-[#6b7280]">
-              {t("averageRating", "Average Rating")}
-            </div>
+        {statsLoading ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-200"
+              >
+                <div className="w-12 h-12 bg-gray-200 rounded-full mx-auto mb-3 animate-pulse"></div>
+                <div className="h-8 bg-gray-200 rounded mx-auto mb-1 animate-pulse"></div>
+                <div className="h-4 bg-gray-200 rounded mx-auto animate-pulse"></div>
+              </div>
+            ))}
           </div>
+        ) : testimonialsStats ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+            <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-200">
+              <div className="w-12 h-12 bg-[#c8a45e] rounded-full flex items-center justify-center mx-auto mb-3">
+                <FiStar className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-2xl font-bold text-[#09142b] mb-1">
+                {testimonialsStats.averageRating || 0}
+              </div>
+              <div className="text-sm text-gray-600">
+                {t("averageRating", "Average Rating")}
+              </div>
+            </div>
 
-          <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-200">
-            <div className="w-12 h-12 bg-[#c8a45e] rounded-full flex items-center justify-center mx-auto mb-3">
-              <FiUsers className="w-6 h-6 text-white" />
+            <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-200">
+              <div className="w-12 h-12 bg-[#c8a45e] rounded-full flex items-center justify-center mx-auto mb-3">
+                <FiUsers className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-2xl font-bold text-[#09142b] mb-1">
+                {(testimonialsStats.totalTestimonials || 0).toLocaleString()}
+              </div>
+              <div className="text-sm text-gray-600">
+                {t("totalReviews", "Total Reviews")}
+              </div>
             </div>
-            <div className="text-2xl font-bold text-[#09142b] mb-1">
-              {testimonialsStats.totalReviews.toLocaleString()}
-            </div>
-            <div className="text-sm text-[#6b7280]">
-              {t("totalReviews", "Total Reviews")}
-            </div>
-          </div>
 
-          <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-200">
-            <div className="w-12 h-12 bg-[#c8a45e] rounded-full flex items-center justify-center mx-auto mb-3">
-              <FiAward className="w-6 h-6 text-white" />
+            <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-200">
+              <div className="w-12 h-12 bg-[#c8a45e] rounded-full flex items-center justify-center mx-auto mb-3">
+                <FiAward className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-2xl font-bold text-[#09142b] mb-1">
+                {testimonialsStats.satisfiedClients || 0}%
+              </div>
+              <div className="text-sm text-gray-600">
+                {t("satisfiedClients", "Satisfied Clients")}
+              </div>
             </div>
-            <div className="text-2xl font-bold text-[#09142b] mb-1">
-              {testimonialsStats.satisfiedClients}%
-            </div>
-            <div className="text-sm text-[#6b7280]">
-              {t("satisfiedClients", "Satisfied Clients")}
-            </div>
-          </div>
 
-          <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-200">
-            <div className="w-12 h-12 bg-[#c8a45e] rounded-full flex items-center justify-center mx-auto mb-3">
-              <FiClock className="w-6 h-6 text-white" />
-            </div>
-            <div className="text-2xl font-bold text-[#09142b] mb-1">
-              {testimonialsStats.yearsOfService}+
-            </div>
-            <div className="text-sm text-[#6b7280]">
-              {t("yearsOfService", "Years of Service")}
+            <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-200">
+              <div className="w-12 h-12 bg-[#c8a45e] rounded-full flex items-center justify-center mx-auto mb-3">
+                <FiClock className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-2xl font-bold text-[#09142b] mb-1">
+                {testimonialsStats.yearsOfService || 5}+
+              </div>
+              <div className="text-sm text-gray-600">
+                {t("yearsOfService", "Years of Service")}
+              </div>
             </div>
           </div>
-        </div>
+        ) : null}
 
         {/* Filter Tabs */}
         <div className="flex flex-wrap justify-center gap-2 mb-8">
@@ -128,39 +228,66 @@ const TestimonialsSection = () => {
         </div>
 
         {/* Overall Rating Display */}
-        <div className="text-center mb-8">
-          <div
-            className={`inline-flex items-center gap-2 bg-white rounded-lg px-6 py-3 shadow-sm border border-gray-200 ${
-              isRTL ? "flex-row-reverse" : ""
-            }`}
-          >
+        {statsLoading ? (
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 bg-white rounded-lg px-6 py-3 shadow-sm border border-gray-200">
+              <div className="flex items-center gap-1">
+                <div className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
+                <div className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
+                <div className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
+                <div className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
+                <div className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+              <span className="h-6 bg-gray-200 rounded w-20 animate-pulse"></span>
+              <span className="h-4 bg-gray-200 rounded w-32 animate-pulse"></span>
+            </div>
+          </div>
+        ) : testimonialsStats ? (
+          <div className="text-center mb-8">
             <div
-              className={`flex items-center gap-1 ${
+              className={`inline-flex items-center gap-2 bg-white rounded-lg px-6 py-3 shadow-sm border border-gray-200 ${
                 isRTL ? "flex-row-reverse" : ""
               }`}
             >
-              {renderStars(testimonialsStats.averageRating)}
+              <div
+                className={`flex items-center gap-1 ${
+                  isRTL ? "flex-row-reverse" : ""
+                }`}
+              >
+                {renderStars(testimonialsStats.averageRating)}
+              </div>
+              <span className="text-lg font-semibold text-[#09142b]">
+                {testimonialsStats.averageRating || 0} {t("outOf", "out of")} 5
+              </span>
+              <span className="text-sm text-[#6b7280]">
+                ({(testimonialsStats.totalTestimonials || 0).toLocaleString()}{" "}
+                {t("reviews", "reviews")})
+              </span>
             </div>
-            <span className="text-lg font-semibold text-[#09142b]">
-              {testimonialsStats.averageRating} {t("outOf", "out of")} 5
-            </span>
-            <span className="text-sm text-[#6b7280]">
-              ({testimonialsStats.totalReviews.toLocaleString()}{" "}
-              {t("reviews", "reviews")})
-            </span>
           </div>
-        </div>
+        ) : null}
 
         {/* Testimonials Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredTestimonials.map((testimonial) => (
-            <TestimonialCard
-              key={testimonial.id}
-              testimonial={testimonial}
-              currentLanguage={currentLanguage}
-            />
-          ))}
-        </div>
+        {testimonials.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {testimonials.map((testimonial) => (
+              <TestimonialCard
+                key={testimonial.id}
+                testimonial={testimonial}
+                currentLanguage={currentLanguage}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <div className="text-gray-500 text-lg mb-2">
+              لا توجد توصيات متاحة حالياً
+            </div>
+            <div className="text-gray-400 text-sm">
+              سيتم عرض التوصيات هنا عند توفرها
+            </div>
+          </div>
+        )}
 
         {/* CTA Section */}
         <div className="text-center mt-12">

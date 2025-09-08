@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/useAuth.js";
+import { useLogin, useRegister } from "../hooks/useAuthMutations";
 import {
   FiMail,
   FiLock,
@@ -9,39 +12,154 @@ import {
   FiEye,
   FiEyeOff,
 } from "react-icons/fi";
-import { FcGoogle } from "react-icons/fc";
 
 const Auth = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated, user, error, clearError } = useAuth();
+
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const isRTL = i18n.language === "ar";
+  const [formError, setFormError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     confirmPassword: "",
     fullName: "",
-    phone: "",
+    phoneNumber: "",
   });
 
+  // Use custom hooks for mutations
+  const loginMutation = useLogin();
+  const registerMutation = useRegister();
+
+  // Memoize the redirect logic to prevent infinite re-renders
+  const handleRedirect = useCallback(() => {
+    if (isAuthenticated && user) {
+      const from = location.state?.from?.pathname || "/";
+
+      // Redirect based on user role
+      if (user.role === "admin") {
+        navigate("/dashboard");
+      } else {
+        navigate(from);
+      }
+    }
+  }, [isAuthenticated, user, navigate, location.state?.from?.pathname]);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    handleRedirect();
+  }, [handleRedirect]);
+
+  // Clear form error when switching between login/register
+  useEffect(() => {
+    setFormError("");
+    setFieldErrors({});
+    clearError();
+  }, [isLogin, clearError]);
+
+  // Clear form error when auth error changes
+  useEffect(() => {
+    if (error) {
+      setFormError(error);
+    }
+  }, [error]);
+
   const handleInputChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+
+    // Clear field-specific error when user starts typing
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
+
+    // Clear general error when user starts typing
+    if (formError) {
+      setFormError("");
+      clearError();
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log("Form submitted:", formData);
+    setFormError("");
+    setFieldErrors({});
+
+    if (!isLogin && formData.password !== formData.confirmPassword) {
+      setFormError("Passwords do not match");
+      return;
+    }
+
+    try {
+      if (isLogin) {
+        // Login
+        const result = await loginMutation.mutateAsync({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (!result.success) {
+          setFormError(result.error);
+        }
+      } else {
+        // Register
+        const result = await registerMutation.mutateAsync({
+          fullName: formData.fullName,
+          phoneNumber: formData.phoneNumber,
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (!result.success) {
+          setFormError(result.error);
+        }
+      }
+    } catch (error) {
+      // Handle backend validation errors
+      if (
+        error.response?.data?.errors &&
+        Array.isArray(error.response.data.errors)
+      ) {
+        const newFieldErrors = {};
+        error.response.data.errors.forEach((err) => {
+          if (err.field && err.message) {
+            newFieldErrors[err.field] = err.message;
+          }
+        });
+        setFieldErrors(newFieldErrors);
+
+        // Set general error message if there's one
+        if (error.response.data.message) {
+          setFormError(error.response.data.message);
+        }
+      } else {
+        setFormError(error.message || "An error occurred");
+      }
+    }
   };
 
-  const handleGoogleAuth = () => {
-    // Handle Google authentication here
-    console.log("Google authentication initiated");
+  const isLoading = loginMutation.isPending || registerMutation.isPending;
+
+  // Helper function to get field error
+  const getFieldError = (fieldName) => {
+    return fieldErrors[fieldName] || "";
+  };
+
+  // Helper function to check if field has error
+  const hasFieldError = (fieldName) => {
+    return !!fieldErrors[fieldName];
   };
 
   return (
@@ -119,37 +237,16 @@ const Auth = () => {
             </div>
           </div>
 
+          {/* General Error Message */}
+          {formError && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-center">
+              {formError}
+            </div>
+          )}
+
           {/* Form */}
           <div className="bg-white rounded-2xl p-8 shadow-xl border border-[#e7cfa7]">
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Google Authentication Button */}
-              <div className="space-y-4">
-                <button
-                  type="button"
-                  onClick={handleGoogleAuth}
-                  className="w-full flex items-center justify-center gap-3 py-3 px-6 border-2 border-[#e7cfa7] rounded-xl font-semibold text-[#09142b] hover:bg-[#faf6f0] transition-all duration-300 transform hover:scale-105 shadow-md"
-                >
-                  <FcGoogle size={20} />
-                  <span>
-                    {isLogin
-                      ? t("authGoogleSignIn", "تسجيل الدخول بحساب Google")
-                      : t("authGoogleSignUp", "إنشاء حساب بحساب Google")}
-                  </span>
-                </button>
-
-                {/* Divider */}
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-[#e7cfa7]"></div>
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white text-[#6b7280]">
-                      {t("authOrDivider", "أو")}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
               {!isLogin && (
                 <>
                   {/* Full Name */}
@@ -164,14 +261,24 @@ const Auth = () => {
                         name="fullName"
                         value={formData.fullName}
                         onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
+                        className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300 ${
+                          hasFieldError("fullName")
+                            ? "border-red-300 focus:ring-red-500"
+                            : "border-[#e7cfa7]"
+                        }`}
                         placeholder={t(
                           "authFullNamePlaceholder",
                           "أدخل اسمك الكامل"
                         )}
                         required={!isLogin}
+                        disabled={isLoading}
                       />
                     </div>
+                    {hasFieldError("fullName") && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {getFieldError("fullName")}
+                      </p>
+                    )}
                   </div>
 
                   {/* Phone */}
@@ -183,17 +290,27 @@ const Auth = () => {
                       <FiPhone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6b7280]" />
                       <input
                         type="tel"
-                        name="phone"
-                        value={formData.phone}
+                        name="phoneNumber"
+                        value={formData.phoneNumber}
                         onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
+                        className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300 ${
+                          hasFieldError("phoneNumber")
+                            ? "border-red-300 focus:ring-red-500"
+                            : "border-[#e7cfa7]"
+                        }`}
                         placeholder={t(
                           "authPhonePlaceholder",
                           "أدخل رقم هاتفك"
                         )}
                         required={!isLogin}
+                        disabled={isLoading}
                       />
                     </div>
+                    {hasFieldError("phoneNumber") && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {getFieldError("phoneNumber")}
+                      </p>
+                    )}
                   </div>
                 </>
               )}
@@ -210,14 +327,24 @@ const Auth = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
+                    className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300 ${
+                      hasFieldError("email")
+                        ? "border-red-300 focus:ring-red-500"
+                        : "border-[#e7cfa7]"
+                    }`}
                     placeholder={t(
                       "authEmailPlaceholder",
                       "أدخل بريدك الإلكتروني"
                     )}
                     required
+                    disabled={isLoading}
                   />
                 </div>
+                {hasFieldError("email") && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {getFieldError("email")}
+                  </p>
+                )}
               </div>
 
               {/* Password */}
@@ -232,12 +359,17 @@ const Auth = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-12 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
+                    className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300 ${
+                      hasFieldError("password")
+                        ? "border-red-300 focus:ring-red-500"
+                        : "border-[#e7cfa7]"
+                    }`}
                     placeholder={t(
                       "authPasswordPlaceholder",
                       "أدخل كلمة المرور"
                     )}
                     required
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
@@ -251,6 +383,11 @@ const Auth = () => {
                     )}
                   </button>
                 </div>
+                {hasFieldError("password") && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {getFieldError("password")}
+                  </p>
+                )}
               </div>
 
               {/* Confirm Password (Register only) */}
@@ -266,12 +403,17 @@ const Auth = () => {
                       name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-12 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
+                      className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300 ${
+                        hasFieldError("confirmPassword")
+                          ? "border-red-300 focus:ring-red-500"
+                          : "border-[#e7cfa7]"
+                      }`}
                       placeholder={t(
                         "authConfirmPasswordPlaceholder",
                         "أعد إدخال كلمة المرور"
                       )}
                       required={!isLogin}
+                      disabled={isLoading}
                     />
                     <button
                       type="button"
@@ -287,17 +429,36 @@ const Auth = () => {
                       )}
                     </button>
                   </div>
+                  {hasFieldError("confirmPassword") && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {getFieldError("confirmPassword")}
+                    </p>
+                  )}
                 </div>
               )}
 
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-[#09142b] to-[#1a2a4a] text-white py-4 px-6 rounded-xl font-semibold text-lg hover:from-[#1a2a4a] hover:to-[#09142b] transition-all duration-300 transform hover:scale-105 shadow-lg"
+                disabled={isLoading}
+                className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-300 transform shadow-lg ${
+                  isLoading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-[#09142b] to-[#1a2a4a] text-white hover:from-[#1a2a4a] hover:to-[#09142b] hover:scale-105"
+                }`}
               >
-                {isLogin
-                  ? t("authLoginButton", "تسجيل الدخول")
-                  : t("authRegisterButton", "إنشاء حساب")}
+                {isLoading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    {isLogin
+                      ? t("authLoggingIn", "جاري تسجيل الدخول...")
+                      : t("authCreatingAccount", "جاري إنشاء الحساب...")}
+                  </div>
+                ) : isLogin ? (
+                  t("authLoginButton", "تسجيل الدخول")
+                ) : (
+                  t("authRegisterButton", "إنشاء حساب")
+                )}
               </button>
 
               {/* Forgot Password (Login only) */}

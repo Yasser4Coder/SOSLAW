@@ -7,8 +7,10 @@ import {
   FiBell,
   FiUser,
   FiDatabase,
+  FiPhone,
 } from "react-icons/fi";
 import CustomAlert from "./CustomAlert";
+import ContactInfoManagement from "./ContactInfoManagement";
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("general");
@@ -57,10 +59,19 @@ const Settings = () => {
     }));
   };
 
-  const handleSave = () => {
-    // API call to save settings
-    console.log("Saving settings:", settings);
-    showAlert("success", "تم الحفظ", "تم حفظ الإعدادات بنجاح");
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+      // Here you would typically save to backend
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+      setIsSaving(false);
+      setShowSuccessMessage(true);
+      setTimeout(() => setShowSuccessMessage(false), 3000);
+    } catch (error) {
+      setIsSaving(false);
+      setShowErrorMessage(true);
+      setTimeout(() => setShowErrorMessage(false), 3000);
+    }
   };
 
   const showAlert = (type, title, message) => {
@@ -76,6 +87,11 @@ const Settings = () => {
       id: "general",
       label: "الإعدادات العامة",
       icon: FiGlobe,
+    },
+    {
+      id: "contact",
+      label: "معلومات التواصل",
+      icon: FiPhone,
     },
     {
       id: "notifications",
@@ -218,6 +234,12 @@ const Settings = () => {
                   />
                 </div>
               </div>
+            </div>
+          )}
+
+          {activeTab === "contact" && (
+            <div className="space-y-6">
+              <ContactInfoManagement />
             </div>
           )}
 

@@ -2,7 +2,14 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
-const ServiceCard = ({ icon: Icon, title, desc, subItems = [], route }) => {
+const ServiceCard = ({
+  icon: Icon,
+  title,
+  desc,
+  subItems = [],
+  route,
+  serviceId,
+}) => {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
 
@@ -53,7 +60,7 @@ const ServiceCard = ({ icon: Icon, title, desc, subItems = [], route }) => {
           </Link>
         )}
         <Link
-          to="/contact"
+          to={`/request-service/${serviceId}`}
           className="px-6 py-2 bg-white text-[#c8a45e] font-semibold rounded-lg border-2 border-[#c8a45e] hover:bg-[#faf6f0] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#c8a45e] focus:ring-offset-2"
           aria-label={isRTL ? "اطلب الخدمة" : "Request Service"}
         >

@@ -119,7 +119,20 @@
   "taxFinancialLegislation": "Tax & Financial Legislation",
   "newInvestorSupport": "New Investor Support",
   "faqSectionTitle": "Frequently Asked Questions",
-  "faqSectionDesc": "Find answers to common legal questions and concerns",
+  "faqSectionSubtitle": "Answers to the most common questions",
+  "allCategories": "All Categories",
+  "noFAQsAvailable": "No FAQs available at the moment",
+  "noFAQsInCategory": "No FAQs in this category",
+  "loading": "Loading...",
+  "errorLoadingData": "Error loading data",
+  "tryAgainLater": "Please try again later",
+  "faqCategory": {
+    "general": "General",
+    "services": "Services",
+    "company": "Company Formation",
+    "auditing": "Legal Auditing",
+    "training": "Training"
+  },
   "faq1Question": "What legal services does SOSLAW provide?",
   "faq1Answer": "SOSLAW offers comprehensive legal services including consultation, contract drafting, dispute resolution, corporate law, family law, and more.",
   "faq2Question": "How can I schedule a legal consultation?",
@@ -193,6 +206,7 @@
   "contactSuccess": "Message sent successfully!",
   "contactError": "Error sending message. Please try again.",
   "joinUs": "Join Us",
+  "requestService": "Request Service",
   "joinTeamTitle": "Join Our Team",
   "joinTeamDesc": "Become part of our dynamic legal team and contribute to shaping the future of legal services",
   "joinTeamButton": "Apply Now",
@@ -342,6 +356,14 @@
   "joinTeamEducationPlaceholder": "Describe your educational qualifications",
   "joinTeamSkills": "Skills",
   "joinTeamSkillsPlaceholder": "List your main skills",
+  "requiredSkills": "Required Skills",
+  "category": "Category",
+  "roleId": "Role ID",
+  "slug": "Slug",
+  "order": "Order",
+  "status": "Status",
+  "createdAt": "Created At",
+  "updatedAt": "Updated At",
   "joinTeamMotivation": "Motivation to Join",
   "joinTeamMotivationPlaceholder": "Explain why you want to join our team",
   "joinTeamExpectedSalary": "Expected Salary",
@@ -718,5 +740,11 @@
   "whatWeOffer": "What We Offer",
   "formats": "Formats",
   "servicesTitle": "Our Legal Services",
-  "servicesDesc": "Comprehensive legal services... carefully designed to meet your needs, saving you time and effort towards the optimal solution."
+  "servicesDesc": "Comprehensive legal services... carefully designed to meet your needs, saving you time and effort towards the optimal solution.",
+  "roleCategory": {
+    "administrative": "Administrative",
+    "content": "Content",
+    "legal": "Legal",
+    "training": "Training"
+  }
 }

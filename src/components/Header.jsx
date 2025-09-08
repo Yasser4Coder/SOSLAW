@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FiPhone,
   FiClock,
@@ -7,11 +7,16 @@ import {
   FiChevronDown,
   FiMenu,
   FiX,
+  FiUser,
+  FiLogOut,
+  FiSettings,
 } from "react-icons/fi";
 import { FaInstagram, FaFacebook, FaLinkedin } from "react-icons/fa";
 import logo from "../assets/logo.svg";
 import { useTranslation } from "react-i18next";
 import { useSmoothScroll } from "../hooks/useSmoothScroll";
+import { useAuth } from "../contexts/useAuth.js";
+import { useContactInfo } from "../hooks/useContactInfo";
 
 const LANGUAGES = [
   { code: "en", label: "EN" },
@@ -48,11 +53,15 @@ const NAV_LINKS = [
 const Header = () => {
   const { t, i18n } = useTranslation();
   const location = useLocation();
+  const navigate = useNavigate();
   const { scrollToSection } = useSmoothScroll();
+  const { user, isAuthenticated, logout, isAdmin } = useAuth();
+  const { getMainPhone, getMainHours, getSocialMedia } = useContactInfo();
   const [lang, setLang] = useState(i18n.language || "en");
   const [showLang, setShowLang] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [showMore, setShowMore] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const [mobileDropdown, setMobileDropdown] = useState({
     more: false,
   });
@@ -62,6 +71,7 @@ const Header = () => {
   const langRef = useRef();
   const moreMenuRef = useRef();
   const moreTriggerRef = useRef();
+  const userMenuRef = useRef();
 
   // Handle navigation with smooth scrolling for anchor links
   const handleNavigation = (to, closeMenu = false) => {
@@ -106,6 +116,14 @@ const Header = () => {
     document.body.lang = code;
   };
 
+  // Handle logout
+  const handleLogout = async () => {
+    await logout();
+    setShowUserMenu(false);
+    setMobileMenu(false);
+    navigate("/");
+  };
+
   // Close Language dropdown on outside click
   useEffect(() => {
     if (!showLang) return;
@@ -145,6 +163,18 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [showMore]);
 
+  // Close User Menu on outside click
+  useEffect(() => {
+    if (!showUserMenu) return;
+    function handleClick(e) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setShowUserMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [showUserMenu]);
+
   // Sticky header
   useEffect(() => {
     const header = document.getElementById("main-header");
@@ -178,7 +208,7 @@ const Header = () => {
         <div className="flex items-center gap-6">
           <span className="flex items-center gap-1">
             <FiPhone />
-            <span className="text-[#09142b] font-medium">{t("phone")}</span>
+            <span className="text-[#09142b] font-medium">{getMainPhone()}</span>
           </span>
         </div>
 
@@ -186,7 +216,7 @@ const Header = () => {
         <div className="flex items-center gap-6">
           <span className="flex items-center gap-1">
             <FiClock />
-            <span className="text-[#09142b]">{t("hours")}</span>
+            <span className="text-[#09142b]">{getMainHours()}</span>
           </span>
         </div>
         {/* Center: Language Switcher */}
@@ -376,26 +406,88 @@ const Header = () => {
             </li>
           ))}
         </ul>
-        {/* Free Consultation Button (Desktop Only) */}
-        <Link
-          to="/auth"
-          className={`hidden md:inline-block ${
-            lang === "ar" ? "mr-6" : "ml-6"
-          } px-6 py-2 bg-[#c8a45e] text-white font-semibold rounded shadow hover:bg-[#c8a45e]/80 transition focus:outline-none focus:ring-2 focus:ring-[#c8a45e]`}
-          aria-label={t("freeConsultation")}
-        >
-          {t("freeConsultation")}
-        </Link>
-        {/* Mobile Hamburger */}
-        <button
-          className="md:hidden text-[#c8a45e] text-2xl ml-4 focus:outline-none"
-          aria-label={mobileMenu ? "Close menu" : "Open menu"}
-          aria-expanded={mobileMenu}
-          onClick={() => setMobileMenu((v) => !v)}
-        >
-          {mobileMenu ? <FiX /> : <FiMenu />}
-        </button>
+
+        {/* Right side buttons */}
+        <div className="flex items-center gap-4">
+          {/* Dashboard button for admin users */}
+          {isAuthenticated && isAdmin() && (
+            <Link
+              to="/dashboard"
+              className="hidden md:inline-block px-4 py-2 bg-[#09142b] text-white font-semibold rounded shadow hover:bg-[#09142b]/80 transition focus:outline-none focus:ring-2 focus:ring-[#09142b]"
+            >
+              Dashboard
+            </Link>
+          )}
+
+          {/* User menu or Auth button */}
+          {isAuthenticated ? (
+            <div className="relative" ref={userMenuRef}>
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center gap-2 px-4 py-2 bg-[#c8a45e] text-white font-semibold rounded shadow hover:bg-[#c8a45e]/80 transition focus:outline-none focus:ring-2 focus:ring-[#c8a45e]"
+              >
+                <FiUser className="w-4 h-4" />
+                <span className="hidden sm:inline">
+                  {user?.fullName?.split(" ")[0] || "User"}
+                </span>
+              </button>
+
+              {showUserMenu && (
+                <div
+                  className={`absolute mt-2 w-56 bg-white border rounded shadow-lg z-50 ${
+                    lang === "ar" ? "left-0" : "right-0"
+                  }`}
+                >
+                  <div className="px-4 py-3 border-b border-gray-200">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {user?.fullName}
+                    </p>
+                    <p
+                      className="text-sm text-gray-500 truncate"
+                      title={user?.email}
+                    >
+                      {user?.email}
+                    </p>
+                    <p className="text-xs text-gray-400 capitalize">
+                      {user?.role}
+                    </p>
+                  </div>
+                  <div className="py-1">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 transition-colors duration-200"
+                    >
+                      <FiLogOut className="w-4 h-4" />
+                      {lang === "ar" ? "تسجيل الخروج" : "Logout"}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              to="/auth"
+              className={`hidden md:inline-block ${
+                lang === "ar" ? "mr-6" : "ml-6"
+              } px-6 py-2 bg-[#c8a45e] text-white font-semibold rounded shadow hover:bg-[#c8a45e]/80 transition focus:outline-none focus:ring-2 focus:ring-[#c8a45e]`}
+              aria-label={t("freeConsultation")}
+            >
+              {t("freeConsultation")}
+            </Link>
+          )}
+
+          {/* Mobile Hamburger */}
+          <button
+            className="md:hidden text-[#c8a45e] text-2xl ml-4 focus:outline-none"
+            aria-label={mobileMenu ? "Close menu" : "Open menu"}
+            aria-expanded={mobileMenu}
+            onClick={() => setMobileMenu((v) => !v)}
+          >
+            {mobileMenu ? <FiX /> : <FiMenu />}
+          </button>
+        </div>
       </nav>
+
       {/* Mobile Menu */}
       {mobileMenu && (
         <div
@@ -541,6 +633,18 @@ const Header = () => {
               )}
             </div>
           ))}
+
+          {/* Dashboard link for admin users in mobile */}
+          {isAuthenticated && isAdmin() && (
+            <Link
+              to="/dashboard"
+              className="block py-2 font-bold text-[#09142b] hover:text-[#c8a45e] focus:outline-none transition-all duration-200 cursor-pointer"
+              onClick={() => setMobileMenu(false)}
+            >
+              Dashboard
+            </Link>
+          )}
+
           {/* Language Switcher in Mobile */}
           <div className="mt-2">
             <div className="text-xs text-[#c8a45e] mb-1 font-semibold">
@@ -563,15 +667,39 @@ const Header = () => {
               ))}
             </div>
           </div>
-          {/* Free Consultation Button (Mobile Only) */}
-          <Link
-            to="/auth"
-            className="block w-full mt-4 px-6 py-3 bg-[#c8a45e] text-white font-semibold rounded shadow hover:bg-[#c8a45e]/80 transition text-center focus:outline-none focus:ring-2 focus:ring-[#c8a45e]"
-            aria-label={t("freeConsultation")}
-            onClick={() => setMobileMenu(false)}
-          >
-            {t("freeConsultation")}
-          </Link>
+
+          {/* Auth button or user info in mobile */}
+          {isAuthenticated ? (
+            <div className="mt-4 p-3 bg-[#faf6f0] rounded-lg">
+              <div className="text-sm text-[#09142b] font-medium mb-2 truncate">
+                {lang === "ar" ? "مرحباً، " : "Welcome, "}
+                {user?.fullName?.split(" ")[0] || "User"}!
+              </div>
+              {user?.email && (
+                <div
+                  className="text-xs text-[#6b7280] mb-3 truncate"
+                  title={user.email}
+                >
+                  {user.email}
+                </div>
+              )}
+              <button
+                onClick={handleLogout}
+                className="w-full px-4 py-2 bg-red-500 text-white font-semibold rounded shadow hover:bg-red-600 transition text-center focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                {lang === "ar" ? "تسجيل الخروج" : "Logout"}
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/auth"
+              className="block w-full mt-4 px-6 py-3 bg-[#c8a45e] text-white font-semibold rounded shadow hover:bg-[#c8a45e]/80 transition text-center focus:outline-none focus:ring-2 focus:ring-[#c8a45e]"
+              aria-label={t("freeConsultation")}
+              onClick={() => setMobileMenu(false)}
+            >
+              {t("freeConsultation")}
+            </Link>
+          )}
         </div>
       )}
     </header>

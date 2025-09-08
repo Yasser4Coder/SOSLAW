@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet-async";
+import SEOHead from "../components/SEOHead";
+import { useContactInfo } from "../hooks/useContactInfo";
 import {
   FiMail,
   FiUser,
@@ -10,6 +11,8 @@ import {
   FiMapPin,
   FiPhone,
 } from "react-icons/fi";
+import contactRequestService from "../services/contactRequestService";
+import toast from "react-hot-toast";
 
 const PRIMARY = "#09142b";
 
@@ -18,19 +21,52 @@ const GOOGLE_MAPS_EMBED_URL =
 
 const Contact = () => {
   const { t, i18n } = useTranslation();
-  const lang = i18n.language || "en";
+  const isRTL = i18n.language === "ar";
+  const { getContactPhone, getContactEmail, getMainAddress } = useContactInfo();
   const title = t(
     "contactSeoTitle",
-    "Contact SOSLAW | Legal Consultation Services"
+    "تواصل معنا | SOSLAW - منصة الاستشارات القانونية"
   );
   const desc = t(
     "contactSeoDesc",
-    "Contact SOSLAW team for legal consultations - our location, contact information, and quick contact form."
+    "تواصل مع فريق SOSLAW للحصول على استشارتك القانونية. نحن متاحون لمساعدتك في جميع القضايا القانونية. استشارتك القانونية أينما كنت."
   );
-  const url = "https://soslaw.com/contact";
-  const image = "/logo.svg";
-  const isRTL = i18n.language === "ar";
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const keywords =
+    "تواصل معنا, استشارة قانونية, محامي, قانون, خدمات قانونية, SOSLAW, الجزائر, استشارة أونلاين";
+
+  // Structured data for Contact page
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    name: "تواصل معنا - SOSLAW",
+    description: desc,
+    url: "https://soslaw.com/contact",
+    mainEntity: {
+      "@type": "LegalService",
+      name: "SOSLAW",
+      telephone: "+213-XXX-XXX-XXX",
+      email: "info@soslaw.com",
+      address: {
+        "@type": "PostalAddress",
+        addressCountry: "DZ",
+        addressLocality: "الجزائر",
+        addressRegion: "الجزائر",
+      },
+      contactPoint: {
+        "@type": "ContactPoint",
+        telephone: "+213-XXX-XXX-XXX",
+        contactType: "customer service",
+        availableLanguage: "Arabic",
+      },
+    },
+  };
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: "",
+  });
   const [status, setStatus] = useState(null); // null | "success" | "error"
   const [loading, setLoading] = useState(false);
 
@@ -38,39 +74,57 @@ const Contact = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setStatus(null);
-    setTimeout(() => {
-      if (form.name && form.email && form.message) {
-        setStatus("success");
-        setForm({ name: "", email: "", message: "" });
-      } else {
+
+    try {
+      // Validate required fields
+      if (!form.name || !form.email || !form.message) {
+        toast.error("يرجى ملء جميع الحقول المطلوبة");
         setStatus("error");
+        return;
       }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(form.email)) {
+        toast.error("يرجى إدخال بريد إلكتروني صحيح");
+        setStatus("error");
+        return;
+      }
+
+      // Send the request to the backend
+      await contactRequestService.createContactRequest({
+        name: form.name.trim(),
+        email: form.email.trim().toLowerCase(),
+        phone: form.phone ? form.phone.trim() : null,
+        subject: form.subject ? form.subject.trim() : null,
+        message: form.message.trim(),
+      });
+
+      toast.success("تم إرسال رسالتك بنجاح! سنتواصل معك قريباً");
+      setStatus("success");
+      setForm({ name: "", email: "", phone: "", subject: "", message: "" });
+    } catch (error) {
+      console.error("Error submitting contact request:", error);
+      toast.error("حدث خطأ أثناء إرسال الرسالة. يرجى المحاولة مرة أخرى");
+      setStatus("error");
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
   };
 
   return (
     <main className="min-h-screen bg-[#f5f7fa] flex flex-col items-center w-full">
-      <Helmet>
-        <html lang={lang} />
-        <title>{title}</title>
-        <meta name="description" content={desc} />
-        {/* Open Graph */}
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={desc} />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={url} />
-        <meta property="og:image" content={image} />
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={title} />
-        <meta name="twitter:description" content={desc} />
-        <meta name="twitter:image" content={image} />
-      </Helmet>
+      <SEOHead
+        title={title}
+        description={desc}
+        keywords={keywords}
+        canonical="/contact"
+        structuredData={structuredData}
+      />
       {/* Hero Section */}
       <section className="w-full bg-[#09142b] py-16 px-4 md:px-8 text-center">
         <h1
@@ -115,21 +169,21 @@ const Contact = () => {
               </span>
             </div>
             <p className="text-[#09142b] text-base font-medium opacity-90 mb-2">
-              {t("contactLocationAddress", "Algiers, Algeria")}
+              {getMainAddress()}
             </p>
             <div className="flex items-center gap-2 text-[#09142b]">
               <FiPhone className="text-[#c8a45e] text-xl" />
               <span className="font-semibold">
                 {t("contactPhone", "Phone")}:{" "}
               </span>
-              <span dir="ltr">+213 555 123 456</span>
+              <span dir="ltr">{getContactPhone()}</span>
             </div>
             <div className="flex items-center gap-2 text-[#09142b]">
               <FiMail className="text-[#c8a45e] text-xl" />
               <span className="font-semibold">
                 {t("contactEmailInfo", "Email")}:{" "}
               </span>
-              <span dir="ltr">info@soslaw.com</span>
+              <span dir="ltr">{getContactEmail()}</span>
             </div>
           </div>
         </div>
@@ -179,6 +233,44 @@ const Contact = () => {
                 required
                 disabled={loading}
                 placeholder={t("contactEmail")}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label
+                htmlFor="phone"
+                className="font-semibold text-[#09142b] flex items-center gap-2"
+              >
+                <FiPhone className="text-[#c8a45e]" />{" "}
+                {t("contactPhone", "رقم الهاتف")}
+              </label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                className="rounded-lg border border-[#e7cfa7] px-4 py-3 focus:ring-2 focus:ring-[#c8a45e] focus:outline-none text-[#09142b] bg-white placeholder-[#b8b8b8]"
+                value={form.phone}
+                onChange={handleChange}
+                disabled={loading}
+                placeholder={t("contactPhone", "رقم الهاتف")}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label
+                htmlFor="subject"
+                className="font-semibold text-[#09142b] flex items-center gap-2"
+              >
+                <FiMessageCircle className="text-[#c8a45e]" />{" "}
+                {t("contactSubject", "الموضوع")}
+              </label>
+              <input
+                id="subject"
+                name="subject"
+                type="text"
+                className="rounded-lg border border-[#e7cfa7] px-4 py-3 focus:ring-2 focus:ring-[#c8a45e] focus:outline-none text-[#09142b] bg-white placeholder-[#b8b8b8]"
+                value={form.subject}
+                onChange={handleChange}
+                disabled={loading}
+                placeholder={t("contactSubject", "الموضوع")}
               />
             </div>
             <div className="flex flex-col gap-2">

@@ -15,9 +15,12 @@ import {
   FiTrendingUp,
   FiCalendar,
   FiMail,
+  FiStar,
+  FiTag,
 } from "react-icons/fi";
 import { useFontLoader } from "../hooks/useFontLoader";
 import { useScrollToTop } from "../hooks/useScrollToTop";
+import { useAuth } from "../contexts/useAuth.js";
 import BackToTop from "../components/BackToTop";
 
 // Dashboard Pages
@@ -27,7 +30,12 @@ import JoinTeamRequests from "../components/dashboard/JoinTeamRequests";
 import ContactRequests from "../components/dashboard/ContactRequests";
 import LegalConsultations from "../components/dashboard/LegalConsultations";
 import ConsultantsManagement from "../components/dashboard/ConsultantsManagement";
+import TestimonialsManagement from "../components/dashboard/TestimonialsManagement";
 import FAQManagement from "../components/dashboard/FAQManagement";
+import CategoryManagement from "../components/dashboard/CategoryManagement";
+import RoleManagement from "../components/dashboard/RoleManagement";
+import JoinTeamApplicationsManagement from "../components/dashboard/JoinTeamApplicationsManagement";
+import ServiceRequestsManagement from "../components/dashboard/ServiceRequestsManagement";
 import Settings from "../components/dashboard/Settings";
 import NotificationDropdown from "../components/dashboard/NotificationDropdown";
 import AllNotifications from "../components/dashboard/AllNotifications";
@@ -36,6 +44,14 @@ const DashboardLayout = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isRTL = true; // Dashboard is always RTL/Arabic
+  const { logout } = useAuth();
+
+  // Handle logout with confirmation
+  const handleLogout = () => {
+    if (window.confirm("هل أنت متأكد من تسجيل الخروج؟")) {
+      logout();
+    }
+  };
 
   // Ensure font is loaded
   useFontLoader();
@@ -56,24 +72,7 @@ const DashboardLayout = () => {
       icon: FiUsers,
       current: location.pathname === "/dashboard/users",
     },
-    {
-      name: "طلبات الانضمام للفريق",
-      href: "/dashboard/join-team",
-      icon: FiBriefcase,
-      current: location.pathname === "/dashboard/join-team",
-    },
-    {
-      name: "طلبات التواصل",
-      href: "/dashboard/contact",
-      icon: FiMessageSquare,
-      current: location.pathname === "/dashboard/contact",
-    },
-    {
-      name: "الاستشارات القانونية",
-      href: "/dashboard/consultations",
-      icon: FiFileText,
-      current: location.pathname === "/dashboard/consultations",
-    },
+
     {
       name: "إدارة المستشارين",
       href: "/dashboard/consultants",
@@ -81,10 +80,46 @@ const DashboardLayout = () => {
       current: location.pathname === "/dashboard/consultants",
     },
     {
+      name: "إدارة التوصيات",
+      href: "/dashboard/testimonials",
+      icon: FiStar,
+      current: location.pathname === "/dashboard/testimonials",
+    },
+    {
       name: "إدارة الأسئلة الشائعة",
       href: "/dashboard/faq",
       icon: FiHelpCircle,
       current: location.pathname === "/dashboard/faq",
+    },
+    {
+      name: "إدارة الفئات",
+      href: "/dashboard/categories",
+      icon: FiTag,
+      current: location.pathname === "/dashboard/categories",
+    },
+    {
+      name: "إدارة الوظائف",
+      href: "/dashboard/roles",
+      icon: FiBriefcase,
+      current: location.pathname === "/dashboard/roles",
+    },
+    {
+      name: "طلبات التوظيف",
+      href: "/dashboard/applications",
+      icon: FiMail,
+      current: location.pathname === "/dashboard/applications",
+    },
+    {
+      name: "طلبات الخدمات",
+      href: "/dashboard/service-requests",
+      icon: FiFileText,
+      current: location.pathname === "/dashboard/service-requests",
+    },
+    {
+      name: "طلبات التواصل",
+      href: "/dashboard/contact",
+      icon: FiMessageSquare,
+      current: location.pathname === "/dashboard/contact",
     },
     {
       name: "الإعدادات",
@@ -128,6 +163,15 @@ const DashboardLayout = () => {
                   </div>
                   <div className="text-sm text-gray-500">مدير</div>
                 </div>
+                {/* Top Navigation Logout Button */}
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+                  title="تسجيل الخروج"
+                >
+                  <FiLogOut className="ml-2 h-4 w-4" />
+                  <span className="hidden sm:inline">تسجيل الخروج</span>
+                </button>
               </div>
             </div>
           </div>
@@ -142,7 +186,18 @@ const DashboardLayout = () => {
             <Route path="/contact" element={<ContactRequests />} />
             <Route path="/consultations" element={<LegalConsultations />} />
             <Route path="/consultants" element={<ConsultantsManagement />} />
+            <Route path="/testimonials" element={<TestimonialsManagement />} />
             <Route path="/faq" element={<FAQManagement />} />
+            <Route path="/categories" element={<CategoryManagement />} />
+            <Route path="/roles" element={<RoleManagement />} />
+            <Route
+              path="/applications"
+              element={<JoinTeamApplicationsManagement />}
+            />
+            <Route
+              path="/service-requests"
+              element={<ServiceRequestsManagement />}
+            />
             <Route path="/notifications" element={<AllNotifications />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
@@ -186,7 +241,10 @@ const DashboardLayout = () => {
 
         {/* Logout Button */}
         <div className="p-4">
-          <button className="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-300 hover:bg-[#1a2a4a] hover:text-white rounded-md transition-colors">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-300 hover:bg-[#1a2a4a] hover:text-white rounded-md transition-colors"
+          >
             <FiLogOut className="ml-3 h-5 w-5 text-gray-400" />
             تسجيل الخروج
           </button>
@@ -247,14 +305,19 @@ const DashboardLayout = () => {
           </div>
         </nav>
 
-        {/* Mobile Logout Button */}
-        <div className="absolute bottom-0 w-full p-4">
-          <button className="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-300 hover:bg-[#1a2a4a] hover:text-white rounded-md transition-colors">
+        {/* Logout Button */}
+        <div className="p-4">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-300 hover:bg-[#1a2a4a] hover:text-white rounded-md transition-colors"
+          >
             <FiLogOut className="ml-3 h-5 w-5 text-gray-400" />
             تسجيل الخروج
           </button>
         </div>
       </div>
+
+      {/* Back to Top Button */}
       <BackToTop />
     </div>
   );

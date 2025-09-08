@@ -1,211 +1,171 @@
-# SOSLAW - Professional Legal Services Website
+# SoSLaw Frontend with Authentication
 
-A modern, multilingual, responsive React application built with Vite and Tailwind CSS for professional legal services.
+This is the frontend application for SoSLaw with integrated authentication system.
 
-## 🚀 Features
+## Features
 
-- **Modern React (Vite)** - Fast development and build times
-- **Tailwind CSS** - Utility-first CSS framework for rapid UI development
-- **Multilingual** - Fully translatable in English, Arabic (RTL), and French
-- **RTL/LTR Support** - Automatic direction switching based on language
-- **Professional Structure** - Well-organized folder structure for scalability
-- **Responsive Design** - Mobile-first approach with beautiful UI
-- **Component-Based Architecture** - Reusable components for maintainability
-- **Modern Navigation**
-  - Main links: Home, About, Contact, Join Our Team
-  - Dropdowns: Consulting branches (with nested submenus), More (Services, Legal Library, Our Consultants)
-  - Mobile and desktop menus, accessible and keyboard-friendly
-- **Customizable Hero Section**
-  - Main button: "Request Your Legal Consultation" (fully translatable)
-- **Sign In/Register Button**
-  - Prominent in the header, fully translatable
+### Authentication System
 
-## 📁 Project Structure
+- **User Registration**: Full name, phone number, email, and password
+- **User Login**: Email and password authentication
+- **Role-Based Access**: Admin and Client roles
+- **Protected Routes**: Certain pages require authentication
+- **Automatic Redirects**:
+  - Admin users → Dashboard after login
+  - Client users → Home page after login
+  - Unauthenticated users → Auth page for protected routes
 
-```
-src/
-├── components/          # Reusable UI components
-│   ├── Header.jsx      # Navigation header
-│   ├── Footer.jsx      # Site footer
-├── pages/              # Page components
-│   └── Home.jsx        # Home page
-├── layouts/            # Layout components
-│   └── MainLayout.jsx  # Main application layout
-├── hooks/              # Custom React hooks
-│   └── useCounter.js   # Counter functionality hook
-├── utils/              # Utility functions and constants
-│   └── constants.js    # Application constants
-├── services/           # API services (future use)
-├── context/            # React context providers (future use)
-├── assets/             # Static assets
-├── App.jsx             # Main application component
-├── main.jsx            # Application entry point
-└── index.css           # Global styles with Tailwind
-```
+### Protected Routes
 
-## 🛠️ Technologies Used
+The following routes require authentication:
 
-- **React 18** - Modern React with hooks
-- **Vite** - Fast build tool and dev server
-- **Tailwind CSS** - Utility-first CSS framework
-- **JavaScript** - ES6+ features
-- **PostCSS** - CSS processing
-- **Autoprefixer** - CSS vendor prefixing
-- **react-i18next** - Internationalization and translation
+- `/join-team` - Join team page
+- `/role/:roleId` - Role details
+- `/services/:serviceId` - Service details
+- `/library` - Legal library
 
-## 🌍 Multilingual & RTL Support
+### Admin-Only Routes
 
-- **Languages:** English, Arabic (RTL), French
-- **Automatic direction switching** for RTL/LTR based on selected language
-- **Translation files** in `src/locales/en/`, `ar/`, and `fr/`
-- **All navigation, buttons, and content** are fully translatable
+- `/dashboard/*` - Admin dashboard (admin role required)
 
-## 🧭 Navigation & UX
+## Technical Implementation
 
-- **Header Navigation:**
-  - Home, About, Contact, Join Our Team
-  - Consulting branches (dropdown with nested submenus)
-  - More (dropdown: Services, Legal Library, Our Consultants)
-  - Sign In | Register with Us button (header, always visible)
-- **Hero Section:**
-  - Main button: "Request Your Legal Consultation" (translatable, not tied to sign in/register)
-- **Responsive:**
-  - Mobile and desktop menus
-  - Dropdowns and submenus are touch and keyboard accessible
+### Dependencies
 
-## 🛠️ Getting Started
+- **React Query**: For API state management and caching
+- **Axios**: HTTP client for API calls
+- **js-cookie**: Cookie management for JWT tokens
+- **React Router**: Navigation and route protection
 
-### Prerequisites
+### Key Components
 
-- Node.js (version 16 or higher)
-- npm or yarn
+#### AuthContext (`src/contexts/AuthContext.jsx`)
 
-### Installation
+- Manages authentication state
+- Handles login, register, and logout
+- Provides user information and role checking
+- Automatic token management with cookies
 
-1. **Clone the repository**
+#### ProtectedRoute (`src/components/ProtectedRoute.jsx`)
 
-   ```bash
-   git clone <repository-url>
-   cd SOSLAW
-   ```
+- Route protection component
+- Role-based access control
+- Loading states during authentication checks
+- Automatic redirects based on user role
 
-2. **Install dependencies**
+#### API Service (`src/services/api.js`)
+
+- Centralized API configuration
+- Automatic token injection
+- Error handling and token refresh
+- Cookie-based authentication
+
+#### Custom Hooks (`src/hooks/useAuthMutations.js`)
+
+- React Query mutations for auth operations
+- Automatic cache invalidation
+- Error handling and loading states
+
+### Authentication Flow
+
+1. **Registration**:
+
+   - User fills registration form
+   - API call to `/auth/register`
+   - JWT token stored in HTTP-only cookie
+   - User redirected based on role
+
+2. **Login**:
+
+   - User provides email/password
+   - API call to `/auth/login`
+   - JWT token stored in HTTP-only cookie
+   - User redirected based on role
+
+3. **Route Protection**:
+
+   - ProtectedRoute checks authentication status
+   - Redirects to `/auth` if not authenticated
+   - Checks role permissions if specified
+   - Renders protected content if authorized
+
+4. **Logout**:
+   - API call to `/auth/logout`
+   - Token removed from cookie
+   - User redirected to home page
+   - All cached data cleared
+
+### Security Features
+
+- **HTTP-only Cookies**: JWT tokens stored securely
+- **Automatic Token Refresh**: Handled by backend
+- **Role-Based Access Control**: Admin/Client permissions
+- **Protected Routes**: Authentication required for sensitive pages
+- **Automatic Redirects**: Based on user role and authentication status
+
+## Usage
+
+### Starting the Application
+
+1. Install dependencies:
 
    ```bash
    npm install
    ```
 
-3. **Start the development server**
+2. Start the development server:
 
    ```bash
    npm run dev
    ```
 
-4. **Open your browser**
-   Navigate to `http://localhost:5173`
+3. Make sure the backend server is running on `http://localhost:5000`
 
-### Available Scripts
+### Testing Authentication
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
+1. **Register a new user**:
 
-## 🎨 Customization
+   - Navigate to `/auth`
+   - Switch to registration mode
+   - Fill in the form with valid data
+   - Submit to create account
 
-### Tailwind CSS Configuration
+2. **Login with existing user**:
 
-The project uses Tailwind CSS with custom configuration in `tailwind.config.js`. You can:
+   - Navigate to `/auth`
+   - Enter email and password
+   - Submit to authenticate
 
-- Add custom colors in the `theme.extend.colors` section
-- Add custom components in `src/index.css` using `@layer components`
-- Modify the content paths to include additional file types
+3. **Test protected routes**:
 
-### Custom Components
+   - Try accessing `/join-team` without authentication
+   - Should redirect to `/auth`
+   - After login, should redirect back to intended page
 
-- **Header** - Navigation header with responsive menu, dropdowns, and language switcher
-- **Footer** - Site footer with branding and quick links
-- **MainLayout** - Layout wrapper for consistent page structure
+4. **Test role-based access**:
+   - Login as admin user → redirected to `/dashboard`
+   - Login as client user → redirected to home page
+   - Try accessing admin routes as client → redirected appropriately
 
-### Custom Hooks
+## Backend Integration
 
-- **useCounter** - Custom hook for counter functionality
+The frontend expects the backend to be running with the following endpoints:
 
-## 📱 Responsive Design
+- `POST /api/v1/auth/register` - User registration
+- `POST /api/v1/auth/login` - User login
+- `POST /api/v1/auth/logout` - User logout
+- `GET /api/v1/auth/profile` - Get current user profile
+- `PUT /api/v1/auth/change-password` - Change password
+- `POST /api/v1/auth/refresh` - Refresh JWT token
 
-The application is built with a mobile-first approach using Tailwind CSS responsive utilities:
+## Environment Variables
 
-- **Mobile** - Default styles (no prefix)
-- **Tablet** - `md:` prefix (768px and up)
-- **Desktop** - `lg:` prefix (1024px and up)
+No additional environment variables are required for the frontend. The API base URL is hardcoded to `http://localhost:5000/api/v1` for development.
 
-## ♿ Accessibility
+## Notes
 
-- All navigation and dropdowns are keyboard accessible
-- Proper ARIA roles and focus management
-- Color contrast and focus indicators for usability
-
-## 🔧 Development
-
-### Adding New Components
-
-1. Create your component in the appropriate folder:
-   - `src/components/` for reusable UI components
-   - `src/pages/` for page components
-   - `src/layouts/` for layout components
-2. Export your component and import where needed
-
-### Adding New Pages
-
-1. Create a new page component in `src/pages/`
-2. Add routing logic (when implementing routing)
-3. Update navigation in `src/components/Header.jsx`
-
-### Styling Guidelines
-
-- Use Tailwind CSS utility classes for styling
-- Create custom components in `src/index.css` using `@layer components`
-- Follow the existing color scheme and design patterns
-- Use responsive design principles
-
-## 🚀 Deployment
-
-### Build for Production
-
-```bash
-npm run build
-```
-
-This creates a `dist` folder with optimized production files.
-
-### Deploy to Vercel
-
-1. Install Vercel CLI: `npm i -g vercel`
-2. Run: `vercel`
-3. Follow the prompts
-
-### Deploy to Netlify
-
-1. Build the project: `npm run build`
-2. Upload the `dist` folder to Netlify
-3. Configure build settings if needed
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## 📞 Support
-
-For support or questions, please contact the development team.
-
----
-
-**SOSLAW** - Professional legal services and solutions
+- The design and styling remain unchanged from the original implementation
+- Only authentication logic has been added
+- All existing functionality is preserved
+- Mobile responsiveness is maintained
+- Internationalization (i18n) support is preserved

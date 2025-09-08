@@ -116,6 +116,7 @@
   "taxFinancialLegislation": "Fiscalité et législation financière",
   "newInvestorSupport": "Accompagnement des nouveaux investisseurs",
   "joinUs": "Rejoignez notre équipe",
+  "requestService": "Demander un service",
   "heroRequestNow": "Demandez votre consultation juridique",
   "servicesSectionTitle": "Services",
   "servicesSectionDesc": "Une gamme complète de services juridiques et professionnels pour répondre à tous vos besoins.",
@@ -294,6 +295,14 @@
   "joinTeamEducationPlaceholder": "Décrivez vos qualifications éducatives",
   "joinTeamSkills": "Compétences",
   "joinTeamSkillsPlaceholder": "Listez vos principales compétences",
+  "requiredSkills": "Compétences Requises",
+  "category": "Catégorie",
+  "roleId": "ID du Rôle",
+  "slug": "Slug",
+  "order": "Ordre",
+  "status": "Statut",
+  "createdAt": "Créé le",
+  "updatedAt": "Mis à jour le",
   "joinTeamMotivation": "Motivation pour rejoindre",
   "joinTeamMotivationPlaceholder": "Expliquez pourquoi vous voulez rejoindre notre équipe",
   "joinTeamExpectedSalary": "Salaire attendu",
@@ -328,6 +337,20 @@
   "contentWriter": "Rédacteur de contenu",
   "contentWriterDesc": "Rédacteur spécialisé dans le contenu juridique et les articles",
   "faqSectionTitle": "Questions fréquentes",
+  "faqSectionSubtitle": "Réponses aux questions les plus courantes",
+  "allCategories": "Toutes les catégories",
+  "noFAQsAvailable": "Aucune FAQ disponible pour le moment",
+  "noFAQsInCategory": "Aucune FAQ dans cette catégorie",
+  "loading": "Chargement...",
+  "errorLoadingData": "Erreur lors du chargement des données",
+  "tryAgainLater": "Veuillez réessayer plus tard",
+  "faqCategory": {
+    "general": "Général",
+    "services": "Services",
+    "company": "Création d'entreprise",
+    "auditing": "Audit juridique",
+    "training": "Formation"
+  },
   "faq": [
     {
       "q": "Quels services juridiques SOSLAW propose-t-il ?",
@@ -777,5 +800,11 @@
   "whatWeOffer": "Ce que nous offrons",
   "formats": "Formats",
   "servicesTitle": "Nos services juridiques",
-  "servicesDesc": "Des services juridiques complets... soigneusement conçus pour répondre à vos besoins, vous faisant économiser du temps et des efforts vers la solution optimale."
+  "servicesDesc": "Des services juridiques complets... soigneusement conçus pour répondre à vos besoins, vous faisant économiser du temps et des efforts vers la solution optimale.",
+  "roleCategory": {
+    "administrative": "Administratif",
+    "content": "Contenu",
+    "legal": "Juridique",
+    "training": "Formation"
+  }
 }

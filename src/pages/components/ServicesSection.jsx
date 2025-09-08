@@ -69,6 +69,7 @@ const ServicesSection = () => {
                   service.description[currentLanguage] || service.description.en
                 }
                 route={`/services/${service.id}`}
+                serviceId={service.id}
               />
             );
           })}

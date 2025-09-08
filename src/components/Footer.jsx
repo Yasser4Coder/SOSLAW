@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
 import logoBlueBg from "../assets/logoBlueBg.svg";
 import { useTranslation } from "react-i18next";
+import { useContactInfo } from "../hooks/useContactInfo";
 
 const Footer = () => {
   const { t } = useTranslation();
+  const { getMainPhone, getMainEmail, getSocialMedia } = useContactInfo();
 
   return (
     <footer className="w-full bg-[#09142b] text-[#c8a45e] pt-10 pb-4 px-4 md:px-12 mt-12 border-t border-[#e7cfa7]">
@@ -74,34 +76,46 @@ const Footer = () => {
               {t("phone")}
             </span>
             <a
-              href="mailto:Sos.law.35@gmail.com"
+              href={`mailto:${getMainEmail()}`}
               className="block text-sm text-[#e7cfa7] hover:text-white transition-colors focus:underline"
             >
-              Sos.law.35@gmail.com
+              {getMainEmail()}
             </a>
           </div>
           <div className="flex gap-4 mt-2">
-            <a
-              href="#"
-              aria-label="Facebook"
-              className="text-[#c8a45e] hover:text-white text-2xl transition-colors focus:outline-none"
-            >
-              <FaFacebook />
-            </a>
-            <a
-              href="#"
-              aria-label="Instagram"
-              className="text-[#c8a45e] hover:text-white text-2xl transition-colors focus:outline-none"
-            >
-              <FaInstagram />
-            </a>
-            <a
-              href="#"
-              aria-label="LinkedIn"
-              className="text-[#c8a45e] hover:text-white text-2xl transition-colors focus:outline-none"
-            >
-              <FaLinkedin />
-            </a>
+            {getSocialMedia().facebook && (
+              <a
+                href={getSocialMedia().facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="text-[#c8a45e] hover:text-white text-2xl transition-colors focus:outline-none"
+              >
+                <FaFacebook />
+              </a>
+            )}
+            {getSocialMedia().instagram && (
+              <a
+                href={getSocialMedia().instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="text-[#c8a45e] hover:text-white text-2xl transition-colors focus:outline-none"
+              >
+                <FaInstagram />
+              </a>
+            )}
+            {getSocialMedia().linkedin && (
+              <a
+                href={getSocialMedia().linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                className="text-[#c8a45e] hover:text-white text-2xl transition-colors focus:outline-none"
+              >
+                <FaLinkedin />
+              </a>
+            )}
           </div>
         </div>
       </div>
