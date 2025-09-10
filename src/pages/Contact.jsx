@@ -128,13 +128,17 @@ const Contact = () => {
       {/* Hero Section */}
       <section className="w-full bg-[#09142b] py-16 px-4 md:px-8 text-center">
         <h1
-          className="text-4xl md:text-5xl font-extrabold text-[#c8a45e] mb-4 drop-shadow-lg"
+          className={`font-extrabold text-[#c8a45e] mb-4 drop-shadow-lg ${
+            isRTL ? "text-3xl md:text-5xl" : "text-4xl md:text-5xl"
+          }`}
           dir={isRTL ? "rtl" : "ltr"}
         >
           {t("contactPageTitle")}
         </h1>
         <p
-          className="text-[#faf6f0] text-lg md:text-xl max-w-2xl mx-auto mb-2"
+          className={`text-[#faf6f0] max-w-2xl mx-auto mb-2 ${
+            isRTL ? "text-sm md:text-xl" : "text-lg md:text-xl"
+          }`}
           dir={isRTL ? "rtl" : "ltr"}
         >
           {t("contactPageSubtitle")}
@@ -163,27 +167,65 @@ const Contact = () => {
           </div>
           <div className="bg-[#faf6f0] rounded-2xl shadow-md border border-[#e7cfa7] p-6 flex flex-col gap-4">
             <div className="flex items-center gap-3 text-[#09142b]">
-              <FiMapPin className="text-[#c8a45e] text-2xl" />
-              <span className="font-bold">
+              <FiMapPin
+                className={`text-[#c8a45e] ${
+                  isRTL ? "text-xl md:text-2xl" : "text-2xl"
+                }`}
+              />
+              <span
+                className={`font-bold ${
+                  isRTL ? "text-sm md:text-base" : "text-base"
+                }`}
+              >
                 {t("contactLocationTitle", "Our Location")}
               </span>
             </div>
-            <p className="text-[#09142b] text-base font-medium opacity-90 mb-2">
+            <p
+              className={`text-[#09142b] font-medium opacity-90 mb-2 ${
+                isRTL ? "text-sm md:text-base" : "text-base"
+              }`}
+            >
               {getMainAddress()}
             </p>
             <div className="flex items-center gap-2 text-[#09142b]">
-              <FiPhone className="text-[#c8a45e] text-xl" />
-              <span className="font-semibold">
+              <FiPhone
+                className={`text-[#c8a45e] ${
+                  isRTL ? "text-lg md:text-xl" : "text-xl"
+                }`}
+              />
+              <span
+                className={`font-semibold ${
+                  isRTL ? "text-sm md:text-base" : "text-base"
+                }`}
+              >
                 {t("contactPhone", "Phone")}:{" "}
               </span>
-              <span dir="ltr">{getContactPhone()}</span>
+              <span
+                dir="ltr"
+                className={`${isRTL ? "text-sm md:text-base" : "text-base"}`}
+              >
+                {getContactPhone()}
+              </span>
             </div>
             <div className="flex items-center gap-2 text-[#09142b]">
-              <FiMail className="text-[#c8a45e] text-xl" />
-              <span className="font-semibold">
+              <FiMail
+                className={`text-[#c8a45e] ${
+                  isRTL ? "text-lg md:text-xl" : "text-xl"
+                }`}
+              />
+              <span
+                className={`font-semibold ${
+                  isRTL ? "text-sm md:text-base" : "text-base"
+                }`}
+              >
                 {t("contactEmailInfo", "Email")}:{" "}
               </span>
-              <span dir="ltr">{getContactEmail()}</span>
+              <span
+                dir="ltr"
+                className={`${isRTL ? "text-sm md:text-base" : "text-base"}`}
+              >
+                {getContactEmail()}
+              </span>
             </div>
           </div>
         </div>
@@ -200,15 +242,22 @@ const Contact = () => {
             <div className="flex flex-col gap-2">
               <label
                 htmlFor="name"
-                className="font-semibold text-[#09142b] flex items-center gap-2"
+                className={`font-semibold text-[#09142b] flex items-center gap-2 ${
+                  isRTL ? "text-sm md:text-base" : "text-base"
+                }`}
               >
-                <FiUser className="text-[#c8a45e]" /> {t("contactName")}
+                <FiUser
+                  className={`text-[#c8a45e] ${isRTL ? "text-lg" : "text-xl"}`}
+                />{" "}
+                {t("contactName")}
               </label>
               <input
                 id="name"
                 name="name"
                 type="text"
-                className="rounded-lg border border-[#e7cfa7] px-4 py-3 focus:ring-2 focus:ring-[#c8a45e] focus:outline-none text-[#09142b] bg-white placeholder-[#b8b8b8]"
+                className={`rounded-lg border border-[#e7cfa7] px-4 py-3 focus:ring-2 focus:ring-[#c8a45e] focus:outline-none text-[#09142b] bg-white placeholder-[#b8b8b8] ${
+                  isRTL ? "text-sm md:text-base" : "text-base"
+                }`}
                 value={form.name}
                 onChange={handleChange}
                 required
@@ -219,15 +268,22 @@ const Contact = () => {
             <div className="flex flex-col gap-2">
               <label
                 htmlFor="email"
-                className="font-semibold text-[#09142b] flex items-center gap-2"
+                className={`font-semibold text-[#09142b] flex items-center gap-2 ${
+                  isRTL ? "text-sm md:text-base" : "text-base"
+                }`}
               >
-                <FiMail className="text-[#c8a45e]" /> {t("contactEmail")}
+                <FiMail
+                  className={`text-[#c8a45e] ${isRTL ? "text-lg" : "text-xl"}`}
+                />{" "}
+                {t("contactEmail")}
               </label>
               <input
                 id="email"
                 name="email"
                 type="email"
-                className="rounded-lg border border-[#e7cfa7] px-4 py-3 focus:ring-2 focus:ring-[#c8a45e] focus:outline-none text-[#09142b] bg-white placeholder-[#b8b8b8]"
+                className={`rounded-lg border border-[#e7cfa7] px-4 py-3 focus:ring-2 focus:ring-[#c8a45e] focus:outline-none text-[#09142b] bg-white placeholder-[#b8b8b8] ${
+                  isRTL ? "text-sm md:text-base" : "text-base"
+                }`}
                 value={form.email}
                 onChange={handleChange}
                 required
@@ -238,16 +294,22 @@ const Contact = () => {
             <div className="flex flex-col gap-2">
               <label
                 htmlFor="phone"
-                className="font-semibold text-[#09142b] flex items-center gap-2"
+                className={`font-semibold text-[#09142b] flex items-center gap-2 ${
+                  isRTL ? "text-sm md:text-base" : "text-base"
+                }`}
               >
-                <FiPhone className="text-[#c8a45e]" />{" "}
+                <FiPhone
+                  className={`text-[#c8a45e] ${isRTL ? "text-lg" : "text-xl"}`}
+                />{" "}
                 {t("contactPhone", "رقم الهاتف")}
               </label>
               <input
                 id="phone"
                 name="phone"
                 type="tel"
-                className="rounded-lg border border-[#e7cfa7] px-4 py-3 focus:ring-2 focus:ring-[#c8a45e] focus:outline-none text-[#09142b] bg-white placeholder-[#b8b8b8]"
+                className={`rounded-lg border border-[#e7cfa7] px-4 py-3 focus:ring-2 focus:ring-[#c8a45e] focus:outline-none text-[#09142b] bg-white placeholder-[#b8b8b8] ${
+                  isRTL ? "text-sm md:text-base" : "text-base"
+                }`}
                 value={form.phone}
                 onChange={handleChange}
                 disabled={loading}
@@ -257,16 +319,22 @@ const Contact = () => {
             <div className="flex flex-col gap-2">
               <label
                 htmlFor="subject"
-                className="font-semibold text-[#09142b] flex items-center gap-2"
+                className={`font-semibold text-[#09142b] flex items-center gap-2 ${
+                  isRTL ? "text-sm md:text-base" : "text-base"
+                }`}
               >
-                <FiMessageCircle className="text-[#c8a45e]" />{" "}
+                <FiMessageCircle
+                  className={`text-[#c8a45e] ${isRTL ? "text-lg" : "text-xl"}`}
+                />{" "}
                 {t("contactSubject", "الموضوع")}
               </label>
               <input
                 id="subject"
                 name="subject"
                 type="text"
-                className="rounded-lg border border-[#e7cfa7] px-4 py-3 focus:ring-2 focus:ring-[#c8a45e] focus:outline-none text-[#09142b] bg-white placeholder-[#b8b8b8]"
+                className={`rounded-lg border border-[#e7cfa7] px-4 py-3 focus:ring-2 focus:ring-[#c8a45e] focus:outline-none text-[#09142b] bg-white placeholder-[#b8b8b8] ${
+                  isRTL ? "text-sm md:text-base" : "text-base"
+                }`}
                 value={form.subject}
                 onChange={handleChange}
                 disabled={loading}
@@ -276,16 +344,22 @@ const Contact = () => {
             <div className="flex flex-col gap-2">
               <label
                 htmlFor="message"
-                className="font-semibold text-[#09142b] flex items-center gap-2"
+                className={`font-semibold text-[#09142b] flex items-center gap-2 ${
+                  isRTL ? "text-sm md:text-base" : "text-base"
+                }`}
               >
-                <FiMessageCircle className="text-[#c8a45e]" />{" "}
+                <FiMessageCircle
+                  className={`text-[#c8a45e] ${isRTL ? "text-lg" : "text-xl"}`}
+                />{" "}
                 {t("contactMessage")}
               </label>
               <textarea
                 id="message"
                 name="message"
                 rows={5}
-                className="rounded-lg border border-[#e7cfa7] px-4 py-3 focus:ring-2 focus:ring-[#c8a45e] focus:outline-none text-[#09142b] bg-white placeholder-[#b8b8b8] resize-none"
+                className={`rounded-lg border border-[#e7cfa7] px-4 py-3 focus:ring-2 focus:ring-[#c8a45e] focus:outline-none text-[#09142b] bg-white placeholder-[#b8b8b8] resize-none ${
+                  isRTL ? "text-sm md:text-base" : "text-base"
+                }`}
                 value={form.message}
                 onChange={handleChange}
                 required
@@ -295,7 +369,9 @@ const Contact = () => {
             </div>
             <button
               type="submit"
-              className={`mt-2 w-full py-3 rounded-lg font-bold text-lg transition-all duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-[#c8a45e] ${
+              className={`mt-2 w-full py-3 rounded-lg font-bold transition-all duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-[#c8a45e] ${
+                isRTL ? "text-sm md:text-lg" : "text-lg"
+              } ${
                 loading
                   ? "bg-[#b8b8b8] text-white cursor-not-allowed"
                   : "bg-[#09142b] text-[#c8a45e] hover:bg-[#0a1a2f] hover:text-white"
@@ -310,14 +386,30 @@ const Contact = () => {
             </button>
             {status === "success" && (
               <div className="flex items-center gap-2 text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3 mt-2">
-                <FiCheckCircle className="text-green-600 text-xl" />
-                <span>{t("contactSuccess")}</span>
+                <FiCheckCircle
+                  className={`text-green-600 ${
+                    isRTL ? "text-lg md:text-xl" : "text-xl"
+                  }`}
+                />
+                <span
+                  className={`${isRTL ? "text-sm md:text-base" : "text-base"}`}
+                >
+                  {t("contactSuccess")}
+                </span>
               </div>
             )}
             {status === "error" && (
               <div className="flex items-center gap-2 text-red-700 bg-red-50 border border-red-200 rounded-lg px-4 py-3 mt-2">
-                <FiAlertCircle className="text-red-600 text-xl" />
-                <span>{t("contactError")}</span>
+                <FiAlertCircle
+                  className={`text-red-600 ${
+                    isRTL ? "text-lg md:text-xl" : "text-xl"
+                  }`}
+                />
+                <span
+                  className={`${isRTL ? "text-sm md:text-base" : "text-base"}`}
+                >
+                  {t("contactError")}
+                </span>
               </div>
             )}
           </form>

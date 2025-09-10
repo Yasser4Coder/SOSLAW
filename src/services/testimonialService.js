@@ -25,7 +25,7 @@ class TestimonialService {
   async getPublicTestimonials(options = {}) {
     const params = new URLSearchParams();
     const API_BASE_URL =
-      import.meta.env?.VITE_API_URL || "http://localhost:5000";
+      import.meta.env?.VITE_API_URL || "https://api-v1.soslawdz.com";
 
     if (options.limit) params.append("limit", options.limit);
     if (options.language) params.append("language", options.language);
@@ -95,7 +95,7 @@ class TestimonialService {
   // Get testimonial statistics
   async getTestimonialStats() {
     const API_BASE_URL =
-      import.meta.env?.VITE_API_URL || "http://localhost:5000";
+      import.meta.env?.VITE_API_URL || "https://api-v1.soslawdz.com";
     const response = await axios.get(
       `${API_BASE_URL}/public/testimonials/stats`
     );

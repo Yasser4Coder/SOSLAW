@@ -45,10 +45,20 @@ const ServicesSection = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-[#c8a45e] rounded-full mb-6">
             <FaGavel className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-[#09142b] mb-4">
+          <h2
+            className={`font-bold text-[#09142b] mb-4 ${
+              currentLanguage === "ar"
+                ? "text-2xl md:text-4xl"
+                : "text-3xl md:text-4xl"
+            }`}
+          >
             {t("servicesTitle", "Our Legal Services")}
           </h2>
-          <p className="text-lg text-[#6b7280] max-w-3xl mx-auto">
+          <p
+            className={`text-[#6b7280] max-w-3xl mx-auto ${
+              currentLanguage === "ar" ? "text-sm md:text-lg" : "text-lg"
+            }`}
+          >
             {t(
               "servicesDesc",
               "Comprehensive legal services tailored to meet your specific needs. From consultation to document preparation, we've got you covered."

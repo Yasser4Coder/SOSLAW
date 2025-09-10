@@ -23,7 +23,7 @@ const Settings = () => {
   const [settings, setSettings] = useState({
     general: {
       siteName: "SOSLAW",
-      siteDescription: "منصة جزائرية رقمية للاستشارات والخدمات القانونية",
+      siteDescription: "خدمات واستشارات قانونية رقمية في الجزائر",
       contactEmail: "info@soslaw.com",
       contactPhone: "+213 123 456 789",
       address: "الجزائر العاصمة، الجزائر",

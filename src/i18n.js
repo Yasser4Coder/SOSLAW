@@ -21,9 +21,8 @@ i18n
       useSuspense: false,
     },
     detection: {
-      order: ["localStorage", "navigator", "htmlTag"],
-      caches: ["localStorage"],
-      lookupLocalStorage: "i18nextLng",
+      order: ["htmlTag"], // Always default to Arabic
+      caches: [],
     },
   });
 

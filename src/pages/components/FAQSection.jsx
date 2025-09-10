@@ -63,13 +63,21 @@ const FAQSection = () => {
         className="w-full bg-[#faf6f0] py-16 px-4 md:px-8 border-t border-[#e7cfa7]"
       >
         <div className="max-w-3xl mx-auto text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-[#09142b] mb-4">
+          <h2
+            className={`font-extrabold text-[#09142b] mb-4 ${
+              isRTL ? "text-2xl md:text-4xl" : "text-3xl md:text-4xl"
+            }`}
+          >
             {t("faqSectionTitle")}
           </h2>
         </div>
         <div className="max-w-3xl mx-auto flex items-center justify-center py-8">
           <FiLoader className="animate-spin text-4xl text-[#c8a45e]" />
-          <span className="mr-3 text-lg text-[#09142b]">
+          <span
+            className={`mr-3 text-[#09142b] ${
+              isRTL ? "text-sm md:text-lg" : "text-lg"
+            }`}
+          >
             {t("loading", "جاري التحميل...")}
           </span>
         </div>
@@ -85,15 +93,27 @@ const FAQSection = () => {
         className="w-full bg-[#faf6f0] py-16 px-4 md:px-8 border-t border-[#e7cfa7]"
       >
         <div className="max-w-3xl mx-auto text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-[#09142b] mb-4">
+          <h2
+            className={`font-extrabold text-[#09142b] mb-4 ${
+              isRTL ? "text-2xl md:text-4xl" : "text-3xl md:text-4xl"
+            }`}
+          >
             {t("faqSectionTitle")}
           </h2>
         </div>
         <div className="max-w-3xl mx-auto text-center py-8">
-          <div className="text-red-600 text-lg mb-2">
+          <div
+            className={`text-red-600 mb-2 ${
+              isRTL ? "text-base md:text-lg" : "text-lg"
+            }`}
+          >
             {t("errorLoadingData", "خطأ في تحميل البيانات")}
           </div>
-          <div className="text-gray-600">
+          <div
+            className={`text-gray-600 ${
+              isRTL ? "text-sm md:text-base" : "text-base"
+            }`}
+          >
             {error.message ||
               t("tryAgainLater", "يرجى المحاولة مرة أخرى لاحقاً")}
           </div>
@@ -108,10 +128,18 @@ const FAQSection = () => {
       className="w-full bg-[#faf6f0] py-16 px-4 md:px-8 border-t border-[#e7cfa7]"
     >
       <div className="max-w-3xl mx-auto text-center mb-10">
-        <h2 className="text-3xl md:text-4xl font-extrabold text-[#09142b] mb-4">
+        <h2
+          className={`font-extrabold text-[#09142b] mb-4 ${
+            isRTL ? "text-2xl md:text-4xl" : "text-3xl md:text-4xl"
+          }`}
+        >
           {t("faqSectionTitle")}
         </h2>
-        <p className="text-lg text-[#09142b] opacity-80">
+        <p
+          className={`text-[#09142b] opacity-80 ${
+            isRTL ? "text-sm md:text-lg" : "text-lg"
+          }`}
+        >
           {t("faqSectionSubtitle", "إجابات على الأسئلة الأكثر شيوعاً")}
         </p>
       </div>
@@ -122,7 +150,9 @@ const FAQSection = () => {
           <div className="flex flex-wrap justify-center gap-2">
             <button
               onClick={() => handleCategoryChange("all")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-full font-medium transition-colors ${
+                isRTL ? "text-xs md:text-sm" : "text-sm"
+              } ${
                 selectedCategory === "all"
                   ? "bg-[#c8a45e] text-white"
                   : "bg-white text-[#09142b] hover:bg-[#e7cfa7] border border-[#e7cfa7]"
@@ -134,7 +164,9 @@ const FAQSection = () => {
               <button
                 key={category.slug}
                 onClick={() => handleCategoryChange(category.slug)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-full font-medium transition-colors ${
+                  isRTL ? "text-xs md:text-sm" : "text-sm"
+                } ${
                   selectedCategory === category.slug
                     ? "bg-[#c8a45e] text-white"
                     : "bg-white text-[#09142b] hover:bg-[#e7cfa7] border border-[#e7cfa7]"
@@ -151,7 +183,11 @@ const FAQSection = () => {
       <div className="max-w-3xl mx-auto">
         {faqs.length === 0 ? (
           <div className="text-center py-8">
-            <div className="text-gray-600 text-lg">
+            <div
+              className={`text-gray-600 ${
+                isRTL ? "text-base md:text-lg" : "text-lg"
+              }`}
+            >
               {selectedCategory === "all"
                 ? t("noFAQsAvailable", "لا توجد أسئلة شائعة متاحة حالياً")
                 : t("noFAQsInCategory", "لا توجد أسئلة في هذه الفئة")}

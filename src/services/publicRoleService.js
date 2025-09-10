@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "https://api-v1.soslawdz.com";
 
 // Create axios instance for public endpoints
 const publicApi = axios.create({
@@ -34,17 +35,23 @@ export const getPublicRoleStats = async (params = {}) => {
     const response = await publicApi.get("/public/roles/stats", { params });
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to fetch role stats");
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch role stats"
+    );
   }
 };
 
 // Get role categories
 export const getPublicRoleCategories = async (params = {}) => {
   try {
-    const response = await publicApi.get("/public/roles/categories", { params });
+    const response = await publicApi.get("/public/roles/categories", {
+      params,
+    });
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to fetch role categories");
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch role categories"
+    );
   }
 };
 

@@ -58,16 +58,28 @@ const ConsultantsSection = () => {
         className="w-full bg-[#faf6f0] py-16 px-4 md:px-8"
       >
         <div className="max-w-6xl mx-auto text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-[#09142b] mb-4">
+          <h2
+            className={`font-extrabold text-[#09142b] mb-4 ${
+              lang === "ar" ? "text-2xl md:text-4xl" : "text-3xl md:text-4xl"
+            }`}
+          >
             {t("consultantsTitle")}
           </h2>
-          <p className="text-[#6b7280] text-base md:text-lg max-w-2xl mx-auto">
+          <p
+            className={`text-[#6b7280] max-w-2xl mx-auto ${
+              lang === "ar" ? "text-sm md:text-lg" : "text-base md:text-lg"
+            }`}
+          >
             {t("consultantsDesc")}
           </p>
         </div>
         <div className="flex items-center justify-center h-64">
           <FiLoader className="animate-spin text-4xl text-blue-600" />
-          <span className="mr-3 text-lg text-gray-600">
+          <span
+            className={`mr-3 text-gray-600 ${
+              lang === "ar" ? "text-sm md:text-lg" : "text-lg"
+            }`}
+          >
             جاري تحميل المستشارين...
           </span>
         </div>
@@ -83,16 +95,36 @@ const ConsultantsSection = () => {
         className="w-full bg-[#faf6f0] py-16 px-4 md:px-8"
       >
         <div className="max-w-6xl mx-auto text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-[#09142b] mb-4">
+          <h2
+            className={`font-extrabold text-[#09142b] mb-4 ${
+              lang === "ar" ? "text-2xl md:text-4xl" : "text-3xl md:text-4xl"
+            }`}
+          >
             {t("consultantsTitle")}
           </h2>
-          <p className="text-[#6b7280] text-base md:text-lg max-w-2xl mx-auto">
+          <p
+            className={`text-[#6b7280] max-w-2xl mx-auto ${
+              lang === "ar" ? "text-sm md:text-lg" : "text-base md:text-lg"
+            }`}
+          >
             {t("consultantsDesc")}
           </p>
         </div>
         <div className="text-center py-8">
-          <div className="text-red-600 text-lg mb-2">خطأ في تحميل البيانات</div>
-          <div className="text-gray-600">{error.message}</div>
+          <div
+            className={`text-red-600 mb-2 ${
+              lang === "ar" ? "text-base md:text-lg" : "text-lg"
+            }`}
+          >
+            خطأ في تحميل البيانات
+          </div>
+          <div
+            className={`text-gray-600 ${
+              lang === "ar" ? "text-sm md:text-base" : "text-base"
+            }`}
+          >
+            {error.message}
+          </div>
         </div>
       </section>
     );
@@ -106,25 +138,29 @@ const ConsultantsSection = () => {
         className="w-full bg-[#faf6f0] py-16 px-4 md:px-8"
       >
         <div className="max-w-6xl mx-auto text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-[#09142b] mb-4">
+          <h2
+            className={`font-extrabold text-[#09142b] mb-4 ${
+              lang === "ar" ? "text-2xl md:text-4xl" : "text-3xl md:text-4xl"
+            }`}
+          >
             {t("consultantsTitle")}
           </h2>
-          <p className="text-[#6b7280] text-base md:text-lg max-w-2xl mx-auto">
+          <p
+            className={`text-[#6b7280] max-w-2xl mx-auto ${
+              lang === "ar" ? "text-sm md:text-lg" : "text-base md:text-lg"
+            }`}
+          >
             {t("consultantsDesc")}
           </p>
         </div>
         <div className="text-center py-8">
-          <div className="text-gray-600 text-lg mb-4">
+          <div
+            className={`text-gray-600 mb-4 ${
+              lang === "ar" ? "text-base md:text-lg" : "text-lg"
+            }`}
+          >
             لا يوجد مستشارين متاحين حالياً
           </div>
-          <button
-            onClick={() => {
-              testApiCall();
-            }}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-          >
-            Debug Info
-          </button>
         </div>
       </section>
     );
@@ -136,10 +172,18 @@ const ConsultantsSection = () => {
       className="w-full bg-[#faf6f0] py-16 px-4 md:px-8"
     >
       <div className="max-w-6xl mx-auto text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-extrabold text-[#09142b] mb-4">
+        <h2
+          className={`font-extrabold text-[#09142b] mb-4 ${
+            lang === "ar" ? "text-2xl md:text-4xl" : "text-3xl md:text-4xl"
+          }`}
+        >
           {t("consultantsTitle")}
         </h2>
-        <p className="text-[#6b7280] text-base md:text-lg max-w-2xl mx-auto">
+        <p
+          className={`text-[#6b7280] max-w-2xl mx-auto ${
+            lang === "ar" ? "text-sm md:text-lg" : "text-base md:text-lg"
+          }`}
+        >
           {t("consultantsDesc")}
         </p>
       </div>

@@ -1,7 +1,8 @@
 import api from "./api.js";
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "https://api-v1.soslawdz.com";
 
 // Protected routes (admin)
 export const getAllRoles = (params = {}) => {

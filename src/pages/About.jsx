@@ -30,20 +30,38 @@ const AboutHero = () => {
 
       <div className="relative z-10 max-w-5xl mx-auto">
         <div className="flex items-center justify-center gap-3 mb-6">
-          <FiStar className="text-[#c8a45e] text-2xl animate-pulse" />
-          <span className="text-[#c8a45e] font-bold text-lg">SOS Law</span>
-          <FiStar className="text-[#c8a45e] text-2xl animate-pulse" />
+          <FiStar
+            className={`text-[#c8a45e] animate-pulse ${
+              isRTL ? "text-xl md:text-2xl" : "text-2xl"
+            }`}
+          />
+          <span
+            className={`text-[#c8a45e] font-bold ${
+              isRTL ? "text-sm md:text-lg" : "text-lg"
+            }`}
+          >
+            SOS Law
+          </span>
+          <FiStar
+            className={`text-[#c8a45e] animate-pulse ${
+              isRTL ? "text-xl md:text-2xl" : "text-2xl"
+            }`}
+          />
         </div>
 
         <h1
-          className="text-4xl md:text-6xl font-extrabold text-[#09142b] mb-6 leading-tight"
+          className={`font-extrabold text-[#09142b] mb-6 leading-tight ${
+            isRTL ? "text-3xl md:text-6xl" : "text-4xl md:text-6xl"
+          }`}
           dir={isRTL ? "rtl" : "ltr"}
         >
           {t("aboutPageTitle", "About Us")}
         </h1>
 
         <p
-          className="text-[#6b7280] text-lg md:text-xl max-w-4xl mx-auto mb-8 leading-relaxed"
+          className={`text-[#6b7280] max-w-4xl mx-auto mb-8 leading-relaxed ${
+            isRTL ? "text-sm md:text-xl" : "text-lg md:text-xl"
+          }`}
           dir={isRTL ? "rtl" : "ltr"}
         >
           {t(
@@ -53,8 +71,17 @@ const AboutHero = () => {
         </p>
 
         <div className="flex items-center justify-center gap-4">
-          <FiGlobe className="text-[#c8a45e] text-3xl" aria-hidden="true" />
-          <span className="text-[#c8a45e] font-semibold text-xl">
+          <FiGlobe
+            className={`text-[#c8a45e] ${
+              isRTL ? "text-2xl md:text-3xl" : "text-3xl"
+            }`}
+            aria-hidden="true"
+          />
+          <span
+            className={`text-[#c8a45e] font-semibold ${
+              isRTL ? "text-base md:text-xl" : "text-xl"
+            }`}
+          >
             {t("aboutInnovativePlatform", "Innovative Digital Legal Platform")}
           </span>
         </div>
@@ -71,8 +98,16 @@ const AboutWhoWeAre = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-[#faf6f0] px-4 py-2 rounded-full mb-4">
-            <FiCheckCircle className="text-[#c8a45e] text-lg" />
-            <span className="text-[#09142b] font-semibold">
+            <FiCheckCircle
+              className={`text-[#c8a45e] ${
+                isRTL ? "text-base md:text-lg" : "text-lg"
+              }`}
+            />
+            <span
+              className={`text-[#09142b] font-semibold ${
+                isRTL ? "text-sm md:text-base" : "text-base"
+              }`}
+            >
               {t("aboutWhoWeAreTitle", "Who We Are")}
             </span>
           </div>
@@ -83,14 +118,22 @@ const AboutWhoWeAre = () => {
             className={`space-y-6 ${isRTL ? "text-right" : "text-left"}`}
             dir={isRTL ? "rtl" : "ltr"}
           >
-            <p className="text-[#09142b] text-lg leading-relaxed">
+            <p
+              className={`text-[#09142b] leading-relaxed ${
+                isRTL ? "text-sm md:text-lg" : "text-lg"
+              }`}
+            >
               {t(
                 "aboutWhoWeAreDesc1",
                 "We operate under a dual model that combines physical presence through a licensed legal institution and technical interaction through an integrated digital platform, providing individuals and companies with a modern and secure way to access reliable legal services."
               )}
             </p>
 
-            <p className="text-[#09142b] text-lg leading-relaxed">
+            <p
+              className={`text-[#09142b] leading-relaxed ${
+                isRTL ? "text-sm md:text-lg" : "text-lg"
+              }`}
+            >
               {t(
                 "aboutWhoWeAreDesc2",
                 "At SOS Law, we believe that legal knowledge is not exclusive to specialists only, but a right for every individual. That's why we've made technology a means to spread awareness, simplify access to lawyers and consultants, and provide fast and modern legal solutions that consider the needs of Algerian society in all its segments."
@@ -165,8 +208,16 @@ const AboutDistinctiveFeatures = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full mb-4 shadow-md">
-            <FiStar className="text-[#c8a45e] text-lg" />
-            <span className="text-[#09142b] font-semibold">
+            <FiStar
+              className={`text-[#c8a45e] ${
+                isRTL ? "text-base md:text-lg" : "text-lg"
+              }`}
+            />
+            <span
+              className={`text-[#09142b] font-semibold ${
+                isRTL ? "text-sm md:text-base" : "text-base"
+              }`}
+            >
               {t("aboutDistinctiveTitle", "What Distinguishes SOS Law?")}
             </span>
           </div>
@@ -185,7 +236,11 @@ const AboutDistinctiveFeatures = () => {
                 <div className="flex-shrink-0 w-10 h-10 bg-[#c8a45e] rounded-lg flex items-center justify-center text-white">
                   {feature.icon}
                 </div>
-                <p className="text-[#09142b] font-medium leading-relaxed">
+                <p
+                  className={`text-[#09142b] font-medium leading-relaxed ${
+                    isRTL ? "text-sm md:text-base" : "text-base"
+                  }`}
+                >
                   {feature.text}
                 </p>
               </div>
@@ -249,8 +304,16 @@ const AboutValues = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-[#faf6f0] px-4 py-2 rounded-full mb-4">
-            <FiHeart className="text-[#c8a45e] text-lg" />
-            <span className="text-[#09142b] font-semibold">
+            <FiHeart
+              className={`text-[#c8a45e] ${
+                isRTL ? "text-base md:text-lg" : "text-lg"
+              }`}
+            />
+            <span
+              className={`text-[#09142b] font-semibold ${
+                isRTL ? "text-sm md:text-base" : "text-base"
+              }`}
+            >
               {t("aboutValuesTitle", "Our Values")}
             </span>
           </div>
@@ -268,10 +331,20 @@ const AboutValues = () => {
               <div className="w-16 h-16 bg-[#c8a45e] rounded-full flex items-center justify-center mx-auto mb-4 text-white">
                 {value.icon}
               </div>
-              <h3 className="text-xl font-bold text-[#09142b] mb-3">
+              <h3
+                className={`font-bold text-[#09142b] mb-3 ${
+                  isRTL ? "text-lg md:text-xl" : "text-xl"
+                }`}
+              >
                 {value.title}
               </h3>
-              <p className="text-[#6b7280] leading-relaxed">{value.desc}</p>
+              <p
+                className={`text-[#6b7280] leading-relaxed ${
+                  isRTL ? "text-sm md:text-base" : "text-base"
+                }`}
+              >
+                {value.desc}
+              </p>
             </div>
           ))}
         </div>
@@ -305,11 +378,19 @@ const AboutVisionMission = () => {
               <div className="w-12 h-12 bg-gradient-to-br from-[#c8a45e] to-[#b48b5a] rounded-full flex items-center justify-center shadow-md">
                 <FiTarget className="text-white text-xl" />
               </div>
-              <h2 className="text-2xl font-bold text-[#09142b]">
+              <h2
+                className={`font-bold text-[#09142b] ${
+                  isRTL ? "text-xl md:text-2xl" : "text-2xl"
+                }`}
+              >
                 {t("aboutVisionTitle", "Our Vision")}
               </h2>
             </div>
-            <p className="text-lg leading-relaxed text-[#6b7280]">
+            <p
+              className={`leading-relaxed text-[#6b7280] ${
+                isRTL ? "text-sm md:text-lg" : "text-lg"
+              }`}
+            >
               {t(
                 "aboutVisionDesc",
                 "To be the first digital legal reference in Algeria and the region, by combining real-world expertise with modern technology."
@@ -328,11 +409,19 @@ const AboutVisionMission = () => {
               <div className="w-12 h-12 bg-gradient-to-br from-[#c8a45e] to-[#b48b5a] rounded-full flex items-center justify-center shadow-md">
                 <FiShield className="text-white text-xl" />
               </div>
-              <h2 className="text-2xl font-bold text-[#09142b]">
+              <h2
+                className={`font-bold text-[#09142b] ${
+                  isRTL ? "text-xl md:text-2xl" : "text-2xl"
+                }`}
+              >
                 {t("aboutMissionTitle", "Our Mission")}
               </h2>
             </div>
-            <p className="text-lg leading-relaxed text-[#6b7280]">
+            <p
+              className={`leading-relaxed text-[#6b7280] ${
+                isRTL ? "text-sm md:text-lg" : "text-lg"
+              }`}
+            >
               {t(
                 "aboutMissionDesc",
                 "To provide professional, simplified, and secure legal services that ensure individuals and companies access their legal rights, and contribute to building a more law-aware society."
@@ -349,7 +438,7 @@ const About = () => {
   const { t } = useTranslation();
   const title = t(
     "aboutSeoTitle",
-    "عن منصة SOSLAW | منصة جزائرية رقمية للاستشارات والخدمات القانونية"
+    "عن منصة SOSLAW | خدمات واستشارات قانونية رقمية في الجزائر"
   );
   const desc = t(
     "aboutSeoDesc",
@@ -368,7 +457,7 @@ const About = () => {
     mainEntity: {
       "@type": "LegalService",
       name: "SOSLAW",
-      description: "منصة جزائرية رقمية للاستشارات والخدمات القانونية",
+      description: "خدمات واستشارات قانونية رقمية في الجزائر",
       founder: {
         "@type": "Organization",
         name: "SOSLAW Team",

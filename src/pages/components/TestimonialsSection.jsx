@@ -81,12 +81,20 @@ const TestimonialsSection = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-[#c8a45e] rounded-full mb-6">
             <FiMessageSquare className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-[#09142b] mb-4">
+          <h2
+            className={`font-bold text-[#09142b] mb-4 ${
+              isRTL ? "text-2xl md:text-4xl" : "text-3xl md:text-4xl"
+            }`}
+          >
             {t("testimonialsTitle", "What Our Clients Say")}
           </h2>
           <div className="flex items-center justify-center h-64">
             <FiLoader className="animate-spin text-4xl text-blue-600" />
-            <span className="mr-3 text-lg text-gray-600">
+            <span
+              className={`mr-3 text-gray-600 ${
+                isRTL ? "text-sm md:text-lg" : "text-lg"
+              }`}
+            >
               جاري تحميل التوصيات...
             </span>
           </div>
@@ -106,14 +114,28 @@ const TestimonialsSection = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-[#c8a45e] rounded-full mb-6">
             <FiMessageSquare className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-[#09142b] mb-4">
+          <h2
+            className={`font-bold text-[#09142b] mb-4 ${
+              isRTL ? "text-2xl md:text-4xl" : "text-3xl md:text-4xl"
+            }`}
+          >
             {t("testimonialsTitle", "What Our Clients Say")}
           </h2>
           <div className="text-center py-8">
-            <div className="text-red-600 text-lg mb-2">
+            <div
+              className={`text-red-600 mb-2 ${
+                isRTL ? "text-base md:text-lg" : "text-lg"
+              }`}
+            >
               خطأ في تحميل البيانات
             </div>
-            <div className="text-gray-600">{error.message}</div>
+            <div
+              className={`text-gray-600 ${
+                isRTL ? "text-sm md:text-base" : "text-base"
+              }`}
+            >
+              {error.message}
+            </div>
           </div>
         </div>
       </section>
@@ -131,10 +153,18 @@ const TestimonialsSection = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-[#c8a45e] rounded-full mb-6">
             <FiMessageSquare className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-[#09142b] mb-4">
+          <h2
+            className={`font-bold text-[#09142b] mb-4 ${
+              isRTL ? "text-2xl md:text-4xl" : "text-3xl md:text-4xl"
+            }`}
+          >
             {t("testimonialsTitle", "What Our Clients Say")}
           </h2>
-          <p className="text-lg text-[#6b7280] max-w-3xl mx-auto">
+          <p
+            className={`text-[#6b7280] max-w-3xl mx-auto ${
+              isRTL ? "text-sm md:text-lg" : "text-lg"
+            }`}
+          >
             {t(
               "testimonialsDesc",
               "Discover why thousands of clients trust SOS Law for their legal needs. Read authentic reviews from satisfied customers across various industries."
@@ -162,10 +192,18 @@ const TestimonialsSection = () => {
               <div className="w-12 h-12 bg-[#c8a45e] rounded-full flex items-center justify-center mx-auto mb-3">
                 <FiStar className="w-6 h-6 text-white" />
               </div>
-              <div className="text-2xl font-bold text-[#09142b] mb-1">
+              <div
+                className={`font-bold text-[#09142b] mb-1 ${
+                  isRTL ? "text-xl md:text-2xl" : "text-2xl"
+                }`}
+              >
                 {testimonialsStats.averageRating || 0}
               </div>
-              <div className="text-sm text-gray-600">
+              <div
+                className={`text-gray-600 ${
+                  isRTL ? "text-xs md:text-sm" : "text-sm"
+                }`}
+              >
                 {t("averageRating", "Average Rating")}
               </div>
             </div>
@@ -174,10 +212,18 @@ const TestimonialsSection = () => {
               <div className="w-12 h-12 bg-[#c8a45e] rounded-full flex items-center justify-center mx-auto mb-3">
                 <FiUsers className="w-6 h-6 text-white" />
               </div>
-              <div className="text-2xl font-bold text-[#09142b] mb-1">
+              <div
+                className={`font-bold text-[#09142b] mb-1 ${
+                  isRTL ? "text-xl md:text-2xl" : "text-2xl"
+                }`}
+              >
                 {(testimonialsStats.totalTestimonials || 0).toLocaleString()}
               </div>
-              <div className="text-sm text-gray-600">
+              <div
+                className={`text-gray-600 ${
+                  isRTL ? "text-xs md:text-sm" : "text-sm"
+                }`}
+              >
                 {t("totalReviews", "Total Reviews")}
               </div>
             </div>
@@ -186,10 +232,18 @@ const TestimonialsSection = () => {
               <div className="w-12 h-12 bg-[#c8a45e] rounded-full flex items-center justify-center mx-auto mb-3">
                 <FiAward className="w-6 h-6 text-white" />
               </div>
-              <div className="text-2xl font-bold text-[#09142b] mb-1">
+              <div
+                className={`font-bold text-[#09142b] mb-1 ${
+                  isRTL ? "text-xl md:text-2xl" : "text-2xl"
+                }`}
+              >
                 {testimonialsStats.satisfiedClients || 0}%
               </div>
-              <div className="text-sm text-gray-600">
+              <div
+                className={`text-gray-600 ${
+                  isRTL ? "text-xs md:text-sm" : "text-sm"
+                }`}
+              >
                 {t("satisfiedClients", "Satisfied Clients")}
               </div>
             </div>
@@ -198,10 +252,18 @@ const TestimonialsSection = () => {
               <div className="w-12 h-12 bg-[#c8a45e] rounded-full flex items-center justify-center mx-auto mb-3">
                 <FiClock className="w-6 h-6 text-white" />
               </div>
-              <div className="text-2xl font-bold text-[#09142b] mb-1">
+              <div
+                className={`font-bold text-[#09142b] mb-1 ${
+                  isRTL ? "text-xl md:text-2xl" : "text-2xl"
+                }`}
+              >
                 {testimonialsStats.yearsOfService || 5}+
               </div>
-              <div className="text-sm text-gray-600">
+              <div
+                className={`text-gray-600 ${
+                  isRTL ? "text-xs md:text-sm" : "text-sm"
+                }`}
+              >
                 {t("yearsOfService", "Years of Service")}
               </div>
             </div>
@@ -214,7 +276,9 @@ const TestimonialsSection = () => {
             <button
               key={rating}
               onClick={() => setActiveTab(rating)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${
+              className={`px-4 py-2 rounded-full font-medium transition-colors duration-200 ${
+                isRTL ? "text-xs md:text-sm" : "text-sm"
+              } ${
                 activeTab === rating
                   ? "bg-[#c8a45e] text-white"
                   : "bg-white text-[#6b7280] hover:bg-gray-50 border border-gray-200"
@@ -256,10 +320,18 @@ const TestimonialsSection = () => {
               >
                 {renderStars(testimonialsStats.averageRating)}
               </div>
-              <span className="text-lg font-semibold text-[#09142b]">
+              <span
+                className={`font-semibold text-[#09142b] ${
+                  isRTL ? "text-base md:text-lg" : "text-lg"
+                }`}
+              >
                 {testimonialsStats.averageRating || 0} {t("outOf", "out of")} 5
               </span>
-              <span className="text-sm text-[#6b7280]">
+              <span
+                className={`text-[#6b7280] ${
+                  isRTL ? "text-xs md:text-sm" : "text-sm"
+                }`}
+              >
                 ({(testimonialsStats.totalTestimonials || 0).toLocaleString()}{" "}
                 {t("reviews", "reviews")})
               </span>
@@ -280,10 +352,18 @@ const TestimonialsSection = () => {
           </div>
         ) : (
           <div className="text-center py-12">
-            <div className="text-gray-500 text-lg mb-2">
+            <div
+              className={`text-gray-500 mb-2 ${
+                isRTL ? "text-base md:text-lg" : "text-lg"
+              }`}
+            >
               لا توجد توصيات متاحة حالياً
             </div>
-            <div className="text-gray-400 text-sm">
+            <div
+              className={`text-gray-400 ${
+                isRTL ? "text-xs md:text-sm" : "text-sm"
+              }`}
+            >
               سيتم عرض التوصيات هنا عند توفرها
             </div>
           </div>
@@ -292,10 +372,18 @@ const TestimonialsSection = () => {
         {/* CTA Section */}
         <div className="text-center mt-12">
           <div className="bg-gradient-to-r from-[#c8a45e] to-[#b48b5a] rounded-lg p-8 text-white">
-            <h3 className="text-2xl font-bold mb-4">
+            <h3
+              className={`font-bold mb-4 ${
+                isRTL ? "text-xl md:text-2xl" : "text-2xl"
+              }`}
+            >
               {t("testimonialsCTA", "Join Our Satisfied Clients")}
             </h3>
-            <p className="text-lg mb-6 opacity-90">
+            <p
+              className={`mb-6 opacity-90 ${
+                isRTL ? "text-sm md:text-lg" : "text-lg"
+              }`}
+            >
               {t(
                 "testimonialsCTADesc",
                 "Experience the same level of excellence that our clients rave about. Get started with SOS Law today."

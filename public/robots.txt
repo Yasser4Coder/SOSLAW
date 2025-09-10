@@ -2,25 +2,24 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://soslaw.com/sitemap.xml
+Sitemap: https://soslawdz.com/sitemap.xml
 
 # Crawl-delay
 Crawl-delay: 1
 
-# Disallow admin/dashboard areas
-Disallow: /dashboard/
+# Disallow admin areas
 Disallow: /admin/
+Disallow: /api/
+Disallow: /_redirects
+Disallow: /404.html
 
 # Allow important pages
 Allow: /
 Allow: /about
 Allow: /contact
+Allow: /join-team
+Allow: /library
 Allow: /services
 Allow: /consultants
-Allow: /library
-Allow: /join-team
-Allow: /request-service
-Allow: /auth
-
-# Host
-Host: https://soslaw.com
+Allow: /testimonials
+Allow: /faq

@@ -94,13 +94,13 @@ const HeroSection = () => {
             {/* Icon + Subtitle */}
             <div
               className={`flex items-center mb-4 md:mb-6 gap-2 ${
-                isRTL ? "text-lg md:text-xl" : ""
+                isRTL ? "text-sm md:text-lg" : ""
               }`}
             >
-              <JusticeIcon className="w-6 h-6 text-[#b48b5a]" />
+              <JusticeIcon className="w-5 h-5 md:w-6 md:h-6 text-[#b48b5a]" />
               <h2
-                className={`uppercase tracking-widest text-[#b48b5a] text-base md:text-lg font-semibold ${
-                  isRTL ? "text-xl md:text-2xl" : ""
+                className={`uppercase tracking-widest text-[#b48b5a] text-sm md:text-lg font-semibold ${
+                  isRTL ? "text-base md:text-xl" : ""
                 }`}
               >
                 {t("heroSubtitle")}
@@ -110,7 +110,7 @@ const HeroSection = () => {
             <h1
               className={`font-serif text-white font-extrabold mb-4 md:mb-6 leading-tight drop-shadow-lg ${
                 isRTL
-                  ? "text-3xl md:text-5xl lg:text-6xl"
+                  ? "text-2xl md:text-5xl lg:text-6xl"
                   : "text-3xl md:text-5xl lg:text-6xl"
               }`}
             >
@@ -121,7 +121,7 @@ const HeroSection = () => {
               <h2
                 className={`text-white font-bold mb-2 drop-shadow-md ${
                   isRTL
-                    ? "text-lg md:text-xl lg:text-2xl"
+                    ? "text-base md:text-xl lg:text-2xl"
                     : "text-base md:text-lg lg:text-xl"
                 }`}
               >
@@ -129,7 +129,7 @@ const HeroSection = () => {
               </h2>
               <p
                 className={`text-[#b48b5a] font-semibold drop-shadow-md ${
-                  isRTL ? "text-base md:text-lg" : "text-sm md:text-base"
+                  isRTL ? "text-sm md:text-lg" : "text-sm md:text-base"
                 }`}
               >
                 {t("heroTaglineSubtitle")}
@@ -139,7 +139,7 @@ const HeroSection = () => {
             <p
               className={`text-white mb-8 max-w-xl drop-shadow-md ${
                 isRTL
-                  ? "text-base md:text-lg lg:text-xl"
+                  ? "text-sm md:text-lg lg:text-xl"
                   : "text-sm md:text-base lg:text-lg"
               }`}
             >
@@ -151,14 +151,18 @@ const HeroSection = () => {
             <div className="flex gap-4 mb-8">
               <Link
                 to="/contact"
-                className="px-8 py-3 bg-[#b48b5a] text-white font-bold rounded shadow-lg hover:bg-[#a07a4a] active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#b48b5a] text-lg cursor-pointer"
+                className={`px-6 py-2 md:px-8 md:py-3 bg-[#b48b5a] text-white font-bold rounded shadow-lg hover:bg-[#a07a4a] active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#b48b5a] cursor-pointer ${
+                  isRTL ? "text-sm md:text-lg" : "text-base md:text-lg"
+                }`}
                 aria-label={t("heroRequestNow")}
               >
                 {t("heroRequestNow")}
               </Link>
               <button
                 onClick={() => scrollToSection("services")}
-                className="px-8 py-3 bg-white/20 text-white font-semibold rounded border border-white/40 hover:bg-white/30 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#b48b5a] text-lg cursor-pointer backdrop-blur-sm"
+                className={`px-6 py-2 md:px-8 md:py-3 bg-white/20 text-white font-semibold rounded border border-white/40 hover:bg-white/30 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#b48b5a] cursor-pointer backdrop-blur-sm ${
+                  isRTL ? "text-sm md:text-lg" : "text-base md:text-lg"
+                }`}
                 aria-label={t("learnMore") || "Learn More"}
               >
                 {t("learnMore") || "Learn More"}

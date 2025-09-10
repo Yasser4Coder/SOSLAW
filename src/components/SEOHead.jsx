@@ -28,7 +28,7 @@ const SEOHead = ({
     alternateName: "SOS Law",
     description:
       description ||
-      "منصة جزائرية رقمية للاستشارات والخدمات القانونية. استشارتك القانونية أينما كنت.",
+      "خدمات واستشارات قانونية رقمية في الجزائر. استشارتك القانونية أينما كنت.",
     url: fullCanonical,
     logo: `${baseUrl}/logo.svg`,
     image: fullOgImage,

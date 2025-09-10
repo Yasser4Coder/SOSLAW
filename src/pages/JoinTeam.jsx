@@ -257,10 +257,18 @@ const JoinTeam = () => {
           className="max-w-4xl mx-auto text-center relative z-10 font-arabic"
           dir={isRTL ? "rtl" : "ltr"}
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+          <h1
+            className={`font-bold text-white mb-6 ${
+              isRTL ? "text-3xl md:text-5xl" : "text-4xl md:text-5xl"
+            }`}
+          >
             {t("joinTeamPageTitle", "Join Our Team")}
           </h1>
-          <p className="text-[#e7cfa7] text-lg md:text-xl max-w-2xl mx-auto">
+          <p
+            className={`text-[#e7cfa7] max-w-2xl mx-auto ${
+              isRTL ? "text-sm md:text-xl" : "text-lg md:text-xl"
+            }`}
+          >
             {t(
               "joinTeamHeroDesc",
               "Be part of the digital legal services revolution. We're looking for specialized and passionate talents to build the future of law"
@@ -278,10 +286,18 @@ const JoinTeam = () => {
           {/* Role Selection */}
           <div className="mb-12 font-arabic">
             <div className="text-center mb-10">
-              <h2 className="text-3xl md:text-4xl font-bold text-[#09142b] mb-4">
+              <h2
+                className={`font-bold text-[#09142b] mb-4 ${
+                  isRTL ? "text-2xl md:text-4xl" : "text-3xl md:text-4xl"
+                }`}
+              >
                 {t("joinTeamSelectRole", "Choose the Right Role for You")}
               </h2>
-              <p className="text-[#6b7280] text-lg max-w-2xl mx-auto">
+              <p
+                className={`text-[#6b7280] max-w-2xl mx-auto ${
+                  isRTL ? "text-sm md:text-lg" : "text-lg"
+                }`}
+              >
                 {t(
                   "joinTeamSelectRoleDesc",
                   "Choose the role that matches your skills and experience. You can review the details of each role before applying"
@@ -293,19 +309,33 @@ const JoinTeam = () => {
             <div className="mb-8">
               {rolesLoading ? (
                 <div className="flex justify-center items-center py-8">
-                  <FiLoader className="animate-spin text-[#c8a45e] text-2xl" />
-                  <span className="mr-3 text-[#6b7280]">
+                  <FiLoader
+                    className={`animate-spin text-[#c8a45e] ${
+                      isRTL ? "text-xl md:text-2xl" : "text-2xl"
+                    }`}
+                  />
+                  <span
+                    className={`mr-3 text-[#6b7280] ${
+                      isRTL ? "text-sm md:text-base" : "text-base"
+                    }`}
+                  >
                     {t("loading", "Loading...")}
                   </span>
                 </div>
               ) : rolesError ? (
                 <div className="text-center py-8">
-                  <p className="text-red-600 mb-4">
+                  <p
+                    className={`text-red-600 mb-4 ${
+                      isRTL ? "text-sm md:text-base" : "text-base"
+                    }`}
+                  >
                     {t("errorLoadingData", "Error loading data")}
                   </p>
                   <button
                     onClick={() => window.location.reload()}
-                    className="px-4 py-2 bg-[#09142b] text-white rounded-lg hover:bg-[#1a2a4a] transition-colors"
+                    className={`px-4 py-2 bg-[#09142b] text-white rounded-lg hover:bg-[#1a2a4a] transition-colors ${
+                      isRTL ? "text-sm md:text-base" : "text-base"
+                    }`}
                   >
                     {t("tryAgainLater", "Try Again")}
                   </button>
@@ -316,6 +346,8 @@ const JoinTeam = () => {
                     <button
                       onClick={() => setSelectedCategory("")}
                       className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+                        isRTL ? "text-xs md:text-sm" : "text-sm"
+                      } ${
                         selectedCategory === ""
                           ? "bg-[#09142b] text-white shadow-lg"
                           : "bg-white text-[#6b7280] border-2 border-[#e7cfa7] hover:border-[#c8a45e] hover:text-[#09142b]"
@@ -328,6 +360,8 @@ const JoinTeam = () => {
                         key={category}
                         onClick={() => setSelectedCategory(category)}
                         className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+                          isRTL ? "text-xs md:text-sm" : "text-sm"
+                        } ${
                           selectedCategory === category
                             ? "bg-[#09142b] text-white shadow-lg"
                             : "bg-white text-[#6b7280] border-2 border-[#e7cfa7] hover:border-[#c8a45e] hover:text-[#09142b]"
@@ -381,12 +415,22 @@ const JoinTeam = () => {
                       </div>
 
                       {/* Role Title */}
-                      <h3 className="text-base sm:text-lg font-bold text-[#09142b] mb-2 group-hover:text-[#c8a45e] transition-colors duration-300">
+                      <h3
+                        className={`font-bold text-[#09142b] mb-2 group-hover:text-[#c8a45e] transition-colors duration-300 ${
+                          isRTL
+                            ? "text-sm sm:text-base"
+                            : "text-base sm:text-lg"
+                        }`}
+                      >
                         {role.title}
                       </h3>
 
                       {/* Role Description - Truncated */}
-                      <p className="text-[#6b7280] text-xs sm:text-sm leading-relaxed mb-2 sm:mb-3 line-clamp-3 flex-grow">
+                      <p
+                        className={`text-[#6b7280] leading-relaxed mb-2 sm:mb-3 line-clamp-3 flex-grow ${
+                          isRTL ? "text-xs sm:text-xs" : "text-xs sm:text-sm"
+                        }`}
+                      >
                         {role.description.length > 120
                           ? `${role.description.substring(0, 120)}...`
                           : role.description}
@@ -410,7 +454,9 @@ const JoinTeam = () => {
                         <button
                           type="button"
                           onClick={() => handleRoleSelection(role.id)}
-                          className={`flex-1 py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300 ${
+                          className={`flex-1 py-2 px-2 sm:px-3 rounded-lg font-semibold transition-all duration-300 ${
+                            isRTL ? "text-xs sm:text-xs" : "text-xs sm:text-sm"
+                          } ${
                             selectedRole === role.id
                               ? "bg-[#09142b] text-white"
                               : "bg-[#faf6f0] text-[#09142b] hover:bg-[#c8a45e] hover:text-white"
@@ -422,7 +468,9 @@ const JoinTeam = () => {
                         </button>
                         <Link
                           to={`/role/${role.slug}`}
-                          className="flex-1 py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-semibold bg-[#09142b] text-white hover:bg-[#1a2a4a] transition-all duration-300 text-center"
+                          className={`flex-1 py-2 px-2 sm:px-3 rounded-lg font-semibold bg-[#09142b] text-white hover:bg-[#1a2a4a] transition-all duration-300 text-center ${
+                            isRTL ? "text-xs sm:text-xs" : "text-xs sm:text-sm"
+                          }`}
                         >
                           {t("seeMore", "See More")}
                         </Link>
@@ -458,10 +506,18 @@ const JoinTeam = () => {
             }).length === 0 && (
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">🔍</div>
-                <h3 className="text-xl font-semibold text-[#09142b] mb-2">
+                <h3
+                  className={`font-semibold text-[#09142b] mb-2 ${
+                    isRTL ? "text-lg md:text-xl" : "text-xl"
+                  }`}
+                >
                   {t("joinTeamNoRolesFound", "No Roles Available")}
                 </h3>
-                <p className="text-[#6b7280]">
+                <p
+                  className={`text-[#6b7280] ${
+                    isRTL ? "text-sm md:text-base" : "text-base"
+                  }`}
+                >
                   {t(
                     "joinTeamNoRolesDesc",
                     "Try selecting a different category or check available roles"
@@ -480,10 +536,18 @@ const JoinTeam = () => {
                     <FiCheck className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold mb-1">
+                    <h3
+                      className={`font-bold mb-1 ${
+                        isRTL ? "text-lg md:text-xl" : "text-xl"
+                      }`}
+                    >
                       {t("joinTeamRoleSelected", "Role Selected Successfully!")}
                     </h3>
-                    <p className="text-white/90">
+                    <p
+                      className={`text-white/90 ${
+                        isRTL ? "text-sm md:text-base" : "text-base"
+                      }`}
+                    >
                       {t(
                         "joinTeamRoleSelectedDesc",
                         "You have selected the role"
@@ -494,7 +558,9 @@ const JoinTeam = () => {
                 </div>
                 <button
                   onClick={scrollToForm}
-                  className="flex items-center space-x-2 space-x-reverse bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-all duration-300"
+                  className={`flex items-center space-x-2 space-x-reverse bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-all duration-300 ${
+                    isRTL ? "text-sm md:text-base" : "text-base"
+                  }`}
                 >
                   <span>{t("joinTeamContinueToForm", "Continue to Form")}</span>
                   <FiArrowDown className="w-4 h-4" />
@@ -512,10 +578,18 @@ const JoinTeam = () => {
               {/* Form Header with Role Info */}
               <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#e7cfa7]">
                 <div>
-                  <h3 className="text-2xl font-bold text-[#09142b] mb-2">
+                  <h3
+                    className={`font-bold text-[#09142b] mb-2 ${
+                      isRTL ? "text-xl md:text-2xl" : "text-2xl"
+                    }`}
+                  >
                     {t("joinTeamApplicationForm", "Application Form")}
                   </h3>
-                  <p className="text-[#6b7280]">
+                  <p
+                    className={`text-[#6b7280] ${
+                      isRTL ? "text-sm md:text-base" : "text-base"
+                    }`}
+                  >
                     {t(
                       "joinTeamFormDesc",
                       "Complete the following form to apply for the role"
@@ -536,7 +610,11 @@ const JoinTeam = () => {
                 {/* Personal Information */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-[#09142b] font-semibold mb-2">
+                    <label
+                      className={`block text-[#09142b] font-semibold mb-2 ${
+                        isRTL ? "text-sm md:text-base" : "text-base"
+                      }`}
+                    >
                       {t("joinTeamFullName", "Full Name")} *
                     </label>
                     <div className="relative">
@@ -907,7 +985,9 @@ const JoinTeam = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-[#09142b] to-[#1a2a4a] text-white py-4 px-6 rounded-xl font-semibold text-lg hover:from-[#1a2a4a] hover:to-[#09142b] transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={`w-full bg-gradient-to-r from-[#09142b] to-[#1a2a4a] text-white py-4 px-6 rounded-xl font-semibold hover:from-[#1a2a4a] hover:to-[#09142b] transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${
+                    isRTL ? "text-sm md:text-lg" : "text-lg"
+                  }`}
                 >
                   {isSubmitting
                     ? t("joinTeamSubmitting", "Submitting...")

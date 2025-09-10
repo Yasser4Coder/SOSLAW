@@ -152,10 +152,18 @@ const ConsultationBranchesSection = () => {
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-[#09142b] mb-6">
+          <h2
+            className={`font-extrabold text-[#09142b] mb-6 ${
+              isRTL ? "text-2xl md:text-4xl" : "text-3xl md:text-4xl"
+            }`}
+          >
             ⚖ {t("consultationBranchesTitle")}
           </h2>
-          <p className="text-[#6b7280] text-lg max-w-3xl mx-auto leading-relaxed">
+          <p
+            className={`text-[#6b7280] max-w-3xl mx-auto leading-relaxed ${
+              isRTL ? "text-sm md:text-lg" : "text-lg"
+            }`}
+          >
             {t("consultationBranchesDesc")}
           </p>
         </div>
@@ -178,14 +186,20 @@ const ConsultationBranchesSection = () => {
                   <branch.icon size={24} />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-bold text-[#09142b] mb-4 group-hover:text-[#c8a45e] transition-colors duration-300">
+                  <h3
+                    className={`font-bold text-[#09142b] mb-4 group-hover:text-[#c8a45e] transition-colors duration-300 ${
+                      isRTL ? "text-base md:text-lg" : "text-lg"
+                    }`}
+                  >
                     {t(branch.titleKey)}
                   </h3>
                   <ul className="space-y-2">
                     {branch.services.map((service, serviceIndex) => (
                       <li
                         key={serviceIndex}
-                        className="flex items-center text-[#6b7280] text-sm hover:text-[#09142b] transition-colors duration-200"
+                        className={`flex items-center text-[#6b7280] hover:text-[#09142b] transition-colors duration-200 ${
+                          isRTL ? "text-xs md:text-sm" : "text-sm"
+                        }`}
                       >
                         <FiCheck
                           className={`text-[#c8a45e] flex-shrink-0 ${
@@ -205,10 +219,20 @@ const ConsultationBranchesSection = () => {
 
         {/* CTA Section */}
         <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 text-center">
-          <h4 className="text-xl font-bold text-[#09142b] mb-4">
+          <h4
+            className={`font-bold text-[#09142b] mb-4 ${
+              isRTL ? "text-lg md:text-xl" : "text-xl"
+            }`}
+          >
             {t("getLegalConsultationNow")}
           </h4>
-          <p className="text-[#6b7280] mb-6">{t("getLegalConsultationDesc")}</p>
+          <p
+            className={`text-[#6b7280] mb-6 ${
+              isRTL ? "text-sm md:text-base" : "text-base"
+            }`}
+          >
+            {t("getLegalConsultationDesc")}
+          </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/contact"

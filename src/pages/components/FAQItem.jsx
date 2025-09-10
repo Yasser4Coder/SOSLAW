@@ -22,7 +22,9 @@ const FAQItem = ({ idx, faq, isOpen, onToggle, isRTL }) => {
       dir={isRTL ? "rtl" : "ltr"}
     >
       <button
-        className="w-full flex items-center justify-between px-6 py-4 text-lg font-semibold text-[#c8a45e] focus:outline-none focus:ring-2 focus:ring-[#c8a45e] transition-colors group"
+        className={`w-full flex items-center justify-between px-6 py-4 font-semibold text-[#c8a45e] focus:outline-none focus:ring-2 focus:ring-[#c8a45e] transition-colors group ${
+          isRTL ? "text-sm md:text-lg" : "text-lg"
+        }`}
         aria-expanded={isOpen}
         aria-controls={`faq-panel-${idx}`}
         onClick={onToggle}
@@ -51,7 +53,11 @@ const FAQItem = ({ idx, faq, isOpen, onToggle, isRTL }) => {
           tabIndex={isOpen ? 0 : -1}
           aria-live="polite"
         >
-          <p className="text-[#09142b] text-base whitespace-pre-line opacity-90">
+          <p
+            className={`text-[#09142b] whitespace-pre-line opacity-90 ${
+              isRTL ? "text-sm md:text-base" : "text-base"
+            }`}
+          >
             {faq.a}
           </p>
           {/* Fade effect at bottom if scrollable */}

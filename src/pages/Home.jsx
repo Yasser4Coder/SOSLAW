@@ -4,18 +4,18 @@ import ServicesSection from "./components/ServicesSection";
 import TestimonialsSection from "./components/TestimonialsSection";
 import ConsultationBranchesSection from "./components/ConsultationBranchesSection";
 import FAQSection from "./components/FAQSection";
-import SEOHead from "../components/SEOHead";
+import SEO from "../components/SEO";
 import { useTranslation } from "react-i18next";
 
 const Home = () => {
   const { t } = useTranslation();
   const title = t(
     "homeSeoTitle",
-    "SOSLAW | منصة جزائرية رقمية للاستشارات والخدمات القانونية"
+    "SOSLAW | خدمات واستشارات قانونية رقمية في الجزائر"
   );
   const desc = t(
     "homeSeoDesc",
-    "منصة جزائرية رقمية للاستشارات والخدمات القانونية. استشارتك القانونية أينما كنت. في SOS Law، نحن لا نقدّم فقط خدمة قانونية، بل نؤسس لثقافة قانونية رقمية حديثة، تناسب الجيل الجديد، وتلبي احتياجات المجتمع الجزائري المتطور. معًا نحو عدالة أسرع، أوضح، وأقرب للجميع."
+    "خدمات واستشارات قانونية رقمية في الجزائر. استشارتك القانونية أينما كنت. في SOS Law، نحن لا نقدّم فقط خدمة قانونية، بل نؤسس لثقافة قانونية رقمية حديثة، تناسب الجيل الجديد، وتلبي احتياجات المجتمع الجزائري المتطور. معًا نحو عدالة أسرع، أوضح، وأقرب للجميع."
   );
   const keywords =
     "استشارات قانونية, خدمات قانونية, محامي الجزائر, استشارة قانونية أونلاين, قانون جزائري, محاماة, عدالة, قانون تجاري, قانون مدني, قانون جنائي, قانون أسرة, قانون عقارات, قانون ضرائب, ملكية فكرية, تقاضي, وساطة, حل نزاعات";
@@ -27,11 +27,11 @@ const Home = () => {
     name: "SOSLAW",
     alternateName: "SOS Law",
     description: desc,
-    url: "https://soslaw.com",
-    logo: "https://soslaw.com/logo.svg",
-    image: "https://soslaw.com/logo.svg",
+    url: "https://soslawdz.com",
+    logo: "https://soslawdz.com/logo.svg",
+    image: "https://soslawdz.com/logo.svg",
     telephone: "+213-XXX-XXX-XXX",
-    email: "info@soslaw.com",
+    email: "info@soslawdz.com",
     address: {
       "@type": "PostalAddress",
       addressCountry: "DZ",
@@ -106,20 +106,21 @@ const Home = () => {
       ],
     },
     sameAs: [
-      "https://www.facebook.com/soslaw",
-      "https://www.linkedin.com/company/soslaw",
-      "https://www.instagram.com/soslaw",
+      "https://www.facebook.com/soslawdz",
+      "https://www.linkedin.com/company/soslawdz",
+      "https://www.instagram.com/soslawdz",
+      "https://twitter.com/soslawdz",
     ],
   };
 
   return (
     <main className="">
-      <SEOHead
+      <SEO
         title={title}
         description={desc}
         keywords={keywords}
-        canonical="/"
         structuredData={structuredData}
+        url="/"
       />
       <HeroSection />
       <ConsultantsSection />
