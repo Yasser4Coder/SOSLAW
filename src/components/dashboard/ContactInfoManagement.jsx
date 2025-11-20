@@ -52,7 +52,6 @@ const ContactInfoManagement = () => {
       return failureCount < 3;
     },
     onError: (error) => {
-      console.error("ContactInfo fetch error:", error);
       if (error?.response?.status === 401) {
         toast.error("يرجى تسجيل الدخول أولاً");
       } else {
@@ -72,7 +71,6 @@ const ContactInfoManagement = () => {
     },
     onError: (error) => {
       toast.error("حدث خطأ أثناء تحديث معلومات التواصل");
-      console.error("Bulk update error:", error);
     },
   });
 
@@ -88,7 +86,6 @@ const ContactInfoManagement = () => {
     },
     onError: (error) => {
       toast.error("حدث خطأ أثناء حذف العنصر");
-      console.error("Delete error:", error);
     },
   });
 
@@ -103,7 +100,6 @@ const ContactInfoManagement = () => {
     },
     onError: (error) => {
       toast.error("حدث خطأ أثناء تغيير حالة العنصر");
-      console.error("Toggle status error:", error);
     },
   });
 

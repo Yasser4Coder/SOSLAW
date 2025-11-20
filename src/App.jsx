@@ -9,12 +9,18 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
+import VerifyEmail from "./pages/VerifyEmail";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import JoinTeam from "./pages/JoinTeam";
 import RoleDetails from "./pages/RoleDetails";
 import Dashboard from "./pages/Dashboard";
 import ServicePage from "./pages/ServicePage";
 import Library from "./pages/Library";
 import RequestService from "./pages/RequestService";
+import ServiceRequests from "./pages/ServiceRequests";
+import PaymentDetails from "./pages/PaymentDetails";
+import NationalConferenceRegistration from "./pages/NationalConferenceRegistration";
 import { HelmetProvider } from "react-helmet-async";
 import "./App.css";
 
@@ -34,11 +40,13 @@ function App() {
       <AuthProvider>
         <HelmetProvider>
           <Routes>
-            {/* Dashboard route - Admin only */}
+            {/* Dashboard route - Admin, Consultant, Support */}
             <Route
               path="/dashboard/*"
               element={
-                <ProtectedRoute allowedRoles={["admin"]}>
+                <ProtectedRoute
+                  allowedRoles={["admin", "consultant", "support"]}
+                >
                   <Dashboard />
                 </ProtectedRoute>
               }
@@ -54,6 +62,18 @@ function App() {
                     <Route path="/about" element={<About />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route
+                      path="/forgot-password"
+                      element={<ForgotPassword />}
+                    />
+                    <Route
+                      path="/reset-password/:token"
+                      element={<ResetPassword />}
+                    />
+                    <Route
+                      path="/verify-email/:token"
+                      element={<VerifyEmail />}
+                    />
+                    <Route
                       path="/join"
                       element={<Navigate to="/join-team" replace />}
                     />
@@ -62,7 +82,7 @@ function App() {
                     <Route
                       path="/contact"
                       element={
-                        <ProtectedRoute>
+                        <ProtectedRoute requireEmailVerification={true}>
                           <Contact />
                         </ProtectedRoute>
                       }
@@ -70,7 +90,7 @@ function App() {
                     <Route
                       path="/join-team"
                       element={
-                        <ProtectedRoute>
+                        <ProtectedRoute requireEmailVerification={true}>
                           <JoinTeam />
                         </ProtectedRoute>
                       }
@@ -102,13 +122,35 @@ function App() {
                     <Route
                       path="/request-service/:serviceId?"
                       element={
-                        <ProtectedRoute>
+                        <ProtectedRoute requireEmailVerification={true}>
                           <RequestService />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/national-conference-registration"
+                      element={<NationalConferenceRegistration />}
+                    />
+                    <Route
+                      path="/service-requests"
+                      element={
+                        <ProtectedRoute>
+                          <ServiceRequests />
                         </ProtectedRoute>
                       }
                     />
                   </Routes>
                 </MainLayout>
+              }
+            />
+
+            {/* Standalone Payment Details Route - No Header/Footer */}
+            <Route
+              path="/payment-details/:requestId"
+              element={
+                <ProtectedRoute>
+                  <PaymentDetails />
+                </ProtectedRoute>
               }
             />
           </Routes>

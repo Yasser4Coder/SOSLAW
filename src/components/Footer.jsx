@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
-import logoBlueBg from "../assets/logoBlueBg.svg";
+import logo from "../assets/logo.svg";
 import { useTranslation } from "react-i18next";
 import { useContactInfo } from "../hooks/useContactInfo";
 
@@ -19,8 +19,8 @@ const Footer = () => {
             className="flex items-center gap-3 mb-2 focus:outline-none"
           >
             <img
-              src={logoBlueBg}
-              alt="SOSLAW Logo"
+              src={logo}
+              alt="SOS Law Logo"
               className="h-12 w-auto"
               loading="lazy"
             />

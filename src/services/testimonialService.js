@@ -1,5 +1,6 @@
 import api from "./api";
 import axios from "axios";
+import API_BASE_URL from "../config/api.js";
 
 class TestimonialService {
   // Get all testimonials (admin)
@@ -23,20 +24,25 @@ class TestimonialService {
 
   // Get public testimonials (frontend)
   async getPublicTestimonials(options = {}) {
-    const params = new URLSearchParams();
-    const API_BASE_URL =
-      import.meta.env?.VITE_API_URL || "https://api-v1.soslawdz.com";
+    try {
+      const params = new URLSearchParams();
 
-    if (options.limit) params.append("limit", options.limit);
-    if (options.language) params.append("language", options.language);
-    if (options.rating) params.append("rating", options.rating);
-    if (options.featured !== undefined)
-      params.append("featured", options.featured);
+      if (options.limit) params.append("limit", options.limit);
+      if (options.language) params.append("language", options.language);
+      if (options.rating) params.append("rating", options.rating);
+      if (options.featured !== undefined)
+        params.append("featured", options.featured);
 
-    const response = await axios.get(
-      `${API_BASE_URL}/public/testimonials?${params.toString()}`
-    );
-    return response.data;
+      const url = `${API_BASE_URL}/public/testimonials?${params.toString()}`;
+      
+      const response = await axios.get(url);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Testimonials API Error:', error);
+      console.error('❌ Error response:', error.response?.data);
+      console.error('❌ Error status:', error.response?.status);
+      throw error;
+    }
   }
 
   // Get testimonial by ID
@@ -94,12 +100,17 @@ class TestimonialService {
 
   // Get testimonial statistics
   async getTestimonialStats() {
-    const API_BASE_URL =
-      import.meta.env?.VITE_API_URL || "https://api-v1.soslawdz.com";
-    const response = await axios.get(
-      `${API_BASE_URL}/public/testimonials/stats`
-    );
-    return response.data;
+    try {
+      const url = `${API_BASE_URL}/public/testimonials/stats`;
+      
+      const response = await axios.get(url);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Testimonials Stats API Error:', error);
+      console.error('❌ Error response:', error.response?.data);
+      console.error('❌ Error status:', error.response?.status);
+      throw error;
+    }
   }
 
   // Search testimonials

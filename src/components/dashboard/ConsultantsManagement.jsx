@@ -21,8 +21,9 @@ import Avatar from "../common/Avatar";
 const ConsultantsManagement = () => {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
-
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showAddForm, setShowAddForm] = useState(false);
   const [alert, setAlert] = useState({
     show: false,
@@ -74,17 +75,25 @@ const ConsultantsManagement = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // Reset to page 1 when filter changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedFilter]);
+
   // Fetch consultants with React Query - only filter by status, not search
   const {
     data: consultantsData,
     isLoading: isLoadingConsultants,
     error: consultantsError,
   } = useQuery({
-    queryKey: ["consultants", selectedFilter],
+    queryKey: ["consultants", selectedFilter, currentPage, itemsPerPage],
     queryFn: () => {
+      const offset = (currentPage - 1) * itemsPerPage;
       return consultantService.getAllConsultants({
-        status: selectedFilter,
+        status: selectedFilter === "all" ? undefined : selectedFilter,
         language: "ar",
+        limit: itemsPerPage,
+        offset: offset,
       });
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -375,7 +384,6 @@ const ConsultantsManagement = () => {
         });
       }
     } catch (error) {
-      console.error("Form submission error:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -620,6 +628,15 @@ const ConsultantsManagement = () => {
         <DataTable
           data={consultants}
           columns={columns}
+          pagination={{
+            total: totalConsultants,
+            limit: itemsPerPage,
+            offset: (currentPage - 1) * itemsPerPage,
+            onPageChange: (offset) => {
+              const newPage = Math.floor(offset / itemsPerPage) + 1;
+              setCurrentPage(newPage);
+            }
+          }}
           searchTerm={searchTerm}
           isLoading={isLoadingConsultants}
         />

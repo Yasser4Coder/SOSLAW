@@ -1,44 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FiBell, FiX, FiCheck, FiAlertCircle, FiInfo } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import useNotifications from "../../hooks/useNotifications";
 
 const NotificationDropdown = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: "success",
-      title: "تم تسجيل مستخدم جديد",
-      message: "تم تسجيل المستخدم أحمد محمد بنجاح",
-      time: "منذ 5 دقائق",
-      read: false,
-    },
-    {
-      id: 2,
-      type: "warning",
-      title: "طلب استشارة قانونية جديد",
-      message: "تم إرسال طلب استشارة في القانون المدني",
-      time: "منذ 15 دقيقة",
-      read: false,
-    },
-    {
-      id: 3,
-      type: "info",
-      title: "تحديث النظام",
-      message: "تم تحديث النظام إلى الإصدار الجديد",
-      time: "منذ ساعة",
-      read: true,
-    },
-    {
-      id: 4,
-      type: "success",
-      title: "تم قبول طلب الانضمام",
-      message: "تم قبول طلب انضمام المحامي سارة أحمد",
-      time: "منذ ساعتين",
-      read: true,
-    },
-  ]);
+  const {
+    notifications: apiNotifications,
+    notificationCounts,
+    markAsRead,
+  } = useNotifications();
+
+  // Use API notifications only
+  const notifications = apiNotifications || [];
 
   const dropdownRef = useRef();
 
@@ -74,18 +49,21 @@ const NotificationDropdown = () => {
     setIsOpen(!isOpen);
   };
 
-  const markAsRead = (id) => {
-    setNotifications((prev) =>
-      prev.map((notification) =>
-        notification.id === id ? { ...notification, read: true } : notification
-      )
-    );
+  const handleMarkAsRead = async (id) => {
+    try {
+      await markAsRead(id);
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
   };
 
   const markAllAsRead = () => {
-    setNotifications((prev) =>
-      prev.map((notification) => ({ ...notification, read: true }))
-    );
+    // Mark all notifications as read
+    notifications.forEach((notification) => {
+      if (!notification.read) {
+        handleMarkAsRead(notification.id);
+      }
+    });
   };
 
   const getNotificationIcon = (type) => {
@@ -101,7 +79,8 @@ const NotificationDropdown = () => {
     }
   };
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const unreadCount =
+    notificationCounts.total || notifications.filter((n) => !n.read).length;
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -148,9 +127,15 @@ const NotificationDropdown = () => {
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`p-4 hover:bg-gray-50 transition-colors ${
+                    className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer ${
                       !notification.read ? "bg-blue-50" : ""
                     }`}
+                    onClick={() => {
+                      if (notification.link) {
+                        navigate(notification.link);
+                        setIsOpen(false);
+                      }
+                    }}
                   >
                     <div className="flex items-start space-x-reverse space-x-3">
                       <div className="flex-shrink-0 mt-1">
@@ -163,7 +148,10 @@ const NotificationDropdown = () => {
                           </p>
                           {!notification.read && (
                             <button
-                              onClick={() => markAsRead(notification.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMarkAsRead(notification.id);
+                              }}
                               className="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-md transition-colors duration-200 hover:shadow-sm"
                             >
                               تحديد كمقروء

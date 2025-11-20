@@ -22,8 +22,9 @@ import toast from "react-hot-toast";
 const CategoryManagement = () => {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
-
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
@@ -63,17 +64,25 @@ const CategoryManagement = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // Reset to page 1 when filter changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedFilter]);
+
   // Fetch categories with React Query - only filter by status, not search
   const {
     data: categoriesData,
     isLoading: isLoadingCategories,
     error: categoriesError,
   } = useQuery({
-    queryKey: ["categories", selectedFilter],
+    queryKey: ["categories", selectedFilter, currentPage, itemsPerPage],
     queryFn: () => {
+      const offset = (currentPage - 1) * itemsPerPage;
       return categoryService.getAllCategories({
-        status: selectedFilter,
+        status: selectedFilter === "all" ? undefined : selectedFilter,
         language: "ar",
+        limit: itemsPerPage,
+        offset: offset,
       });
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -123,7 +132,6 @@ const CategoryManagement = () => {
       toast.success("تم حذف الفئة بنجاح");
     },
     onError: (error) => {
-      console.error("Delete category error:", error);
       toast.error(error.message || "فشل في حذف الفئة");
     },
   });
@@ -306,7 +314,6 @@ const CategoryManagement = () => {
         await createCategoryMutation.mutateAsync(formData);
       }
     } catch (error) {
-      console.error("Form submission error:", error);
     }
   };
 
@@ -332,14 +339,12 @@ const CategoryManagement = () => {
 
   // Handle delete
   const handleDelete = (id) => {
-    console.log("Attempting to delete category with ID:", id);
     setCategoryToDelete(id);
     setShowDeleteConfirm(true);
   };
 
   // Handle delete confirmation
   const handleDeleteConfirm = () => {
-    console.log("Delete confirmed for category ID:", categoryToDelete);
     deleteCategoryMutation.mutate(categoryToDelete);
     setShowDeleteConfirm(false);
     setCategoryToDelete(null);
@@ -347,7 +352,6 @@ const CategoryManagement = () => {
 
   // Handle delete cancellation
   const handleDeleteCancel = () => {
-    console.log("Delete cancelled for category ID:", categoryToDelete);
     setShowDeleteConfirm(false);
     setCategoryToDelete(null);
   };
@@ -508,7 +512,16 @@ const CategoryManagement = () => {
       <DataTable
         data={categories}
         columns={columns}
-        totalItems={totalCategories}
+        pagination={{
+          total: totalCategories,
+          limit: itemsPerPage,
+          offset: (currentPage - 1) * itemsPerPage,
+          onPageChange: (offset) => {
+            const newPage = Math.floor(offset / itemsPerPage) + 1;
+            setCurrentPage(newPage);
+          }
+        }}
+        searchTerm={searchTerm}
         isLoading={isLoadingCategories}
       />
 

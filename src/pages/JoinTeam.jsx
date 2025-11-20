@@ -72,8 +72,6 @@ const JoinTeam = () => {
     education: "",
     skills: "",
     motivation: "",
-    expectedSalary: "",
-    availability: "",
     additionalInfo: "",
   });
 
@@ -165,8 +163,6 @@ const JoinTeam = () => {
       formDataToSend.append("education", formData.education);
       formDataToSend.append("skills", formData.skills);
       formDataToSend.append("motivation", formData.motivation);
-      formDataToSend.append("expectedSalary", formData.expectedSalary);
-      formDataToSend.append("availability", formData.availability);
       formDataToSend.append("additionalInfo", formData.additionalInfo);
       if (cvFile) {
         formDataToSend.append("cv", cvFile);
@@ -193,8 +189,6 @@ const JoinTeam = () => {
           education: "",
           skills: "",
           motivation: "",
-          expectedSalary: "",
-          availability: "",
           additionalInfo: "",
         });
         setSelectedRole("");
@@ -757,7 +751,8 @@ const JoinTeam = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-[#09142b] font-semibold mb-2">
-                      {t("joinTeamLinkedin", "LinkedIn")}
+                      {t("joinTeamLinkedin", "LinkedIn")} (
+                      {t("optional", "Optional")})
                     </label>
                     <div className="relative">
                       <FiLinkedin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6b7280]" />
@@ -777,7 +772,8 @@ const JoinTeam = () => {
 
                   <div>
                     <label className="block text-[#09142b] font-semibold mb-2">
-                      {t("joinTeamWebsite", "Website")}
+                      {t("joinTeamWebsite", "Website")} (
+                      {t("optional", "Optional")})
                     </label>
                     <div className="relative">
                       <FiGlobe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6b7280]" />
@@ -869,39 +865,6 @@ const JoinTeam = () => {
                     )}
                     required
                   />
-                </div>
-
-                {/* Salary and Availability */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-[#09142b] font-semibold mb-2">
-                      {t("joinTeamExpectedSalary", "Expected Salary")}
-                    </label>
-                    <input
-                      type="text"
-                      name="expectedSalary"
-                      value={formData.expectedSalary}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
-                      placeholder={t(
-                        "joinTeamExpectedSalaryPlaceholder",
-                        "Mention your expected salary"
-                      )}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[#09142b] font-semibold mb-2">
-                      {t("joinTeamAvailability", "Availability Date")}
-                    </label>
-                    <input
-                      type="date"
-                      name="availability"
-                      value={formData.availability}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-[#e7cfa7] rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300"
-                    />
-                  </div>
                 </div>
 
                 {/* CV Upload */}

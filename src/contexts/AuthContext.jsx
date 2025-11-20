@@ -122,6 +122,22 @@ export const AuthProvider = ({ children }) => {
   // Check if user is client
   const isClient = useCallback(() => hasRole("client"), [hasRole]);
 
+  // Check if user is consultant
+  const isConsultant = useCallback(() => hasRole("consultant"), [hasRole]);
+
+  // Check if user is support
+  const isSupport = useCallback(() => hasRole("support"), [hasRole]);
+
+  // Check if user has dashboard access (admin, consultant, support)
+  const hasDashboardAccess = useCallback(() => {
+    return hasRole("admin") || hasRole("consultant") || hasRole("support");
+  }, [hasRole]);
+
+  // Check if user has limited dashboard access (consultant, support)
+  const hasLimitedDashboardAccess = useCallback(() => {
+    return hasRole("consultant") || hasRole("support");
+  }, [hasRole]);
+
   // Memoize the context value to prevent unnecessary re-renders
   const value = useMemo(
     () => ({
@@ -133,8 +149,25 @@ export const AuthProvider = ({ children }) => {
       hasRole,
       isAdmin,
       isClient,
+      isConsultant,
+      isSupport,
+      hasDashboardAccess,
+      hasLimitedDashboardAccess,
     }),
-    [state, login, register, logout, clearError, hasRole, isAdmin, isClient]
+    [
+      state,
+      login,
+      register,
+      logout,
+      clearError,
+      hasRole,
+      isAdmin,
+      isClient,
+      isConsultant,
+      isSupport,
+      hasDashboardAccess,
+      hasLimitedDashboardAccess,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Complete Flow Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      .success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+      }
+      .error {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+      }
+      .info {
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+      }
+      button {
+        margin: 5px;
+        padding: 10px 15px;
+        cursor: pointer;
+      }
+      pre {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 3px;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Complete Flow Test</h1>
+
+    <div class="test-section info">
+      <h3>Test Steps:</h3>
+      <ol>
+        <li>Login to get authentication token</li>
+        <li>Test Service Requests API</li>
+        <li>Test Notifications API</li>
+        <li>Test Notification Counts API</li>
+      </ol>
+    </div>
+
+    <div class="test-section">
+      <h3>1. Authentication Test</h3>
+      <button onclick="testLogin()">Test Login</button>
+      <div id="login-result"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>2. Service Requests Test</h3>
+      <button onclick="testServiceRequests()">Test Service Requests</button>
+      <div id="service-requests-result"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>3. Notifications Test</h3>
+      <button onclick="testNotifications()">Test Notifications</button>
+      <div id="notifications-result"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>4. Notification Counts Test</h3>
+      <button onclick="testNotificationCounts()">
+        Test Notification Counts
+      </button>
+      <div id="notification-counts-result"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>5. Complete Flow Test</h3>
+      <button onclick="testCompleteFlow()">Run Complete Flow Test</button>
+      <div id="complete-flow-result"></div>
+    </div>
+
+    <script>
+      let authToken = null;
+
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(";").shift();
+      }
+
+      function setResult(elementId, content, isSuccess = true) {
+        const element = document.getElementById(elementId);
+        element.innerHTML = `<pre>${JSON.stringify(content, null, 2)}</pre>`;
+        element.parentElement.className = `test-section ${
+          isSuccess ? "success" : "error"
+        }`;
+      }
+
+      async function testLogin() {
+        try {
+          const response = await fetch(
+            "http://localhost:5000/api/v1/auth/login",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: "admin@soslaw.com",
+                password: "Admin123!",
+              }),
+            }
+          );
+
+          const data = await response.json();
+          if (data.success) {
+            authToken = data.data.token;
+            document.cookie = `jwt=${authToken}; path=/`;
+            setResult("login-result", data, true);
+          } else {
+            setResult("login-result", data, false);
+          }
+        } catch (error) {
+          setResult("login-result", { error: error.message }, false);
+        }
+      }
+
+      async function testServiceRequests() {
+        if (!authToken) {
+          setResult(
+            "service-requests-result",
+            { error: "Please login first" },
+            false
+          );
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            "http://localhost:5000/api/v1/service-requests/my-requests",
+            {
+              headers: { Authorization: `Bearer ${authToken}` },
+            }
+          );
+
+          const data = await response.json();
+          setResult("service-requests-result", data, data.success);
+        } catch (error) {
+          setResult("service-requests-result", { error: error.message }, false);
+        }
+      }
+
+      async function testNotifications() {
+        if (!authToken) {
+          setResult(
+            "notifications-result",
+            { error: "Please login first" },
+            false
+          );
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            "http://localhost:5000/api/v1/notifications",
+            {
+              headers: { Authorization: `Bearer ${authToken}` },
+            }
+          );
+
+          const data = await response.json();
+          setResult("notifications-result", data, data.success);
+        } catch (error) {
+          setResult("notifications-result", { error: error.message }, false);
+        }
+      }
+
+      async function testNotificationCounts() {
+        if (!authToken) {
+          setResult(
+            "notification-counts-result",
+            { error: "Please login first" },
+            false
+          );
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            "http://localhost:5000/api/v1/notifications/counts",
+            {
+              headers: { Authorization: `Bearer ${authToken}` },
+            }
+          );
+
+          const data = await response.json();
+          setResult("notification-counts-result", data, data.success);
+        } catch (error) {
+          setResult(
+            "notification-counts-result",
+            { error: error.message },
+            false
+          );
+        }
+      }
+
+      async function testCompleteFlow() {
+        const results = {};
+
+        try {
+          // Step 1: Login
+          console.log("Step 1: Testing login...");
+          const loginResponse = await fetch(
+            "http://localhost:5000/api/v1/auth/login",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: "admin@soslaw.com",
+                password: "Admin123!",
+              }),
+            }
+          );
+          results.login = await loginResponse.json();
+
+          if (!results.login.success) {
+            setResult("complete-flow-result", results, false);
+            return;
+          }
+
+          authToken = results.login.data.token;
+          document.cookie = `jwt=${authToken}; path=/`;
+
+          // Step 2: Service Requests
+          console.log("Step 2: Testing service requests...");
+          const srResponse = await fetch(
+            "http://localhost:5000/api/v1/service-requests/my-requests",
+            {
+              headers: { Authorization: `Bearer ${authToken}` },
+            }
+          );
+          results.serviceRequests = await srResponse.json();
+
+          // Step 3: Notifications
+          console.log("Step 3: Testing notifications...");
+          const notifResponse = await fetch(
+            "http://localhost:5000/api/v1/notifications",
+            {
+              headers: { Authorization: `Bearer ${authToken}` },
+            }
+          );
+          results.notifications = await notifResponse.json();
+
+          // Step 4: Notification Counts
+          console.log("Step 4: Testing notification counts...");
+          const countsResponse = await fetch(
+            "http://localhost:5000/api/v1/notifications/counts",
+            {
+              headers: { Authorization: `Bearer ${authToken}` },
+            }
+          );
+          results.notificationCounts = await countsResponse.json();
+
+          // Check if all tests passed
+          const allPassed =
+            results.login.success &&
+            results.serviceRequests.success &&
+            results.notifications.success &&
+            results.notificationCounts.success;
+
+          setResult(
+            "complete-flow-result",
+            {
+              summary: {
+                allTestsPassed: allPassed,
+                loginSuccess: results.login.success,
+                serviceRequestsSuccess: results.serviceRequests.success,
+                notificationsSuccess: results.notifications.success,
+                notificationCountsSuccess: results.notificationCounts.success,
+              },
+              details: results,
+            },
+            allPassed
+          );
+        } catch (error) {
+          setResult("complete-flow-result", { error: error.message }, false);
+        }
+      }
+    </script>
+  </body>
+</html>

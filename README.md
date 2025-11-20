@@ -119,7 +119,7 @@ The following routes require authentication:
    npm run dev
    ```
 
-3. Make sure the backend server is running on `http://localhost:5000`
+3. Make sure the backend server is running on `https://api-v1.soslawdz.com`
 
 ### Testing Authentication
 
@@ -160,7 +160,7 @@ The frontend expects the backend to be running with the following endpoints:
 
 ## Environment Variables
 
-No additional environment variables are required for the frontend. The API base URL is hardcoded to `http://localhost:5000/api/v1` for development.
+No additional environment variables are required for the frontend. The API base URL is configured to use `https://api-v1.soslawdz.com` for production.
 
 ## Notes
 

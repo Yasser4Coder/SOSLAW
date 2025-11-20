@@ -23,8 +23,9 @@ import Avatar from "../common/Avatar";
 const TestimonialsManagement = () => {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
-
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showAddForm, setShowAddForm] = useState(false);
   const [alert, setAlert] = useState({
     show: false,
@@ -74,17 +75,25 @@ const TestimonialsManagement = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // Reset to page 1 when filter changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedFilter]);
+
   // Fetch testimonials with React Query - only filter by status, not search
   const {
     data: testimonialsData,
     isLoading: isLoadingTestimonials,
     error: testimonialsError,
   } = useQuery({
-    queryKey: ["testimonials", selectedFilter],
+    queryKey: ["testimonials", selectedFilter, currentPage, itemsPerPage],
     queryFn: () => {
+      const offset = (currentPage - 1) * itemsPerPage;
       return testimonialService.getAllTestimonials({
-        status: selectedFilter,
+        status: selectedFilter === "all" ? undefined : selectedFilter,
         language: "ar",
+        limit: itemsPerPage,
+        offset: offset,
       });
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -467,7 +476,6 @@ const TestimonialsManagement = () => {
         await createTestimonialMutation.mutateAsync(formData);
       }
     } catch (error) {
-      console.error("Form submission error:", error);
     }
   };
 
@@ -708,6 +716,15 @@ const TestimonialsManagement = () => {
         <DataTable
           data={testimonials}
           columns={columns}
+          pagination={{
+            total: totalTestimonials,
+            limit: itemsPerPage,
+            offset: (currentPage - 1) * itemsPerPage,
+            onPageChange: (offset) => {
+              const newPage = Math.floor(offset / itemsPerPage) + 1;
+              setCurrentPage(newPage);
+            }
+          }}
           searchTerm={searchTerm}
           isLoading={isLoadingTestimonials}
         />

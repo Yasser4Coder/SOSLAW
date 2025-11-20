@@ -30,8 +30,9 @@ import toast from "react-hot-toast";
 const JoinTeamApplicationsManagement = () => {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
-
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -60,16 +61,24 @@ const JoinTeamApplicationsManagement = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // Reset to page 1 when filter changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedFilter]);
+
   // Fetch applications with React Query - only filter by status, not search
   const {
     data: applicationsData,
     isLoading: isLoadingApplications,
     error: applicationsError,
   } = useQuery({
-    queryKey: ["joinTeamApplications", selectedFilter],
+    queryKey: ["joinTeamApplications", selectedFilter, currentPage, itemsPerPage],
     queryFn: () => {
+      const offset = (currentPage - 1) * itemsPerPage;
       return joinTeamApplicationService.getAllApplications({
-        status: selectedFilter,
+        status: selectedFilter === "all" ? undefined : selectedFilter,
+        limit: itemsPerPage,
+        offset: offset,
       });
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -91,7 +100,6 @@ const JoinTeamApplicationsManagement = () => {
       toast.success("تم حذف الطلب بنجاح");
     },
     onError: (error) => {
-      console.error("Delete application error:", error);
       toast.error(error.message || "فشل في حذف الطلب");
     },
   });
@@ -251,7 +259,7 @@ const JoinTeamApplicationsManagement = () => {
         <div className="flex items-center space-x-1 space-x-reverse">
           <FiCalendar className="w-3 h-3 text-gray-400" />
           <span className="text-sm text-gray-600">
-            {new Date(application.createdAt).toLocaleDateString()}
+            {new Date(application.createdAt || application.created_at).toLocaleDateString("en-US")}
           </span>
         </div>
       ),
@@ -344,7 +352,6 @@ const JoinTeamApplicationsManagement = () => {
         adminNotes: statusFormData.adminNotes,
       });
     } catch (error) {
-      console.error("Status update error:", error);
     }
   };
 
@@ -572,7 +579,16 @@ const JoinTeamApplicationsManagement = () => {
         <DataTable
           data={applications}
           columns={columns}
-          totalItems={totalApplications}
+          pagination={{
+            total: totalApplications,
+            limit: itemsPerPage,
+            offset: (currentPage - 1) * itemsPerPage,
+            onPageChange: (offset) => {
+              const newPage = Math.floor(offset / itemsPerPage) + 1;
+              setCurrentPage(newPage);
+            }
+          }}
+          searchTerm={searchTerm}
           isLoading={isLoadingApplications}
         />
       )}
@@ -632,7 +648,7 @@ const JoinTeamApplicationsManagement = () => {
                       {selectedApplication.dateOfBirth
                         ? new Date(
                             selectedApplication.dateOfBirth
-                          ).toLocaleDateString()
+                          ).toLocaleDateString("en-US")
                         : "غير محدد"}
                     </p>
                   </div>
@@ -743,7 +759,7 @@ const JoinTeamApplicationsManagement = () => {
                       {selectedApplication.availability
                         ? new Date(
                             selectedApplication.availability
-                          ).toLocaleDateString()
+                          ).toLocaleDateString("en-US")
                         : "غير محدد"}
                     </p>
                   </div>

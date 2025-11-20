@@ -1,0 +1,128 @@
+/* Compact layout for screen view */
+.payment-details-container {
+  /* Remove scroll - let content flow naturally */
+}
+
+/* Print styles for Payment Details page */
+@media print {
+  @page {
+    margin: 0.3in;
+    size: A4;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-size: 10px;
+    line-height: 1.2;
+  }
+
+  .print\\:hidden {
+    display: none !important;
+  }
+
+  .print\\:block {
+    display: block !important;
+  }
+
+  .print\\:bg-white {
+    background-color: white !important;
+  }
+
+  .print\\:p-3 {
+    padding: 0.5rem !important;
+  }
+
+  .print\\:max-w-none {
+    max-width: none !important;
+  }
+
+  /* Ensure single page layout */
+  .print\\:page-break-inside-avoid {
+    page-break-inside: avoid;
+  }
+
+  /* Hide any elements that might cause page breaks */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Optimize spacing for print - reduce all margins */
+  .print\\:space-y-1 > * + * {
+    margin-top: 0.25rem !important;
+  }
+
+  .print\\:space-y-2 > * + * {
+    margin-top: 0.5rem !important;
+  }
+
+  .print\\:space-y-4 > * + * {
+    margin-top: 0.75rem !important;
+  }
+
+  .print\\:space-y-6 > * + * {
+    margin-top: 1rem !important;
+  }
+
+  .print\\:space-y-8 > * + * {
+    margin-top: 1.25rem !important;
+  }
+
+  /* Reduce padding and margins for all elements */
+  * {
+    margin-top: 0 !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-bottom: 0.5rem !important;
+  }
+
+  .mb-1 {
+    margin-bottom: 0.25rem !important;
+  }
+  .mb-2 {
+    margin-bottom: 0.5rem !important;
+  }
+  .mb-4 {
+    margin-bottom: 0.75rem !important;
+  }
+  .mb-8 {
+    margin-bottom: 1rem !important;
+  }
+
+  .p-2 {
+    padding: 0.25rem !important;
+  }
+  .p-4 {
+    padding: 0.5rem !important;
+  }
+  .p-6 {
+    padding: 0.75rem !important;
+  }
+
+  /* Make text smaller for print */
+  .text-xs {
+    font-size: 8px !important;
+  }
+  .text-sm {
+    font-size: 9px !important;
+  }
+  .text-lg {
+    font-size: 11px !important;
+  }
+  .text-xl {
+    font-size: 12px !important;
+  }
+  .text-2xl {
+    font-size: 14px !important;
+  }
+  .text-3xl {
+    font-size: 16px !important;
+  }
+}

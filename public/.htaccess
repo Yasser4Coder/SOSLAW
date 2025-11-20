@@ -1,0 +1,29 @@
+# Enable URL rewriting
+
+RewriteEngine On
+
+# Handle client-side routing
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
+
+# Set proper MIME types for JavaScript modules
+
+<FilesMatch "\.(js|mjs)$">
+Header set Content-Type "application/javascript; charset=utf-8"
+</FilesMatch>
+
+# Cache static assets
+
+<FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$">
+ExpiresActive On
+ExpiresDefault "access plus 1 year"
+Header set Cache-Control "public, immutable"
+</FilesMatch># Security headers
+
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options DENY
+Header always set X-XSS-Protection "1; mode=block"
+
+

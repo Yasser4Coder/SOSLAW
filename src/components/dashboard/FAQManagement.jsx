@@ -22,9 +22,10 @@ import toast from "react-hot-toast";
 const FAQManagement = () => {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
-
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedFAQ, setSelectedFAQ] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -61,18 +62,26 @@ const FAQManagement = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // Reset to page 1 when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedFilter, selectedCategory]);
+
   // Fetch FAQs with React Query - only filter by status and category, not search
   const {
     data: faqsData,
     isLoading: isLoadingFAQs,
     error: faqsError,
   } = useQuery({
-    queryKey: ["faqs", selectedFilter, selectedCategory],
+    queryKey: ["faqs", selectedFilter, selectedCategory, currentPage, itemsPerPage],
     queryFn: () => {
+      const offset = (currentPage - 1) * itemsPerPage;
       return faqService.getAllFAQs({
-        status: selectedFilter,
-        category: selectedCategory,
+        status: selectedFilter === "all" ? undefined : selectedFilter,
+        category: selectedCategory === "all" ? undefined : selectedCategory,
         language: "ar",
+        limit: itemsPerPage,
+        offset: offset,
       });
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -372,7 +381,6 @@ const FAQManagement = () => {
         await createFAQMutation.mutateAsync(formData);
       }
     } catch (error) {
-      console.error("Form submission error:", error);
     }
   };
 
@@ -592,6 +600,15 @@ const FAQManagement = () => {
         <DataTable
           data={faqs}
           columns={columns}
+          pagination={{
+            total: totalFAQs,
+            limit: itemsPerPage,
+            offset: (currentPage - 1) * itemsPerPage,
+            onPageChange: (offset) => {
+              const newPage = Math.floor(offset / itemsPerPage) + 1;
+              setCurrentPage(newPage);
+            }
+          }}
           searchTerm={searchTerm}
           isLoading={isLoadingFAQs}
         />

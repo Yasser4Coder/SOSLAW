@@ -1,9 +1,10 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import API_BASE_URL from "../config/api.js";
 
 // Create axios instance
 const api = axios.create({
-  baseURL: "https://api-v1.soslawdz.com",
+  baseURL: API_BASE_URL,
   withCredentials: true, // Important for cookies
   headers: {
     "Content-Type": "application/json",
@@ -31,7 +32,8 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Clear invalid token
       Cookies.remove("jwt");
-      window.location.href = "/auth";
+      // Log the error instead of redirecting to prevent infinite loops
+      console.warn("Authentication error: Token expired or invalid");
     }
     return Promise.reject(error);
   }

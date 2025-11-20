@@ -1,8 +1,5 @@
 import axios from "axios";
-
-// Use environment variable or default to localhost:5000
-const API_BASE_URL =
-  import.meta.env?.VITE_API_URL || "https://api-v1.soslawdz.com";
+import API_BASE_URL from "../config/api.js";
 
 // Create axios instance for public requests (no auth required)
 const createPublicInstance = () => {

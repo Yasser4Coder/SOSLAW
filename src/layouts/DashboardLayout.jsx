@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useLocation, Routes, Route } from "react-router-dom";
+import { Link, useLocation, Routes, Route, Navigate } from "react-router-dom";
 import {
   FiMenu,
   FiX,
@@ -17,6 +17,7 @@ import {
   FiMail,
   FiStar,
   FiTag,
+  FiDollarSign,
 } from "react-icons/fi";
 import { useFontLoader } from "../hooks/useFontLoader";
 import { useScrollToTop } from "../hooks/useScrollToTop";
@@ -36,6 +37,7 @@ import CategoryManagement from "../components/dashboard/CategoryManagement";
 import RoleManagement from "../components/dashboard/RoleManagement";
 import JoinTeamApplicationsManagement from "../components/dashboard/JoinTeamApplicationsManagement";
 import ServiceRequestsManagement from "../components/dashboard/ServiceRequestsManagement";
+import PaymentsManagement from "../components/dashboard/PaymentsManagement";
 import Settings from "../components/dashboard/Settings";
 import NotificationDropdown from "../components/dashboard/NotificationDropdown";
 import AllNotifications from "../components/dashboard/AllNotifications";
@@ -44,7 +46,7 @@ const DashboardLayout = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isRTL = true; // Dashboard is always RTL/Arabic
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
   // Handle logout with confirmation
   const handleLogout = () => {
@@ -59,75 +61,107 @@ const DashboardLayout = () => {
   // Scroll to top on route change
   useScrollToTop();
 
-  const navigation = [
-    {
-      name: "نظرة عامة",
-      href: "/dashboard",
-      icon: FiHome,
-      current: location.pathname === "/dashboard",
-    },
-    {
-      name: "إدارة المستخدمين",
-      href: "/dashboard/users",
-      icon: FiUsers,
-      current: location.pathname === "/dashboard/users",
-    },
+  // Define navigation items based on user role
+  const getNavigationItems = () => {
+    // Check user role directly
+    const userRole = user?.role;
 
-    {
-      name: "إدارة المستشارين",
-      href: "/dashboard/consultants",
-      icon: FiUser,
-      current: location.pathname === "/dashboard/consultants",
-    },
-    {
-      name: "إدارة التوصيات",
-      href: "/dashboard/testimonials",
-      icon: FiStar,
-      current: location.pathname === "/dashboard/testimonials",
-    },
-    {
-      name: "إدارة الأسئلة الشائعة",
-      href: "/dashboard/faq",
-      icon: FiHelpCircle,
-      current: location.pathname === "/dashboard/faq",
-    },
-    {
-      name: "إدارة الفئات",
-      href: "/dashboard/categories",
-      icon: FiTag,
-      current: location.pathname === "/dashboard/categories",
-    },
-    {
-      name: "إدارة الوظائف",
-      href: "/dashboard/roles",
-      icon: FiBriefcase,
-      current: location.pathname === "/dashboard/roles",
-    },
-    {
-      name: "طلبات التوظيف",
-      href: "/dashboard/applications",
-      icon: FiMail,
-      current: location.pathname === "/dashboard/applications",
-    },
-    {
-      name: "طلبات الخدمات",
-      href: "/dashboard/service-requests",
-      icon: FiFileText,
-      current: location.pathname === "/dashboard/service-requests",
-    },
-    {
-      name: "طلبات التواصل",
-      href: "/dashboard/contact",
-      icon: FiMessageSquare,
-      current: location.pathname === "/dashboard/contact",
-    },
-    {
-      name: "الإعدادات",
-      href: "/dashboard/settings",
-      icon: FiSettings,
-      current: location.pathname === "/dashboard/settings",
-    },
-  ];
+    // Limited access for consultant and support roles
+    if (userRole === "consultant" || userRole === "support") {
+      return [
+        {
+          name: "طلبات الخدمات",
+          href: "/dashboard/service-requests",
+          icon: FiFileText,
+          current: location.pathname === "/dashboard/service-requests",
+        },
+        {
+          name: "طلبات التواصل",
+          href: "/dashboard/contact",
+          icon: FiMessageSquare,
+          current: location.pathname === "/dashboard/contact",
+        },
+      ];
+    }
+
+    // Full access for admin
+    return [
+      {
+        name: "نظرة عامة",
+        href: "/dashboard",
+        icon: FiHome,
+        current: location.pathname === "/dashboard",
+      },
+      {
+        name: "إدارة المستخدمين",
+        href: "/dashboard/users",
+        icon: FiUsers,
+        current: location.pathname === "/dashboard/users",
+      },
+      {
+        name: "إدارة المستشارين",
+        href: "/dashboard/consultants",
+        icon: FiUser,
+        current: location.pathname === "/dashboard/consultants",
+      },
+      {
+        name: "إدارة التوصيات",
+        href: "/dashboard/testimonials",
+        icon: FiStar,
+        current: location.pathname === "/dashboard/testimonials",
+      },
+      {
+        name: "إدارة الأسئلة الشائعة",
+        href: "/dashboard/faq",
+        icon: FiHelpCircle,
+        current: location.pathname === "/dashboard/faq",
+      },
+      {
+        name: "إدارة الفئات",
+        href: "/dashboard/categories",
+        icon: FiTag,
+        current: location.pathname === "/dashboard/categories",
+      },
+      {
+        name: "إدارة الوظائف",
+        href: "/dashboard/roles",
+        icon: FiBriefcase,
+        current: location.pathname === "/dashboard/roles",
+      },
+      {
+        name: "طلبات التوظيف",
+        href: "/dashboard/applications",
+        icon: FiMail,
+        current: location.pathname === "/dashboard/applications",
+      },
+      {
+        name: "طلبات الخدمات",
+        href: "/dashboard/service-requests",
+        icon: FiFileText,
+        current: location.pathname === "/dashboard/service-requests",
+      },
+      {
+        name: "طلبات التواصل",
+        href: "/dashboard/contact",
+        icon: FiMessageSquare,
+        current: location.pathname === "/dashboard/contact",
+      },
+      {
+        name: "المدفوعات",
+        href: "/dashboard/payments",
+        icon: FiDollarSign,
+        current: location.pathname === "/dashboard/payments",
+      },
+      {
+        name: "الإعدادات",
+        href: "/dashboard/settings",
+        icon: FiSettings,
+        current: location.pathname === "/dashboard/settings",
+      },
+    ];
+  };
+
+  const navigation = getNavigationItems();
 
   return (
     <div
@@ -154,14 +188,29 @@ const DashboardLayout = () => {
               <div className="flex items-center space-x-reverse space-x-3">
                 <img
                   className="h-8 w-8 rounded-full"
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                  alt=""
+                  src={
+                    user?.profilePicture ||
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      user?.firstName || "User"
+                    )}+${encodeURIComponent(
+                      user?.lastName || ""
+                    )}&background=09142b&color=ffffff&size=128`
+                  }
+                  alt={`${user?.firstName} ${user?.lastName}`}
                 />
                 <div className="hidden md:block">
                   <div className="text-sm font-medium text-gray-900">
-                    مدير النظام
+                    {user?.firstName} {user?.lastName}
                   </div>
-                  <div className="text-sm text-gray-500">مدير</div>
+                  <div className="text-sm text-gray-500">
+                    {user?.role === "admin"
+                      ? "مدير النظام"
+                      : user?.role === "consultant"
+                      ? "مستشار"
+                      : user?.role === "support"
+                      ? "دعم فني"
+                      : "مدير"}
+                  </div>
                 </div>
                 {/* Top Navigation Logout Button */}
                 <button
@@ -180,26 +229,48 @@ const DashboardLayout = () => {
         {/* Page Content */}
         <main className="flex-1 p-6 overflow-y-auto">
           <Routes>
-            <Route path="/" element={<DashboardOverview />} />
-            <Route path="/users" element={<UsersManagement />} />
-            <Route path="/join-team" element={<JoinTeamRequests />} />
-            <Route path="/contact" element={<ContactRequests />} />
-            <Route path="/consultations" element={<LegalConsultations />} />
-            <Route path="/consultants" element={<ConsultantsManagement />} />
-            <Route path="/testimonials" element={<TestimonialsManagement />} />
-            <Route path="/faq" element={<FAQManagement />} />
-            <Route path="/categories" element={<CategoryManagement />} />
-            <Route path="/roles" element={<RoleManagement />} />
-            <Route
-              path="/applications"
-              element={<JoinTeamApplicationsManagement />}
-            />
+            {/* Routes available to consultant and support users */}
             <Route
               path="/service-requests"
               element={<ServiceRequestsManagement />}
             />
-            <Route path="/notifications" element={<AllNotifications />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/contact" element={<ContactRequests />} />
+
+            {/* Admin-only routes */}
+            {user?.role === "admin" && (
+              <>
+                <Route path="/" element={<DashboardOverview />} />
+                <Route path="/users" element={<UsersManagement />} />
+                <Route path="/join-team" element={<JoinTeamRequests />} />
+                <Route path="/consultations" element={<LegalConsultations />} />
+                <Route
+                  path="/consultants"
+                  element={<ConsultantsManagement />}
+                />
+                <Route
+                  path="/testimonials"
+                  element={<TestimonialsManagement />}
+                />
+                <Route path="/faq" element={<FAQManagement />} />
+                <Route path="/categories" element={<CategoryManagement />} />
+                <Route path="/roles" element={<RoleManagement />} />
+                <Route
+                  path="/applications"
+                  element={<JoinTeamApplicationsManagement />}
+                />
+                <Route path="/payments" element={<PaymentsManagement />} />
+                <Route path="/notifications" element={<AllNotifications />} />
+                <Route path="/settings" element={<Settings />} />
+              </>
+            )}
+
+            {/* Default redirect for limited access users */}
+            {(user?.role === "consultant" || user?.role === "support") && (
+              <Route
+                path="/"
+                element={<Navigate to="/dashboard/service-requests" replace />}
+              />
+            )}
           </Routes>
         </main>
       </div>

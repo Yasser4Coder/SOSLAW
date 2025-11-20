@@ -18,6 +18,7 @@ import {
   FiCalendar,
   FiFileText,
   FiMapPin,
+  FiPhone,
 } from "react-icons/fi";
 import contactRequestService from "../../services/contactRequestService";
 import DataTable from "./DataTable";
@@ -51,13 +52,18 @@ const ContactRequests = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // Reset to page 1 when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedFilter]);
+
   // Fetch contact requests with React Query - only filter by status, not search
   const {
     data: requestsData,
     isLoading: isLoadingRequests,
     error: requestsError,
   } = useQuery({
-    queryKey: ["contact-requests", selectedFilter],
+    queryKey: ["contact-requests", selectedFilter, currentPage, itemsPerPage],
     queryFn: async () => {
       try {
         const result = await contactRequestService.getAllContactRequests({
@@ -65,10 +71,8 @@ const ContactRequests = () => {
           page: currentPage,
           limit: itemsPerPage,
         });
-        console.log("Contact requests API response:", result);
         return result;
       } catch (error) {
-        console.error("Contact requests API error:", error);
         throw error;
       }
     },
@@ -242,15 +246,6 @@ const ContactRequests = () => {
           >
             <FiEye className="w-4 h-4" />
           </button>
-          {request.status !== "replied" && (
-            <button
-              onClick={() => handleReply(request)}
-              className="p-1 text-green-600 hover:text-green-800 hover:bg-green-50 rounded"
-              title="رد"
-            >
-              <FiMessageSquare className="w-4 h-4" />
-            </button>
-          )}
           <button
             onClick={() => handleDelete(request)}
             className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
@@ -272,7 +267,6 @@ const ContactRequests = () => {
       toast.success("تم تحديث حالة الطلب بنجاح");
     },
     onError: (error) => {
-      console.error("Error updating request status:", error);
       toast.error("حدث خطأ أثناء تحديث حالة الطلب");
     },
   });
@@ -289,7 +283,6 @@ const ContactRequests = () => {
       toast.success("تم إرسال الرد بنجاح");
     },
     onError: (error) => {
-      console.error("Error sending reply:", error);
       toast.error("حدث خطأ أثناء إرسال الرد");
     },
   });
@@ -304,7 +297,6 @@ const ContactRequests = () => {
       toast.success("تم حذف الطلب بنجاح");
     },
     onError: (error) => {
-      console.error("Error deleting request:", error);
       toast.error("حدث خطأ أثناء حذف الطلب");
     },
   });
@@ -349,8 +341,10 @@ const ContactRequests = () => {
   };
 
   const getStatusStats = () => {
+    // For statistics, we need to get all requests, not just the current page
+    // This is a limitation of the current implementation - ideally we'd have separate stats endpoint
     const stats = {
-      total: allRequests.length,
+      total: totalRequests, // Use total from backend
       new: allRequests.filter((r) => r.status === "new").length,
       read: allRequests.filter((r) => r.status === "read").length,
       replied: allRequests.filter((r) => r.status === "replied").length,
@@ -370,7 +364,6 @@ const ContactRequests = () => {
   }
 
   if (requestsError) {
-    console.error("Contact requests error details:", requestsError);
     return (
       <div className="text-center py-8">
         <FiAlertCircle className="text-4xl text-red-500 mx-auto mb-4" />
@@ -501,11 +494,15 @@ const ContactRequests = () => {
         <DataTable
           data={requests}
           columns={columns}
-          currentPage={currentPage}
-          itemsPerPage={itemsPerPage}
-          totalItems={requests.length}
-          onPageChange={setCurrentPage}
-          onItemsPerPageChange={setItemsPerPage}
+          pagination={{
+            total: totalRequests,
+            limit: itemsPerPage,
+            offset: (currentPage - 1) * itemsPerPage,
+            onPageChange: (offset) => {
+              const newPage = Math.floor(offset / itemsPerPage) + 1;
+              setCurrentPage(newPage);
+            }
+          }}
           searchTerm={searchTerm}
           isLoading={isLoadingRequests}
         />
@@ -528,239 +525,233 @@ const ContactRequests = () => {
       />
 
       {/* View Request Modal */}
-      {showViewModal &&
-        selectedRequest &&
-        (console.log("Rendering modal with selectedRequest:", selectedRequest),
-        (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-gray-900">
-                    تفاصيل طلب التواصل
-                  </h2>
-                  <button
-                    onClick={() => {
-                      setShowViewModal(false);
-                      setSelectedRequest(null);
-                    }}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <FiX className="w-6 h-6" />
-                  </button>
-                </div>
+      {showViewModal && selectedRequest && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-gray-900">
+                  تفاصيل طلب التواصل
+                </h2>
+                <button
+                  onClick={() => {
+                    setShowViewModal(false);
+                    setSelectedRequest(null);
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <FiX className="w-6 h-6" />
+                </button>
+              </div>
 
-                <div className="space-y-6">
-                  {/* Client Information */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                      <FiUser className="ml-2" />
-                      معلومات العميل
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          الاسم
-                        </label>
-                        <p className="text-gray-900">{selectedRequest.name}</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          البريد الإلكتروني
-                        </label>
-                        <p className="text-gray-900 flex items-center">
-                          <FiMail className="ml-1 w-4 h-4" />
-                          {selectedRequest.email}
-                        </p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          رقم الهاتف
-                        </label>
-                        <p className="text-gray-900 flex items-center">
-                          <FiPhone className="ml-1 w-4 h-4" />
-                          {selectedRequest.phone || "غير محدد"}
-                        </p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          الأولوية
-                        </label>
-                        <p className="text-gray-900">
-                          {selectedRequest.priority === "urgent" && "عاجل"}
-                          {selectedRequest.priority === "high" && "عالية"}
-                          {selectedRequest.priority === "normal" && "عادية"}
-                          {selectedRequest.priority === "low" && "منخفضة"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Message Information */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                      <FiFileText className="ml-2" />
-                      محتوى الرسالة
-                    </h3>
-                    <div className="space-y-4">
-                      {selectedRequest.subject && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            الموضوع
-                          </label>
-                          <p className="text-gray-900 font-medium">
-                            {selectedRequest.subject}
-                          </p>
-                        </div>
-                      )}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          الرسالة
-                        </label>
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <p className="text-gray-900 whitespace-pre-wrap">
-                            {selectedRequest.message}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Reply Information */}
-                  {selectedRequest.replyMessage && (
+              <div className="space-y-6">
+                {/* Client Information */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <FiUser className="ml-2" />
+                    معلومات العميل
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <FiMessageSquare className="ml-2" />
-                        الرد
-                      </h3>
-                      <div className="bg-blue-50 p-4 rounded-lg">
-                        <p className="text-gray-900 whitespace-pre-wrap">
-                          {selectedRequest.replyMessage}
-                        </p>
-                      </div>
-                      {selectedRequest.repliedAt && (
-                        <p className="text-sm text-gray-500 mt-2">
-                          تم الرد في:{" "}
-                          {(() => {
-                            try {
-                              const date = new Date(selectedRequest.repliedAt);
-                              const dayNames = [
-                                "الأحد",
-                                "الاثنين",
-                                "الثلاثاء",
-                                "الأربعاء",
-                                "الخميس",
-                                "الجمعة",
-                                "السبت",
-                              ];
-                              const dayName = dayNames[date.getDay()];
-                              const day = String(date.getDate()).padStart(
-                                2,
-                                "0"
-                              );
-                              const month = String(
-                                date.getMonth() + 1
-                              ).padStart(2, "0");
-                              const year = date.getFullYear();
-                              return `${dayName} ${day}/${month}/${year}`;
-                            } catch (error) {
-                              return "غير محدد";
-                            }
-                          })()}
-                        </p>
-                      )}
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        الاسم
+                      </label>
+                      <p className="text-gray-900">{selectedRequest.name}</p>
                     </div>
-                  )}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        البريد الإلكتروني
+                      </label>
+                      <p className="text-gray-900 flex items-center">
+                        <FiMail className="ml-1 w-4 h-4" />
+                        {selectedRequest.email}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        رقم الهاتف
+                      </label>
+                      <p className="text-gray-900 flex items-center">
+                        <FiPhone className="ml-1 w-4 h-4" />
+                        {selectedRequest.phone || "غير محدد"}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        الأولوية
+                      </label>
+                      <p className="text-gray-900">
+                        {selectedRequest.priority === "urgent" && "عاجل"}
+                        {selectedRequest.priority === "high" && "عالية"}
+                        {selectedRequest.priority === "normal" && "عادية"}
+                        {selectedRequest.priority === "low" && "منخفضة"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
-                  {/* Request Details */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                      <FiCalendar className="ml-2" />
-                      تفاصيل الطلب
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Message Information */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <FiFileText className="ml-2" />
+                    محتوى الرسالة
+                  </h3>
+                  <div className="space-y-4">
+                    {selectedRequest.subject && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          تاريخ الإرسال
+                          الموضوع
                         </label>
-                        <p className="text-gray-900">
-                          {(() => {
-                            try {
-                              const date = new Date(selectedRequest.created_at);
-                              const dayNames = [
-                                "الأحد",
-                                "الاثنين",
-                                "الثلاثاء",
-                                "الأربعاء",
-                                "الخميس",
-                                "الجمعة",
-                                "السبت",
-                              ];
-                              const dayName = dayNames[date.getDay()];
-                              const day = String(date.getDate()).padStart(
-                                2,
-                                "0"
-                              );
-                              const month = String(
-                                date.getMonth() + 1
-                              ).padStart(2, "0");
-                              const year = date.getFullYear();
-                              const hours = String(date.getHours()).padStart(
-                                2,
-                                "0"
-                              );
-                              const minutes = String(
-                                date.getMinutes()
-                              ).padStart(2, "0");
-                              return `${dayName} ${day}/${month}/${year} ${hours}:${minutes}`;
-                            } catch (error) {
-                              return "غير محدد";
-                            }
-                          })()}
+                        <p className="text-gray-900 font-medium">
+                          {selectedRequest.subject}
                         </p>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          الحالة
-                        </label>
-                        <p className="text-gray-900">
-                          {selectedRequest.status === "new" && "جديد"}
-                          {selectedRequest.status === "read" && "مقروء"}
-                          {selectedRequest.status === "replied" && "تم الرد"}
-                          {selectedRequest.status === "closed" && "مغلق"}
+                    )}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        الرسالة
+                      </label>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <p className="text-gray-900 whitespace-pre-wrap">
+                          {selectedRequest.message}
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex justify-end space-x-3 space-x-reverse mt-8">
-                  {selectedRequest.status !== "replied" && (
-                    <button
-                      onClick={() => {
-                        setShowViewModal(false);
-                        handleReply(selectedRequest);
-                      }}
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center space-x-2 space-x-reverse"
-                    >
-                      <FiMessageSquare size={16} />
-                      <span>رد</span>
-                    </button>
-                  )}
+                {/* Reply Information */}
+                {selectedRequest.replyMessage && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <FiMessageSquare className="ml-2" />
+                      الرد
+                    </h3>
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <p className="text-gray-900 whitespace-pre-wrap">
+                        {selectedRequest.replyMessage}
+                      </p>
+                    </div>
+                    {selectedRequest.repliedAt && (
+                      <p className="text-sm text-gray-500 mt-2">
+                        تم الرد في:{" "}
+                        {(() => {
+                          try {
+                            const date = new Date(selectedRequest.repliedAt);
+                            const dayNames = [
+                              "الأحد",
+                              "الاثنين",
+                              "الثلاثاء",
+                              "الأربعاء",
+                              "الخميس",
+                              "الجمعة",
+                              "السبت",
+                            ];
+                            const dayName = dayNames[date.getDay()];
+                            const day = String(date.getDate()).padStart(2, "0");
+                            const month = String(date.getMonth() + 1).padStart(
+                              2,
+                              "0"
+                            );
+                            const year = date.getFullYear();
+                            return `${dayName} ${day}/${month}/${year}`;
+                          } catch (error) {
+                            return "غير محدد";
+                          }
+                        })()}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Request Details */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <FiCalendar className="ml-2" />
+                    تفاصيل الطلب
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        تاريخ الإرسال
+                      </label>
+                      <p className="text-gray-900">
+                        {(() => {
+                          try {
+                            const date = new Date(selectedRequest.created_at);
+                            const dayNames = [
+                              "الأحد",
+                              "الاثنين",
+                              "الثلاثاء",
+                              "الأربعاء",
+                              "الخميس",
+                              "الجمعة",
+                              "السبت",
+                            ];
+                            const dayName = dayNames[date.getDay()];
+                            const day = String(date.getDate()).padStart(2, "0");
+                            const month = String(date.getMonth() + 1).padStart(
+                              2,
+                              "0"
+                            );
+                            const year = date.getFullYear();
+                            const hours = String(date.getHours()).padStart(
+                              2,
+                              "0"
+                            );
+                            const minutes = String(date.getMinutes()).padStart(
+                              2,
+                              "0"
+                            );
+                            return `${dayName} ${day}/${month}/${year} ${hours}:${minutes}`;
+                          } catch (error) {
+                            return "غير محدد";
+                          }
+                        })()}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        الحالة
+                      </label>
+                      <p className="text-gray-900">
+                        {selectedRequest.status === "new" && "جديد"}
+                        {selectedRequest.status === "read" && "مقروء"}
+                        {selectedRequest.status === "replied" && "تم الرد"}
+                        {selectedRequest.status === "closed" && "مغلق"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3 space-x-reverse mt-8">
+                {selectedRequest.status !== "replied" && (
                   <button
                     onClick={() => {
                       setShowViewModal(false);
-                      setSelectedRequest(null);
+                      handleReply(selectedRequest);
                     }}
-                    className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center space-x-2 space-x-reverse"
                   >
-                    إغلاق
+                    <FiMessageSquare size={16} />
+                    <span>رد</span>
                   </button>
-                </div>
+                )}
+                <button
+                  onClick={() => {
+                    setShowViewModal(false);
+                    setSelectedRequest(null);
+                  }}
+                  className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
+                >
+                  إغلاق
+                </button>
               </div>
             </div>
           </div>
-        ))}
+        </div>
+      )}
 
       {/* Reply Modal */}
       {showReplyModal && selectedRequest && (

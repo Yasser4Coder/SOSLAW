@@ -341,7 +341,7 @@ const RoleDetails = () => {
                       </h4>
                     </div>
                     <p className="text-[#6b7280]">
-                      {new Date(role.createdAt).toLocaleDateString("ar-SA")}
+                      {new Date(role.createdAt || role.created_at).toLocaleDateString("en-US")}
                     </p>
                   </div>
 
@@ -353,7 +353,7 @@ const RoleDetails = () => {
                       </h4>
                     </div>
                     <p className="text-[#6b7280]">
-                      {new Date(role.updatedAt).toLocaleDateString("ar-SA")}
+                      {new Date(role.updatedAt || role.updated_at).toLocaleDateString("en-US")}
                     </p>
                   </div>
                 </div>

@@ -221,9 +221,16 @@ const UsersManagement = () => {
   // Use users directly since backend handles pagination and filtering
   const tableData = users.map((user) => ({
     ...user,
-    role: user.role === "admin" ? "مدير" : "عميل",
+    role:
+      user.role === "admin"
+        ? "مدير"
+        : user.role === "consultant"
+        ? "مستشار"
+        : user.role === "support"
+        ? "دعم فني"
+        : "عميل",
     isActive: user.isActive ? "نشط" : "غير نشط",
-    createdAt: new Date(user.createdAt).toLocaleDateString("en-US", {
+    createdAt: new Date(user.createdAt || user.created_at).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -365,7 +372,14 @@ const UsersManagement = () => {
               {filters.role && (
                 <span className="text-green-600 font-medium">
                   {" "}
-                  الدور: {filters.role === "admin" ? "مدير" : "عميل"}
+                  الدور:{" "}
+                  {filters.role === "admin"
+                    ? "مدير"
+                    : filters.role === "consultant"
+                    ? "مستشار"
+                    : filters.role === "support"
+                    ? "دعم فني"
+                    : "عميل"}
                 </span>
               )}
               {filters.role && filters.isActive && " | "}
@@ -429,6 +443,8 @@ const UsersManagement = () => {
             <option value="">جميع الأدوار</option>
             <option value="admin">مدير</option>
             <option value="client">عميل</option>
+            <option value="consultant">مستشار</option>
+            <option value="support">دعم فني</option>
           </select>
 
           <select
@@ -634,6 +650,8 @@ const UsersManagement = () => {
                 >
                   <option value="client">عميل</option>
                   <option value="admin">مدير</option>
+                  <option value="consultant">مستشار</option>
+                  <option value="support">دعم فني</option>
                 </select>
               </div>
 

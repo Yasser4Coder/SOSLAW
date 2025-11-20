@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   FiUser,
   FiMail,
@@ -18,9 +18,12 @@ import serviceRequestService from "../services/serviceRequestService";
 import toast from "react-hot-toast";
 import { services } from "./components/servicesData";
 import { getServiceDatabaseId } from "../utils/serviceMapping";
+import Cookies from "js-cookie";
+import API_BASE_URL from "../config/api.js";
 
 const RequestService = () => {
   const { serviceId: urlServiceId } = useParams();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     serviceId: "",
@@ -32,12 +35,41 @@ const RequestService = () => {
     urgency: "normal",
     preferredDate: "",
     additionalRequirements: "",
+    preferredConsultantId: "",
+    selectedPlan: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [consultants, setConsultants] = useState([]);
+  const [loadingConsultants, setLoadingConsultants] = useState(false);
 
   // Use static services data
   const servicesList = services;
+
+  // Fetch consultants on component mount
+  useEffect(() => {
+    const fetchConsultants = async () => {
+      try {
+        setLoadingConsultants(true);
+        console.log('Fetching consultants from API...');
+        const response = await fetch(`${API_BASE_URL}/api/v1/consultants/public`);
+        console.log('Response status:', response.status);
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Consultants data:', data);
+          setConsultants(data.data || []);
+        } else {
+          console.error('API response not ok:', response.status, response.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching consultants:', error);
+      } finally {
+        setLoadingConsultants(false);
+      }
+    };
+
+    fetchConsultants();
+  }, []);
 
   // Pre-fill service when URL contains serviceId
   useEffect(() => {
@@ -72,6 +104,15 @@ const RequestService = () => {
     setIsSubmitting(true);
 
     try {
+      // Check if user is authenticated
+      const token = Cookies.get("jwt");
+      if (!token) {
+        toast.error("يجب تسجيل الدخول أولاً لطلب الخدمة");
+        navigate("/login");
+        setIsSubmitting(false);
+        return;
+      }
+
       // Validate required fields
       const requiredFields = [
         "serviceId",
@@ -87,6 +128,7 @@ const RequestService = () => {
 
       if (missingFields.length > 0) {
         toast.error("يرجى ملء جميع الحقول المطلوبة");
+        setIsSubmitting(false);
         return;
       }
 
@@ -94,6 +136,7 @@ const RequestService = () => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(formData.clientEmail)) {
         toast.error("يرجى إدخال بريد إلكتروني صحيح");
+        setIsSubmitting(false);
         return;
       }
 
@@ -101,6 +144,14 @@ const RequestService = () => {
       const phoneRegex = /^[\+]?[0-9\s\-\(\)]{8,}$/;
       if (!phoneRegex.test(formData.clientPhone)) {
         toast.error("يرجى إدخال رقم هاتف صحيح");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Validate plan selection for legal-consultation service
+      if (formData.serviceId === 'legal-consultation' && !formData.selectedPlan) {
+        toast.error("يرجى اختيار باقة الاستشارة القانونية");
+        setIsSubmitting(false);
         return;
       }
 
@@ -108,6 +159,7 @@ const RequestService = () => {
       const databaseServiceId = getServiceDatabaseId(formData.serviceId);
       if (!databaseServiceId) {
         toast.error("خدمة غير صحيحة");
+        setIsSubmitting(false);
         return;
       }
 
@@ -117,26 +169,55 @@ const RequestService = () => {
         serviceId: databaseServiceId,
       };
 
+      // Log the data being sent for debugging
+      console.log('📤 Sending service request data:', requestData);
+      console.log('📤 Selected Plan:', requestData.selectedPlan);
+
       // Send the request to the backend
-      await serviceRequestService.createServiceRequest(requestData);
+      const response = await serviceRequestService.createServiceRequest(
+        requestData
+      );
 
-      toast.success("تم إرسال طلب الخدمة بنجاح! سنتواصل معك قريباً");
+      if (response.success) {
+        toast.success(
+          "تم إرسال طلب الخدمة بنجاح! يمكنك مراجعة طلباتك في صفحة 'طلباتك'"
+        );
 
-      // Reset form
-      setFormData({
-        serviceId: "",
-        clientName: "",
-        clientEmail: "",
-        clientPhone: "",
-        clientAddress: "",
-        serviceDescription: "",
-        urgency: "normal",
-        preferredDate: "",
-        additionalRequirements: "",
-      });
+        // Force refresh of notification counts to update the badge immediately
+        window.dispatchEvent(new CustomEvent("refreshNotifications"));
+        console.log("Service request created - refreshing notifications");
+
+        // Reset form
+        setFormData({
+          serviceId: "",
+          clientName: "",
+          clientEmail: "",
+          clientPhone: "",
+          clientAddress: "",
+          serviceDescription: "",
+          urgency: "normal",
+          preferredDate: "",
+          additionalRequirements: "",
+          preferredConsultantId: "",
+          selectedPlan: "",
+        });
+      } else {
+        toast.error(response.message || "حدث خطأ أثناء إرسال الطلب");
+      }
     } catch (error) {
       console.error("Error submitting service request:", error);
-      toast.error("حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى");
+
+      // Handle specific error cases
+      if (error.response?.status === 401) {
+        toast.error("انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى");
+        navigate("/login");
+      } else if (error.response?.status === 403) {
+        toast.error("ليس لديك صلاحية لطلب هذه الخدمة");
+      } else if (error.response?.data?.message) {
+        toast.error(`خطأ: ${error.response.data.message}`);
+      } else {
+        toast.error("حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -389,6 +470,182 @@ const RequestService = () => {
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="أي متطلبات إضافية أو ملاحظات..."
                   />
+                </div>
+
+                {/* Plan Selection - Only for legal-consultation service */}
+                {formData.serviceId === 'legal-consultation' && (
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-4">
+                      اختر الباقة التي تناسبك <span className="text-red-500">*</span>
+                    </label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                      {/* Free Plan for Special Needs */}
+                      <div
+                        onClick={() => setFormData(prev => ({ ...prev, selectedPlan: 'free-special-needs' }))}
+                        className={`p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                          formData.selectedPlan === 'free-special-needs'
+                            ? 'border-blue-500 bg-blue-50 shadow-md'
+                            : 'border-gray-200 hover:border-blue-300 hover:shadow'
+                        }`}
+                      >
+                        <div className="flex items-center justify-center mb-2">
+                          <FiUser className="text-orange-500 text-xl" />
+                        </div>
+                        <h4 className="text-center text-sm font-semibold text-gray-900 mb-2">
+                          ذوي الاحتياجات الخاصة
+                        </h4>
+                        <div className="space-y-1 text-xs text-gray-600 mb-2">
+                          <div className="flex items-center justify-center">
+                            <FiClock className="ml-1 text-gray-400" size={12} />
+                            <span>30 دقيقة</span>
+                          </div>
+                          <div className="flex items-center justify-center">
+                            <FiCheckCircle className="ml-1 text-gray-400" size={12} />
+                            <span>عن بُعد أو حضوري</span>
+                          </div>
+                        </div>
+                        <div className="text-center">
+                          <span className="text-base font-bold text-green-600">مجانًا</span>
+                        </div>
+                      </div>
+
+                      {/* Mini Plan */}
+                      <div
+                        onClick={() => setFormData(prev => ({ ...prev, selectedPlan: 'mini-15min' }))}
+                        className={`p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                          formData.selectedPlan === 'mini-15min'
+                            ? 'border-blue-500 bg-blue-50 shadow-md'
+                            : 'border-gray-200 hover:border-blue-300 hover:shadow'
+                        }`}
+                      >
+                        <div className="flex items-center justify-center mb-2">
+                          <FiClock className="text-blue-500 text-xl" />
+                        </div>
+                        <h4 className="text-center text-sm font-semibold text-gray-900 mb-2">
+                          باقة Mini
+                        </h4>
+                        <div className="space-y-1 text-xs text-gray-600 mb-2">
+                          <div className="flex items-center justify-center">
+                            <FiClock className="ml-1 text-gray-400" size={12} />
+                            <span>15 دقيقة</span>
+                          </div>
+                          <div className="flex items-center justify-center">
+                            <FiCheckCircle className="ml-1 text-gray-400" size={12} />
+                            <span>سؤال محدد</span>
+                          </div>
+                          <div className="flex items-center justify-center">
+                            <FiPhone className="ml-1 text-gray-400" size={12} />
+                            <span>عن بُعد</span>
+                          </div>
+                        </div>
+                        <div className="text-center">
+                          <span className="text-base font-bold text-blue-600">1000 دج</span>
+                        </div>
+                      </div>
+
+                      {/* Standard Plan */}
+                      <div
+                        onClick={() => setFormData(prev => ({ ...prev, selectedPlan: 'standard-30min' }))}
+                        className={`p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                          formData.selectedPlan === 'standard-30min'
+                            ? 'border-blue-500 bg-blue-50 shadow-md'
+                            : 'border-gray-200 hover:border-blue-300 hover:shadow'
+                        }`}
+                      >
+                        <div className="flex items-center justify-center mb-2">
+                          <FiFileText className="text-green-500 text-xl" />
+                        </div>
+                        <h4 className="text-center text-sm font-semibold text-gray-900 mb-2">
+                          باقة Standard
+                        </h4>
+                        <div className="space-y-1 text-xs text-gray-600 mb-2">
+                          <div className="flex items-center justify-center">
+                            <FiClock className="ml-1 text-gray-400" size={12} />
+                            <span>30 دقيقة</span>
+                          </div>
+                          <div className="flex items-center justify-center">
+                            <FiCheckCircle className="ml-1 text-gray-400" size={12} />
+                            <span>تحليل + توجيه</span>
+                          </div>
+                          <div className="flex items-center justify-center">
+                            <FiPhone className="ml-1 text-gray-400" size={12} />
+                            <span>عن بُعد</span>
+                          </div>
+                        </div>
+                        <div className="text-center">
+                          <span className="text-base font-bold text-green-600">2000 دج</span>
+                        </div>
+                      </div>
+
+                      {/* Premium Plan */}
+                      <div
+                        onClick={() => setFormData(prev => ({ ...prev, selectedPlan: 'premium-45min' }))}
+                        className={`p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                          formData.selectedPlan === 'premium-45min'
+                            ? 'border-blue-500 bg-blue-50 shadow-md'
+                            : 'border-gray-200 hover:border-blue-300 hover:shadow'
+                        }`}
+                      >
+                        <div className="flex items-center justify-center mb-2">
+                          <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                          </svg>
+                        </div>
+                        <h4 className="text-center text-sm font-semibold text-gray-900 mb-2">
+                          باقة Premium
+                        </h4>
+                        <div className="space-y-1 text-xs text-gray-600 mb-2">
+                          <div className="flex items-center justify-center">
+                            <FiClock className="ml-1 text-gray-400" size={12} />
+                            <span>45 دقيقة</span>
+                          </div>
+                          <div className="flex items-center justify-center">
+                            <FiCheckCircle className="ml-1 text-gray-400" size={12} />
+                            <span>استشارة معمقة</span>
+                          </div>
+                          <div className="flex items-center justify-center">
+                            <FiFileText className="ml-1 text-gray-400" size={12} />
+                            <span>ملاحظات مكتوبة</span>
+                          </div>
+                        </div>
+                        <div className="text-center">
+                          <span className="text-base font-bold text-purple-600">3000 دج</span>
+                        </div>
+                      </div>
+                    </div>
+                    {!formData.selectedPlan && (
+                      <p className="text-red-500 text-sm mt-2">يرجى اختيار باقة للمتابعة</p>
+                    )}
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    المستشار المفضل (اختياري)
+                  </label>
+                  {loadingConsultants ? (
+                    <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 flex items-center">
+                      <FiLoader className="animate-spin ml-2" />
+                      <span className="text-gray-500">جاري تحميل المستشارين...</span>
+                    </div>
+                  ) : (
+                    <select
+                      name="preferredConsultantId"
+                      value={formData.preferredConsultantId}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="">اختر مستشار (اختياري)</option>
+                      {consultants.map((consultant) => (
+                        <option key={consultant.id} value={consultant.id}>
+                          {consultant.name} - {consultant.specialization || 'مستشار قانوني'}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  <p className="text-sm text-gray-500 mt-1">
+                    يمكنك اختيار مستشار معين إذا كان لديك تفضيل، أو ترك هذا الحقل فارغاً
+                  </p>
                 </div>
               </div>
             </div>

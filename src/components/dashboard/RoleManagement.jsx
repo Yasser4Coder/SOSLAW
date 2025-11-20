@@ -23,8 +23,9 @@ import toast from "react-hot-toast";
 const RoleManagement = () => {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
-
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [roleToDelete, setRoleToDelete] = useState(null);
@@ -82,17 +83,25 @@ const RoleManagement = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // Reset to page 1 when filter changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedFilter]);
+
   // Fetch roles with React Query - only filter by status, not search
   const {
     data: rolesData,
     isLoading: isLoadingRoles,
     error: rolesError,
   } = useQuery({
-    queryKey: ["roles", selectedFilter],
+    queryKey: ["roles", selectedFilter, currentPage, itemsPerPage],
     queryFn: () => {
+      const offset = (currentPage - 1) * itemsPerPage;
       return roleService.getAllRoles({
-        status: selectedFilter,
+        status: selectedFilter === "all" ? undefined : selectedFilter,
         language: "ar",
+        limit: itemsPerPage,
+        offset: offset,
       });
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -698,13 +707,15 @@ const RoleManagement = () => {
         columns={columns}
         pagination={{
           total: totalRoles,
-          limit: 10,
-          offset: 0,
-          onPageChange: () => {
-            // Handle page change if needed
-          },
+          limit: itemsPerPage,
+          offset: (currentPage - 1) * itemsPerPage,
+          onPageChange: (offset) => {
+            const newPage = Math.floor(offset / itemsPerPage) + 1;
+            setCurrentPage(newPage);
+          }
         }}
         searchTerm={searchTerm}
+        isLoading={isLoadingRoles}
       />
 
       {/* Add/Edit Modal */}

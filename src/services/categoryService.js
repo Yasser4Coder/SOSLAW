@@ -1,5 +1,6 @@
 import api from "./api";
 import axios from "axios";
+import API_BASE_URL from "../config/api.js";
 
 class CategoryService {
   // Get all categories (admin)
@@ -19,8 +20,6 @@ class CategoryService {
   // Get public categories (frontend)
   async getPublicCategories(options = {}) {
     const params = new URLSearchParams();
-    const API_BASE_URL =
-      import.meta.env?.VITE_API_URL || "https://api-v1.soslawdz.com";
 
     if (options.limit) params.append("limit", options.limit);
     if (options.language) params.append("language", options.language);
@@ -47,8 +46,6 @@ class CategoryService {
 
   // Get category by slug
   async getCategoryBySlug(slug, language = "ar") {
-    const API_BASE_URL =
-      import.meta.env?.VITE_API_URL || "https://api-v1.soslawdz.com";
     const response = await axios.get(
       `${API_BASE_URL}/public/categories/slug/${slug}?language=${language}`
     );

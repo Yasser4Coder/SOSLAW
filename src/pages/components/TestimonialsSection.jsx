@@ -174,8 +174,8 @@ const TestimonialsSection = () => {
 
         {/* Statistics */}
         {statsLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-            {[1, 2, 3, 4].map((i) => (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-12">
+            {[1, 2, 3].map((i) => (
               <div
                 key={i}
                 className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-200"
@@ -187,7 +187,7 @@ const TestimonialsSection = () => {
             ))}
           </div>
         ) : testimonialsStats ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-12">
             <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-200">
               <div className="w-12 h-12 bg-[#c8a45e] rounded-full flex items-center justify-center mx-auto mb-3">
                 <FiStar className="w-6 h-6 text-white" />
@@ -245,26 +245,6 @@ const TestimonialsSection = () => {
                 }`}
               >
                 {t("satisfiedClients", "Satisfied Clients")}
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-200">
-              <div className="w-12 h-12 bg-[#c8a45e] rounded-full flex items-center justify-center mx-auto mb-3">
-                <FiClock className="w-6 h-6 text-white" />
-              </div>
-              <div
-                className={`font-bold text-[#09142b] mb-1 ${
-                  isRTL ? "text-xl md:text-2xl" : "text-2xl"
-                }`}
-              >
-                {testimonialsStats.yearsOfService || 5}+
-              </div>
-              <div
-                className={`text-gray-600 ${
-                  isRTL ? "text-xs md:text-sm" : "text-sm"
-                }`}
-              >
-                {t("yearsOfService", "Years of Service")}
               </div>
             </div>
           </div>

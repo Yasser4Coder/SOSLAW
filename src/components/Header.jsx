@@ -10,6 +10,7 @@ import {
   FiUser,
   FiLogOut,
   FiSettings,
+  FiMessageCircle,
 } from "react-icons/fi";
 import { FaInstagram, FaFacebook, FaLinkedin } from "react-icons/fa";
 import logo from "../assets/logo.svg";
@@ -17,6 +18,8 @@ import { useTranslation } from "react-i18next";
 import { useSmoothScroll } from "../hooks/useSmoothScroll";
 import { useAuth } from "../contexts/useAuth.js";
 import { useContactInfo } from "../hooks/useContactInfo";
+import useNotifications from "../hooks/useNotifications";
+import NotificationBadge from "./NotificationBadge";
 
 const LANGUAGES = [
   { code: "en", label: "EN" },
@@ -33,7 +36,7 @@ const SOCIALS = [
 const NAV_LINKS = [
   { to: "/", label: "home" },
   { to: "/about", label: "about" },
-  { to: "/#services", label: "servicesTitle" },
+  { to: "/", scrollTo: "services", label: "servicesTitle" },
   { to: "/contact", label: "contact" },
   { to: "/join", label: "joinUs" },
 
@@ -42,10 +45,10 @@ const NAV_LINKS = [
     label: "more",
     items: [
       { to: "/library", label: "legalLibrary" },
-      { to: "/#testimonials", label: "testimonialsTitle" },
-      { to: "/#consultants", label: "consultantsTitle" },
-      { to: "/#consultation-branches", label: "consulting" },
-      { to: "/#faq", label: "faqSectionTitle" },
+      { to: "/", scrollTo: "testimonials", label: "testimonialsTitle" },
+      { to: "/", scrollTo: "consultants", label: "consultantsTitle" },
+      { to: "/", scrollTo: "consultation-branches", label: "consulting" },
+      { to: "/", scrollTo: "faq", label: "faqSectionTitle" },
     ],
   },
 ];
@@ -55,8 +58,9 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { scrollToSection } = useSmoothScroll();
-  const { user, isAuthenticated, logout, isAdmin } = useAuth();
-  const { getMainPhone, getMainHours, getSocialMedia } = useContactInfo();
+  const { user, isAuthenticated, logout, isAdmin, hasDashboardAccess } =
+    useAuth();
+  const { getMainPhone, getMainHours } = useContactInfo();
   const [lang, setLang] = useState(i18n.language || "en");
   const [showLang, setShowLang] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
@@ -67,38 +71,54 @@ const Header = () => {
   });
   const [openDropdown, setOpenDropdown] = useState(null);
 
+  // Get notifications from API
+  const { notificationCounts, refetchCounts } = useNotifications();
+
   // Refs for dropdowns
   const langRef = useRef();
   const moreMenuRef = useRef();
   const moreTriggerRef = useRef();
   const userMenuRef = useRef();
 
+  // Listen for custom refresh notifications event
+  useEffect(() => {
+    const handleRefreshNotifications = () => {
+      console.log("Header: Refreshing notifications due to custom event");
+      refetchCounts();
+    };
+
+    window.addEventListener("refreshNotifications", handleRefreshNotifications);
+
+    return () => {
+      window.removeEventListener(
+        "refreshNotifications",
+        handleRefreshNotifications
+      );
+    };
+  }, [refetchCounts]);
+
   // Handle navigation with smooth scrolling for anchor links
-  const handleNavigation = (to, closeMenu = false) => {
-    if (to.startsWith("/#")) {
-      // Handle anchor links with smooth scrolling
-      const sectionId = to.substring(2); // Remove '/#' prefix
-      scrollToSection(sectionId);
-      if (closeMenu) {
-        setMobileMenu(false);
-        setOpenDropdown(null);
-      }
-    } else if (to === "/") {
-      // Handle home page navigation
-      if (closeMenu) {
-        setMobileMenu(false);
-        setOpenDropdown(null);
-      }
-      // If we're already on home page, scroll to top
+  const handleNavigation = (to, scrollTo = null, closeMenu = false) => {
+    if (closeMenu) {
+      setMobileMenu(false);
+      setOpenDropdown(null);
+    }
+
+    if (scrollTo) {
+      // Handle section scrolling
       if (location.pathname === "/") {
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        // Already on home page, just scroll
+        scrollToSection(scrollTo);
+      } else {
+        // Navigate to home page with scrollTo in state
+        navigate(to, { state: { scrollTo } });
       }
+    } else if (to === "/" && location.pathname === "/") {
+      // Handle home page navigation when already on home
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       // Handle regular page navigation
-      if (closeMenu) {
-        setMobileMenu(false);
-        setOpenDropdown(null);
-      }
+      navigate(to);
     }
   };
 
@@ -274,7 +294,7 @@ const Header = () => {
         >
           <img
             src={logo}
-            alt="SOSLAW Logo"
+            alt="SOS Law Logo"
             className="h-10 w-auto"
             loading="lazy"
           />
@@ -331,15 +351,16 @@ const Header = () => {
                     {link.items.map((item) => (
                       <li key={item.label || item.to} role="none">
                         {item.to ? (
-                          <Link
-                            to={item.to}
-                            className="block px-4 py-2 text-[#09142b] hover:bg-[#e7cfa7]/20 rounded focus:outline-none transition-all duration-200 transform hover:scale-105 focus:scale-105 hover:text-[#c8a45e] focus:text-[#c8a45e] cursor-pointer"
+                          <button
+                            onClick={() =>
+                              handleNavigation(item.to, item.scrollTo, true)
+                            }
+                            className="block w-full text-left px-4 py-2 text-[#09142b] hover:bg-[#e7cfa7]/20 rounded focus:outline-none transition-all duration-200 transform hover:scale-105 focus:scale-105 hover:text-[#c8a45e] focus:text-[#c8a45e] cursor-pointer"
                             role="menuitem"
                             tabIndex={0}
-                            onClick={() => handleNavigation(item.to, true)}
                           >
                             {t(item.label)}
-                          </Link>
+                          </button>
                         ) : (
                           <div className="group/sub relative px-4 py-2 text-[#09142b] font-bold hover:bg-[#faf6f0] cursor-pointer">
                             <div className="flex items-center justify-between">
@@ -385,10 +406,13 @@ const Header = () => {
                   </ul>
                 </>
               ) : (
-                <Link
-                  to={link.to}
+                <button
+                  onClick={() => handleNavigation(link.to, link.scrollTo)}
                   className={`font-semibold px-2 py-1 rounded transition-colors duration-200 focus:outline-none relative cursor-pointer ${
-                    location.pathname === link.to
+                    (location.pathname === link.to && !link.scrollTo) ||
+                    (link.scrollTo &&
+                      location.pathname === "/" &&
+                      location.hash === `#${link.scrollTo}`)
                       ? "text-[#c8a45e] underline underline-offset-4"
                       : "text-[#09142b] hover:text-[#c8a45e]"
                   } group`}
@@ -401,7 +425,7 @@ const Header = () => {
                   <span className="relative after:absolute after:left-0 after:-bottom-1 after:w-full after:h-0.5 after:bg-[#c8a45e] after:scale-x-0 group-hover:after:scale-x-100 group-focus:after:scale-x-100 after:origin-left after:transition-transform after:duration-300">
                     {t(link.label)}
                   </span>
-                </Link>
+                </button>
               )}
             </li>
           ))}
@@ -409,8 +433,8 @@ const Header = () => {
 
         {/* Right side buttons */}
         <div className="flex items-center gap-4">
-          {/* Dashboard button for admin users */}
-          {isAuthenticated && isAdmin() && (
+          {/* Dashboard button for admin, consultant, and support users */}
+          {isAuthenticated && hasDashboardAccess() && (
             <Link
               to="/dashboard"
               className="hidden md:inline-block px-4 py-2 bg-[#09142b] text-white font-semibold rounded shadow hover:bg-[#09142b]/80 transition focus:outline-none focus:ring-2 focus:ring-[#09142b]"
@@ -424,12 +448,13 @@ const Header = () => {
             <div className="relative" ref={userMenuRef}>
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center gap-2 px-4 py-2 bg-[#c8a45e] text-white font-semibold rounded shadow hover:bg-[#c8a45e]/80 transition focus:outline-none focus:ring-2 focus:ring-[#c8a45e]"
+                className="flex items-center gap-2 px-4 py-2 bg-[#c8a45e] text-white font-semibold rounded shadow hover:bg-[#c8a45e]/80 transition focus:outline-none focus:ring-2 focus:ring-[#c8a45e] cursor-pointer"
               >
                 <FiUser className="w-4 h-4" />
                 <span className="hidden sm:inline">
                   {user?.fullName?.split(" ")[0] || "User"}
                 </span>
+                <NotificationBadge count={notificationCounts.total} />
               </button>
 
               {showUserMenu && (
@@ -453,9 +478,32 @@ const Header = () => {
                     </p>
                   </div>
                   <div className="py-1">
+                    <Link
+                      to="/service-requests"
+                      className={`w-full ${
+                        lang === "ar" ? "text-right" : "text-left"
+                      } px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 transition-colors duration-200`}
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <FiMessageCircle className="w-4 h-4" />
+                      <span
+                        className="flex-1"
+                        dir={lang === "ar" ? "rtl" : "ltr"}
+                      >
+                        {lang === "ar"
+                          ? "طلباتك"
+                          : lang === "fr"
+                          ? "Vos demandes"
+                          : "Your Requests"}
+                      </span>
+                      <NotificationBadge
+                        count={notificationCounts.serviceRequests}
+                        className="ml-2"
+                      />
+                    </Link>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 transition-colors duration-200"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 transition-colors duration-200 cursor-pointer"
                     >
                       <FiLogOut className="w-4 h-4" />
                       {lang === "ar" ? "تسجيل الخروج" : "Logout"}
@@ -478,7 +526,7 @@ const Header = () => {
 
           {/* Mobile Hamburger */}
           <button
-            className="md:hidden text-[#c8a45e] text-2xl ml-4 focus:outline-none"
+            className="md:hidden text-[#c8a45e] text-2xl ml-4 focus:outline-none cursor-pointer"
             aria-label={mobileMenu ? "Close menu" : "Open menu"}
             aria-expanded={mobileMenu}
             onClick={() => setMobileMenu((v) => !v)}
@@ -683,9 +731,21 @@ const Header = () => {
                   {user.email}
                 </div>
               )}
+
+              {/* Dashboard button for mobile */}
+              {hasDashboardAccess() && (
+                <Link
+                  to="/dashboard"
+                  className="block w-full mb-3 px-4 py-2 bg-[#09142b] text-white font-semibold rounded shadow hover:bg-[#09142b]/80 transition text-center focus:outline-none focus:ring-2 focus:ring-[#09142b]"
+                  onClick={() => setMobileMenu(false)}
+                >
+                  Dashboard
+                </Link>
+              )}
+
               <button
                 onClick={handleLogout}
-                className="w-full px-4 py-2 bg-red-500 text-white font-semibold rounded shadow hover:bg-red-600 transition text-center focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="w-full px-4 py-2 bg-red-500 text-white font-semibold rounded shadow hover:bg-red-600 transition text-center focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
               >
                 {lang === "ar" ? "تسجيل الخروج" : "Logout"}
               </button>
