@@ -38,7 +38,7 @@ const scientificTracks = [
   "حماية الابتكار والملكية الفكرية",
   "العقود والشراكات في المؤسسات الناشئة",
   "التحديات القانونية في الواقع الميداني",
-  "نحو اقتصاد المعرفة: تجارب وطنية في دعم الإبداع",
+  "نحو اقتصاد المعرفة: دور القانون في الانتقال و التحفيز",
 ];
 
 const partnershipOptions = [
@@ -216,7 +216,7 @@ const NationalConferenceRegistration = () => {
               </span>
               <div className="text-right">
                 <div className="text-sm font-semibold text-[#09142b]">التاريخ</div>
-                <div className="text-sm text-[#4b5563]">من 07 إلى 09 ديسمبر 2025</div>
+                <div className="text-sm text-[#4b5563]">من 13 إلى 15 ديسمبر 2025</div>
               </div>
             </div>
 
