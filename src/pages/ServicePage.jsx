@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
@@ -8,18 +8,9 @@ import {
   FiArrowRight,
   FiCheck,
   FiClock,
-  FiUsers,
-  FiFileText,
-  FiTarget,
-  FiAward,
-  FiShield,
-  FiGlobe,
-  FiBook,
   FiBriefcase,
-  FiStar,
   FiPhone,
-  FiMail,
-  FiMapPin,
+  FiTarget,
 } from "react-icons/fi";
 import { services } from "./components/servicesData";
 
@@ -74,44 +65,57 @@ const ServicePage = () => {
   const details = getLocalizedContent(service.details);
   const availability = getLocalizedContent(service.availability);
 
+  const relatedServices = useMemo(() => {
+    const currentTags = new Set(service.tags || []);
+    const others = services
+      .filter((s) => s.id !== service.id)
+      .map((s) => {
+        const tags = s.tags || [];
+        const shared = tags.filter((t) => currentTags.has(t)).length;
+        return { service: s, shared };
+      })
+      .sort((a, b) => b.shared - a.shared);
+    return others.slice(0, 3).map(({ service: s }) => s);
+  }, [service.id, service.tags]);
+
   // Helper function to render lists
   const renderList = (items) => {
     if (!items || !Array.isArray(items)) return null;
 
     return (
-      <div className="space-y-3">
+      <ul className="space-y-3" role="list">
         {items.map((item, index) => (
-          <div key={index} className="flex items-start">
-            <div className="w-5 h-5 bg-[#c8a45e] rounded-full flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
-              <FiCheck className="w-3 h-3 text-white" />
-            </div>
-            <p className="text-[#09142b] leading-relaxed">{item}</p>
-          </div>
+          <li key={index} className="flex gap-3 items-start">
+            <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#c8a45e]">
+              <FiCheck className="h-3 w-3 text-white" aria-hidden />
+            </span>
+            <span className="text-slate-700 leading-relaxed">{item}</span>
+          </li>
         ))}
-      </div>
+      </ul>
     );
   };
+
+  const stepLabel = t("step", "Step");
 
   // Helper function to render process steps
   const renderProcess = (steps) => {
     if (!steps || !Array.isArray(steps)) return null;
 
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {steps.map((step, index) => (
           <div
             key={index}
-            className="bg-white rounded-lg p-6 shadow-sm border border-gray-200"
+            className="flex gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
           >
-            <div className="flex items-center mb-4">
-              <div className="w-8 h-8 bg-[#c8a45e] rounded-full flex items-center justify-center mr-3">
-                <span className="text-white font-bold text-sm">
-                  {index + 1}
-                </span>
-              </div>
-              <h4 className="font-semibold text-[#09142b]">Step {index + 1}</h4>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#09142b] text-sm font-bold text-[#c8a45e]">
+              {index + 1}
             </div>
-            <p className="text-[#6b7280] text-sm leading-relaxed">{step}</p>
+            <div>
+              <h4 className="font-semibold text-[#09142b] mb-1">{stepLabel} {index + 1}</h4>
+              <p className="text-slate-600 text-sm leading-relaxed">{step}</p>
+            </div>
           </div>
         ))}
       </div>
@@ -126,14 +130,14 @@ const ServicePage = () => {
     if (keys.length === 0) return null;
 
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {keys.map((key) => (
           <div
             key={key}
-            className="bg-white rounded-lg p-6 shadow-sm border border-gray-200"
+            className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
           >
-            <h4 className="font-semibold text-[#09142b] mb-3 text-lg">{key}</h4>
-            <p className="text-[#6b7280] leading-relaxed">
+            <h4 className="font-semibold text-[#09142b] mb-2 text-lg">{key}</h4>
+            <p className="text-slate-600 leading-relaxed">
               {getLocalizedContent(differenceData[key])}
             </p>
           </div>
@@ -150,298 +154,382 @@ const ServicePage = () => {
         <html lang={currentLanguage} dir={isRTL ? "rtl" : "ltr"} />
       </Helmet>
 
-      <div className="min-h-screen bg-[#f5f5f5]">
-        {/* Header Navigation */}
-        <div className="bg-white shadow-sm border-b border-gray-200">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex items-center justify-between">
-              <Link
-                to="/"
-                className="inline-flex items-center px-4 py-2 text-[#09142b] hover:text-[#c8a45e] transition-colors duration-200"
-              >
-                <FiArrowLeft className={`mr-2 ${isRTL ? "rotate-180" : ""}`} />
-                {t("backToHome", "Back to Home")}
-              </Link>
-              <div className="flex items-center space-x-4 space-x-reverse">
+      <div className="min-h-screen bg-slate-100" dir={isRTL ? "rtl" : "ltr"}>
+        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+          <Link
+            to="/"
+            className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-[#09142b]"
+          >
+            <FiArrowRight className={`h-4 w-4 ${isRTL ? "rotate-180" : ""}`} aria-hidden />
+            {t("backToHome", "Back to Home")}
+          </Link>
+
+          {/* Hero */}
+          <div className="mb-10 flex flex-col items-center gap-8 rounded-2xl bg-[#09142b] px-6 py-10 text-white shadow-xl sm:flex-row sm:gap-10 sm:px-10 sm:py-12">
+            <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#1e3a5f] sm:h-28 sm:w-28">
+              {service.image ? (
+                <img src={service.image} className="h-full w-full object-cover" alt="" />
+              ) : (
+                (() => {
+                  const Icon = service.icon;
+                  return Icon ? <Icon className="h-12 w-12 text-[#c8a45e] sm:h-14 sm:w-14" /> : null;
+                })()
+              )}
+            </div>
+            <div className="flex flex-1 flex-col items-center text-center sm:items-start sm:text-start">
+              <h1 className="text-2xl font-bold text-[#c8a45e] sm:text-3xl md:text-4xl">{title}</h1>
+              <p className="mt-2 max-w-2xl text-slate-300 leading-relaxed">{description}</p>
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-4 sm:justify-start">
+                <span className="inline-flex items-center gap-2 rounded-full bg-[#1e3a5f] px-4 py-2 text-sm text-slate-200">
+                  <FiClock className="h-4 w-4" aria-hidden />
+                  {availability}
+                </span>
                 <Link
-                  to="/contact"
-                  className="inline-flex items-center px-6 py-2 bg-[#09142b] text-white font-semibold rounded-lg hover:bg-[#1a2a4a] transition-colors duration-200"
+                  to={`/request-service/${service.id}`}
+                  className="inline-flex items-center rounded-xl bg-[#c8a45e] px-6 py-3 font-semibold text-white shadow-lg transition hover:bg-[#b48b5a] focus:outline-none focus:ring-2 focus:ring-[#c8a45e] focus:ring-offset-2 focus:ring-offset-[#09142b]"
+                  aria-label={isRTL ? "اطلب الخدمة" : "Request Service"}
                 >
-                  {t("getStarted", "Get Started")}
+                  {isRTL ? "اطلب الخدمة" : "Request Service"}
                 </Link>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Main Content */}
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          {/* Service Header */}
-          <div className="bg-gradient-to-r from-[#2d3748] to-[#1a2a4a] text-white rounded-lg p-8 mb-8">
-            <div className="text-center">
-              <div className="w-20 h-20 bg-[#c8a45e] rounded-full flex items-center justify-center mx-auto mb-6">
-                <FiBriefcase className="w-10 h-10 text-white" />
-              </div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-4">{title}</h1>
-              <p className="text-lg text-gray-300 leading-relaxed max-w-3xl mx-auto mb-4">
-                {description}
-              </p>
-              <div className="flex items-center justify-center text-sm text-gray-300">
-                <FiClock className="mr-2" />
-                {availability}
-              </div>
-            </div>
-          </div>
+          <div className="flex flex-col gap-8 lg:flex-row lg:gap-10">
+            {/* Main content */}
+            <div className="min-w-0 flex-1 space-y-8">
+              <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                <h2 className="text-xl font-bold text-[#09142b] mb-4 sm:text-2xl">
+                  {t("serviceDetails", "Service Details")}
+                </h2>
+                <p className="text-slate-600 leading-relaxed">{details}</p>
+              </section>
 
-          {/* Service Details */}
-          <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
-            <h2 className="text-2xl font-bold text-[#09142b] mb-6">
-              {t("serviceDetails", "Service Details")}
-            </h2>
-            <p className="text-[#6b7280] leading-relaxed text-lg">{details}</p>
-          </div>
+              {/* What We Translate/Provide - keep same structure, improve wrapper */}
+            {/* What We Translate/Provide Section */}
+              {service.what_we_translate && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                  <h2 className="text-xl font-bold text-[#09142b] mb-4 sm:text-2xl">
+                    {t("whatWeTranslate", "What We Translate")}
+                  </h2>
+                  {renderList(getLocalizedContent(service.what_we_translate))}
+                </section>
+              )}
 
-          {/* What We Translate/Provide Section */}
-          {service.what_we_translate && (
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
-              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
-                {t("whatWeTranslate", "What We Translate")}
-              </h2>
-              {renderList(getLocalizedContent(service.what_we_translate))}
-            </div>
-          )}
+              {service.what_we_provide && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                  <h2 className="text-xl font-bold text-[#09142b] mb-4 sm:text-2xl">
+                    {t("whatWeProvide", "What We Provide")}
+                  </h2>
+                  {renderList(getLocalizedContent(service.what_we_provide))}
+                </section>
+              )}
 
-          {service.what_we_provide && (
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
-              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
-                {t("whatWeProvide", "What We Provide")}
-              </h2>
-              {renderList(getLocalizedContent(service.what_we_provide))}
-            </div>
-          )}
+              {service.features && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                  <h2 className="text-xl font-bold text-[#09142b] mb-4 sm:text-2xl">
+                    {t("keyFeatures", "Key Features")}
+                  </h2>
+                  {renderList(getLocalizedContent(service.features))}
+                </section>
+              )}
 
-          {/* Features Section */}
-          {service.features && (
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
-              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
-                {t("keyFeatures", "Key Features")}
-              </h2>
-              {renderList(getLocalizedContent(service.features))}
-            </div>
-          )}
+              {service.process && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                  <h2 className="text-xl font-bold text-[#09142b] mb-4 sm:text-2xl">
+                    {t("ourProcess", "Our Process")}
+                  </h2>
+                  {renderProcess(getLocalizedContent(service.process))}
+                </section>
+              )}
 
-          {/* Process Section */}
-          {service.process && (
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
-              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
-                {t("ourProcess", "Our Process")}
-              </h2>
-              {renderProcess(getLocalizedContent(service.process))}
-            </div>
-          )}
+              {service.difference_between && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                  <h2 className="text-xl font-bold text-[#09142b] mb-4 sm:text-2xl">
+                    {t("differenceBetween", "Difference Between")}
+                  </h2>
+                  {renderDifferenceComparison(service.difference_between)}
+                </section>
+              )}
 
-          {/* Difference Between Section */}
-          {service.difference_between && (
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
-              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
-                {t("differenceBetween", "Difference Between")}
-              </h2>
-              {renderDifferenceComparison(service.difference_between)}
-            </div>
-          )}
+              {service.cases_we_handle && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                  <h2 className="text-xl font-bold text-[#09142b] mb-4 sm:text-2xl">
+                    {t("casesWeHandle", "Cases We Handle")}
+                  </h2>
+                  {renderList(getLocalizedContent(service.cases_we_handle))}
+                </section>
+              )}
 
-          {/* Cases We Handle Section */}
-          {service.cases_we_handle && (
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
-              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
-                {t("casesWeHandle", "Cases We Handle")}
-              </h2>
-              {renderList(getLocalizedContent(service.cases_we_handle))}
-            </div>
-          )}
+              {service.advantages && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                  <h2 className="text-xl font-bold text-[#09142b] mb-4 sm:text-2xl">
+                    {t("advantages", "Advantages")}
+                  </h2>
+                  {renderList(getLocalizedContent(service.advantages))}
+                </section>
+              )}
 
-          {/* Advantages Section */}
-          {service.advantages && (
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
-              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
-                {t("advantages", "Advantages")}
-              </h2>
-              {renderList(getLocalizedContent(service.advantages))}
-            </div>
-          )}
+              {service.main_services && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                  <h2 className="text-xl font-bold text-[#09142b] mb-4 sm:text-2xl">
+                    {t("mainServices", "Main Services")}
+                  </h2>
+                  {renderList(getLocalizedContent(service.main_services))}
+                </section>
+              )}
 
-          {/* Main Services Section (for nursery package) */}
-          {service.main_services && (
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
-              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
-                {t("mainServices", "Main Services")}
-              </h2>
-              {renderList(getLocalizedContent(service.main_services))}
-            </div>
-          )}
+              {service.additional_feature && (
+                <section className="rounded-2xl bg-gradient-to-r from-[#c8a45e] to-[#b48b5a] p-6 text-white shadow-sm sm:p-8">
+                  <h3 className="text-xl font-bold mb-2">
+                    {t("additionalFeature", "Additional Feature")}
+                  </h3>
+                  <p className="opacity-95 leading-relaxed">
+                    {getLocalizedContent(service.additional_feature)}
+                  </p>
+                </section>
+              )}
 
-          {/* Additional Features */}
-          {service.additional_feature && (
-            <div className="bg-gradient-to-r from-[#c8a45e] to-[#b48b5a] rounded-lg p-8 text-white mb-8">
-              <h3 className="text-xl font-bold mb-4">
-                {t("additionalFeature", "Additional Feature")}
-              </h3>
-              <p className="text-lg opacity-90">
-                {getLocalizedContent(service.additional_feature)}
-              </p>
-            </div>
-          )}
+              {service.how_we_deliver && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                  <h2 className="text-xl font-bold text-[#09142b] mb-4 sm:text-2xl">
+                    {t("howWeDeliver", "How We Deliver")}
+                  </h2>
+                  <p className="text-slate-600 leading-relaxed">
+                    {getLocalizedContent(service.how_we_deliver)}
+                  </p>
+                </section>
+              )}
 
-          {/* How We Deliver Section */}
-          {service.how_we_deliver && (
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
-              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
-                {t("howWeDeliver", "How We Deliver")}
-              </h2>
-              <p className="text-[#6b7280] leading-relaxed text-lg">
-                {getLocalizedContent(service.how_we_deliver)}
-              </p>
-            </div>
-          )}
+              {service.modes && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                  <h2 className="text-xl font-bold text-[#09142b] mb-4 sm:text-2xl">
+                    {t("serviceModes", "Service Modes")}
+                  </h2>
+                  {renderList(getLocalizedContent(service.modes))}
+                </section>
+              )}
 
-          {/* Why Choose Us Section */}
-          {service.why_choose && (
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
-              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
-                {t("whyChooseUs", "Why Choose Us")}
-              </h2>
-              <p className="text-[#6b7280] leading-relaxed text-lg">
-                {getLocalizedContent(service.why_choose)}
-              </p>
-            </div>
-          )}
+              {service.deliverables && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                  <h2 className="text-xl font-bold text-[#09142b] mb-4 sm:text-2xl">
+                    {t("deliverables", "Deliverables")}
+                  </h2>
+                  {renderList(getLocalizedContent(service.deliverables))}
+                </section>
+              )}
 
-          {/* Supervision Section */}
-          {service.supervision && (
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
-              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
-                {t("supervision", "Supervision")}
-              </h2>
-              <p className="text-[#6b7280] leading-relaxed text-lg">
-                {getLocalizedContent(service.supervision)}
-              </p>
-            </div>
-          )}
+              {service.why_choose && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                  <h2 className="text-xl font-bold text-[#09142b] mb-4 sm:text-2xl">
+                    {t("whyChooseUs", "Why Choose Us")}
+                  </h2>
+                  {(() => {
+                    const content = getLocalizedContent(service.why_choose);
+                    const items = Array.isArray(content) ? content : [content];
+                    if (items.length === 1 && typeof items[0] === "string") {
+                      return (
+                        <p className="text-slate-600 leading-relaxed">
+                          {items[0]}
+                        </p>
+                      );
+                    }
+                    return (
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        {items.map((item, index) => (
+                          <div
+                            key={index}
+                            className="flex flex-col items-center rounded-xl border border-slate-200 bg-slate-50 p-5 text-center"
+                          >
+                            <div className="mb-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#c8a45e]">
+                              <FiCheck className="h-6 w-6 text-white" aria-hidden />
+                            </div>
+                            <p className="font-medium text-[#09142b]">{item}</p>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </section>
+              )}
 
-          {/* How to Benefit Section */}
-          {service.how_to_benefit && (
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
-              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
-                {t("howToBenefit", "How to Benefit")}
-              </h2>
-              <p className="text-[#6b7280] leading-relaxed text-lg">
-                {getLocalizedContent(service.how_to_benefit)}
-              </p>
-            </div>
-          )}
+              {service.supervision && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                  <h2 className="text-xl font-bold text-[#09142b] mb-4 sm:text-2xl">
+                    {t("supervision", "Supervision")}
+                  </h2>
+                  <p className="text-slate-600 leading-relaxed">
+                    {getLocalizedContent(service.supervision)}
+                  </p>
+                </section>
+              )}
 
-          {/* Modes Section */}
-          {service.modes && (
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
-              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
-                {t("serviceModes", "Service Modes")}
-              </h2>
-              {renderList(getLocalizedContent(service.modes))}
-            </div>
-          )}
+              {service.how_to_benefit && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                  <h2 className="text-xl font-bold text-[#09142b] mb-4 sm:text-2xl">
+                    {t("howToBenefit", "How to Benefit")}
+                  </h2>
+                  <p className="text-slate-600 leading-relaxed">
+                    {getLocalizedContent(service.how_to_benefit)}
+                  </p>
+                </section>
+              )}
 
-          {/* Deliverables Section */}
-          {service.deliverables && (
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
-              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
-                {t("deliverables", "Deliverables")}
-              </h2>
-              {renderList(getLocalizedContent(service.deliverables))}
-            </div>
-          )}
+              {service.target_audience && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                  <h2 className="text-xl font-bold text-[#09142b] mb-4 sm:text-2xl">
+                    {t("targetAudience", "Target Audience")}
+                  </h2>
+                  {renderList(getLocalizedContent(service.target_audience))}
+                </section>
+              )}
 
-          {/* Target Audience Section */}
-          {service.target_audience && (
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
-              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
-                {t("targetAudience", "Target Audience")}
-              </h2>
-              {renderList(getLocalizedContent(service.target_audience))}
-            </div>
-          )}
+              {service.what_we_offer && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                  <h2 className="text-xl font-bold text-[#09142b] mb-4 sm:text-2xl">
+                    {t("whatWeOffer", "What We Offer")}
+                  </h2>
+                  {renderList(getLocalizedContent(service.what_we_offer))}
+                </section>
+              )}
 
-          {/* What We Offer Section */}
-          {service.what_we_offer && (
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
-              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
-                {t("whatWeOffer", "What We Offer")}
-              </h2>
-              {renderList(getLocalizedContent(service.what_we_offer))}
-            </div>
-          )}
+              {service.formats && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                  <h2 className="text-xl font-bold text-[#09142b] mb-4 sm:text-2xl">
+                    {t("formats", "Formats")}
+                  </h2>
+                  {typeof service.formats === "string" ? (
+                    <p className="text-slate-600 leading-relaxed">
+                      {getLocalizedContent(service.formats)}
+                    </p>
+                  ) : (
+                    renderList(getLocalizedContent(service.formats))
+                  )}
+                </section>
+              )}
 
-          {/* Formats Section */}
-          {service.formats && (
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
-              <h2 className="text-2xl font-bold text-[#09142b] mb-6">
-                {t("formats", "Formats")}
-              </h2>
-              {typeof service.formats === "string" ? (
-                <p className="text-[#6b7280] leading-relaxed text-lg">
-                  {getLocalizedContent(service.formats)}
+              {service.tags && service.tags.length > 0 && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                  <h3 className="text-lg font-bold text-[#09142b] mb-3">
+                    {t("serviceTags", "Service Categories")}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {service.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="rounded-full bg-[#09142b] px-4 py-1.5 text-sm font-medium text-white"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Related services */}
+              {relatedServices.length > 0 && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                  <h2 className="text-xl font-bold text-[#09142b] mb-4 sm:text-2xl">
+                    {t("relatedServices", "Related services")}
+                  </h2>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    {relatedServices.map((related) => {
+                      const RelatedIcon = related.icon;
+                      const relatedTitle = getLocalizedContent(related.title);
+                      const relatedDesc = getLocalizedContent(related.description);
+                      return (
+                        <Link
+                          key={related.id}
+                          to={`/services/${related.id}`}
+                          className="group flex flex-col rounded-xl border border-slate-200 bg-slate-50 p-5 transition hover:border-[#c8a45e] hover:bg-amber-50/50 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#c8a45e] focus:ring-offset-2"
+                        >
+                          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[#09142b] text-[#c8a45e] transition group-hover:bg-[#0b1a36]">
+                            {related.image ? (
+                              <img
+                                src={related.image}
+                                alt=""
+                                className="h-8 w-8 rounded-lg object-cover"
+                              />
+                            ) : RelatedIcon ? (
+                              <RelatedIcon className="h-6 w-6" aria-hidden />
+                            ) : null}
+                          </div>
+                          <h3 className="font-semibold text-[#09142b] group-hover:text-[#b48b5a]">
+                            {relatedTitle}
+                          </h3>
+                          <p className="mt-1 line-clamp-2 text-sm text-slate-600">
+                            {relatedDesc}
+                          </p>
+                          <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-[#c8a45e]">
+                            {t("learnMore", "Learn more")}
+                            <FiArrowRight className={`h-4 w-4 ${isRTL ? "rotate-180" : ""}`} aria-hidden />
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </section>
+              )}
+
+              {/* CTA */}
+              <section className="rounded-2xl bg-gradient-to-r from-[#c8a45e] to-[#b48b5a] p-6 text-white shadow-lg sm:p-8">
+                <h2 className="text-xl font-bold mb-2 sm:text-2xl">
+                  {t("readyToGetStarted", "Ready to Get Started?")}
+                </h2>
+                <p className="mb-6 opacity-95 max-w-xl">
+                  {t(
+                    "contactUsToday",
+                    "Contact us today to discuss your legal needs and get started with our professional services."
+                  )}
                 </p>
-              ) : (
-                renderList(getLocalizedContent(service.formats))
-              )}
-            </div>
-          )}
-
-          {/* Tags Section */}
-          {service.tags && (
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 mb-8">
-              <h3 className="text-xl font-bold text-[#09142b] mb-4">
-                {t("serviceTags", "Service Categories")}
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {service.tags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 bg-[#c8a45e] text-white text-sm rounded-full"
+                <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+                  <Link
+                    to={`/request-service/${service.id}`}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 font-semibold text-[#09142b] transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#b48b5a]"
                   >
-                    {tag}
-                  </span>
-                ))}
-              </div>
+                    <FiBriefcase className="h-5 w-5" aria-hidden />
+                    {isRTL ? "اطلب الخدمة" : "Request this service"}
+                  </Link>
+                  <Link
+                    to="/contact"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white px-6 py-3 font-semibold text-white transition hover:bg-white hover:text-[#09142b] focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#b48b5a]"
+                  >
+                    <FiPhone className="h-5 w-5" aria-hidden />
+                    {t("requestService", "Request Service Now")}
+                  </Link>
+                  <Link
+                    to="/"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white/80 px-6 py-3 font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#b48b5a]"
+                  >
+                    <FiArrowRight className={`h-5 w-5 ${isRTL ? "rotate-180" : ""}`} aria-hidden />
+                    {t("backToHome", "Back to Home")}
+                  </Link>
+                </div>
+              </section>
             </div>
-          )}
 
-          {/* CTA Section */}
-          <div className="bg-gradient-to-r from-[#c8a45e] to-[#b48b5a] rounded-lg p-8 text-white text-center">
-            <h2 className="text-2xl font-bold mb-4">
-              {t("readyToGetStarted", "Ready to Get Started?")}
-            </h2>
-            <p className="text-lg mb-6 opacity-90">
-              {t(
-                "contactUsToday",
-                "Contact us today to discuss your legal needs and get started with our professional services."
-              )}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/contact"
-                className="inline-flex items-center px-8 py-3 bg-white text-[#c8a45e] font-semibold rounded-lg hover:bg-gray-100 transition-colors duration-200 text-lg"
-              >
-                <FiPhone className="mr-2" />
-                {t("requestService", "Request Service Now")}
-              </Link>
-              <Link
-                to="/"
-                className="inline-flex items-center px-8 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-[#c8a45e] transition-colors duration-200 text-lg"
-              >
-                <FiArrowRight className={`mr-2 ${isRTL ? "rotate-180" : ""}`} />
-                {t("backToHome", "Back to Home")}
-              </Link>
-            </div>
+            {/* Sidebar: quick info + CTA (sticky on large screens, below header) */}
+            <aside className="lg:w-80 shrink-0">
+              <div className="lg:sticky lg:top-24 space-y-6">
+                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                  <h3 className="text-lg font-bold text-[#09142b] mb-3">
+                    {isRTL ? "معلومات سريعة" : "Quick info"}
+                  </h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex items-center gap-3 text-slate-600">
+                      <FiClock className="h-5 w-5 shrink-0 text-[#c8a45e]" aria-hidden />
+                      <span>{availability}</span>
+                    </div>
+                  </div>
+                  <Link
+                    to={`/request-service/${service.id}`}
+                    className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#09142b] px-4 py-3 font-semibold text-white transition hover:bg-[#0b1a36] focus:outline-none focus:ring-2 focus:ring-[#09142b] focus:ring-offset-2"
+                  >
+                    {isRTL ? "اطلب الخدمة" : "Request this service"}
+                  </Link>
+                </div>
+              </div>
+            </aside>
           </div>
         </div>
       </div>

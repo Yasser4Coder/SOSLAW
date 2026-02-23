@@ -52,55 +52,50 @@ const ContactRequests = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Reset to page 1 when filter changes
+  // Reset to page 1 when filter or search changes (so results from any page appear)
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedFilter]);
 
-  // Fetch contact requests with React Query - only filter by status, not search
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  // Fetch contact requests with React Query - server-side search across all requests
   const {
     data: requestsData,
     isLoading: isLoadingRequests,
     error: requestsError,
   } = useQuery({
-    queryKey: ["contact-requests", selectedFilter, currentPage, itemsPerPage],
+    queryKey: [
+      "contact-requests",
+      selectedFilter,
+      currentPage,
+      itemsPerPage,
+      searchTerm.trim() || null,
+    ],
     queryFn: async () => {
-      try {
-        const result = await contactRequestService.getAllContactRequests({
-          status: selectedFilter === "all" ? undefined : selectedFilter,
-          page: currentPage,
-          limit: itemsPerPage,
-        });
-        return result;
-      } catch (error) {
-        throw error;
-      }
+      const result = await contactRequestService.getAllContactRequests({
+        status: selectedFilter === "all" ? undefined : selectedFilter,
+        page: currentPage,
+        limit: itemsPerPage,
+        ...(searchTerm.trim() ? { search: searchTerm.trim() } : {}),
+      });
+      return result;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  // Extract requests from API response
-  const allRequests = requestsData?.data?.contactRequests || [];
+  // Fetch stats for dashboard cards (global counts)
+  const { data: statsData } = useQuery({
+    queryKey: ["contact-request-stats"],
+    queryFn: contactRequestService.getContactRequestStats,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+
+  // Extract requests from API response (search is done on the server)
+  const requests = requestsData?.data?.contactRequests || [];
   const totalRequests = requestsData?.data?.total || 0;
-
-  // Filter requests based on search term (client-side filtering)
-  const requests = React.useMemo(() => {
-    if (!searchTerm.trim()) return allRequests;
-
-    const searchLower = searchTerm.toLowerCase().trim();
-
-    return allRequests.filter((request) => {
-      return (
-        (request.name && request.name.toLowerCase().includes(searchLower)) ||
-        (request.email && request.email.toLowerCase().includes(searchLower)) ||
-        (request.subject &&
-          request.subject.toLowerCase().includes(searchLower)) ||
-        (request.message &&
-          request.message.toLowerCase().includes(searchLower)) ||
-        (request.phone && request.phone.toLowerCase().includes(searchLower))
-      );
-    });
-  }, [allRequests, searchTerm]);
 
   // Table columns
   const columns = [
@@ -340,20 +335,15 @@ const ContactRequests = () => {
     }
   };
 
-  const getStatusStats = () => {
-    // For statistics, we need to get all requests, not just the current page
-    // This is a limitation of the current implementation - ideally we'd have separate stats endpoint
-    const stats = {
-      total: totalRequests, // Use total from backend
-      new: allRequests.filter((r) => r.status === "new").length,
-      read: allRequests.filter((r) => r.status === "read").length,
-      replied: allRequests.filter((r) => r.status === "replied").length,
-      closed: allRequests.filter((r) => r.status === "closed").length,
-    };
-    return stats;
+  // Use API stats for cards; when searching, total reflects filtered count from list response
+  const apiStats = statsData?.data || {};
+  const stats = {
+    total: searchTerm.trim() ? totalRequests : (apiStats.total ?? totalRequests),
+    new: apiStats.new ?? 0,
+    read: apiStats.read ?? 0,
+    replied: apiStats.replied ?? 0,
+    closed: apiStats.closed ?? 0,
   };
-
-  const stats = getStatusStats();
 
   if (isLoadingRequests) {
     return (

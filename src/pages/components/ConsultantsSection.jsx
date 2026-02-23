@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, A11y } from "swiper/modules";
 import { useQuery } from "@tanstack/react-query";
@@ -8,7 +9,7 @@ import "swiper/css/pagination";
 import ConsultantCard from "./ConsultantCard";
 import { useTranslation } from "react-i18next";
 import publicConsultantService from "../../services/publicConsultantService";
-import { FiLoader } from "react-icons/fi";
+import { FiLoader, FiArrowLeft } from "react-icons/fi";
 
 const ConsultantsSection = () => {
   const { t, i18n } = useTranslation();
@@ -224,7 +225,7 @@ const ConsultantsSection = () => {
         <style>{`
           .swiper-button-next, .swiper-button-prev {
             color: #c8a45e;
-            background: #fff;
+            background: transparent;
             border-radius: 9999px;
             box-shadow: 0 2px 8px 0 #e7cfa7;
             width: 2.5rem;
@@ -246,6 +247,15 @@ const ConsultantsSection = () => {
             opacity: 1;
           }
         `}</style>
+      </div>
+      <div className="max-w-6xl mx-auto mt-10 text-center">
+        <Link
+          to="/consultants"
+          className="inline-flex items-center gap-2 rounded-xl bg-[#09142b] px-6 py-3 font-semibold text-white shadow-lg transition hover:bg-[#0b1a36] focus:outline-none focus:ring-2 focus:ring-[#c8a45e] focus:ring-offset-2"
+        >
+          {t("seeAllConsultants")}
+          <FiArrowLeft className={`h-5 w-5 ${lang === "ar" ? "rotate-180" : ""}`} aria-hidden />
+        </Link>
       </div>
     </section>
   );

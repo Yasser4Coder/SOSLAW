@@ -26,7 +26,6 @@ import serviceRequestService from "../../services/serviceRequestService";
 import serviceService from "../../services/serviceService";
 import replyService from "../../services/replyService";
 import consultantService from "../../services/consultantService";
-import { testGetAllServiceRequests } from "../../services/serviceRequestService_test";
 import DataTable from "./DataTable";
 import ConfirmationModal from "./ConfirmationModal";
 import toast from "react-hot-toast";
@@ -100,7 +99,7 @@ const ServiceRequestsManagement = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Professional query management with proper separation
+  // Single endpoint: getAllServiceRequests with server-side search across all requests
   const {
     data: requestsData,
     isLoading: isLoadingRequests,
@@ -113,77 +112,27 @@ const ServiceRequestsManagement = () => {
       selectedConsultantFilter,
       currentPage,
       itemsPerPage,
-      debouncedSearchTerm,
+      debouncedSearchTerm.trim() || null,
     ],
     queryFn: async () => {
-      try {
-        // If there's a search term, use the search endpoint
-        if (debouncedSearchTerm && debouncedSearchTerm.trim().length > 0) {
-          const result = await serviceRequestService.searchServiceRequests({
-            q: debouncedSearchTerm.trim(),
-            status: selectedFilter === "all" ? undefined : selectedFilter,
-            assignedTo:
-              selectedConsultantFilter === "all"
-                ? undefined
-                : selectedConsultantFilter,
-            page: currentPage,
-            limit: itemsPerPage,
-          });
-          return result;
-        }
-
-        // If filtering by consultant, use the dedicated endpoint
-        if (selectedConsultantFilter !== "all") {
-          const result =
-            await serviceRequestService.getServiceRequestsByConsultant(
-              selectedConsultantFilter,
-              {
-                status: selectedFilter === "all" ? undefined : selectedFilter,
-                page: currentPage,
-                limit: itemsPerPage,
-              }
-            );
-          return result;
-        } else {
-          // Otherwise use the general endpoint
-          console.log("🚀 Calling getAllServiceRequests...");
-          try {
-            // Use test function to get detailed error information
-            const result = await testGetAllServiceRequests({
-              page: currentPage,
-              limit: itemsPerPage,
-              status: selectedFilter === "all" ? undefined : selectedFilter,
-            });
-            console.log("✅ getAllServiceRequests succeeded:", result);
-            return result;
-          } catch (testError) {
-            console.error("❌ Test function failed:", testError);
-            // Fall back to original method
-            const result = await serviceRequestService.getAllServiceRequests({
-              status: selectedFilter === "all" ? undefined : selectedFilter,
-              page: currentPage,
-              limit: itemsPerPage,
-            });
-            return result;
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching service requests:', error);
-        
-        // Handle authentication errors
-        if (error.response?.status === 401) {
-          // Redirect to login page
-          window.location.href = '/auth';
-          return;
-        }
-        
-        throw error;
-      }
+      const result = await serviceRequestService.getAllServiceRequests({
+        page: currentPage,
+        limit: itemsPerPage,
+        status: selectedFilter === "all" ? undefined : selectedFilter,
+        assignedTo:
+          selectedConsultantFilter === "all"
+            ? undefined
+            : selectedConsultantFilter,
+        ...(debouncedSearchTerm.trim()
+          ? { search: debouncedSearchTerm.trim() }
+          : {}),
+      });
+      return result;
     },
-    staleTime: 30000, // 30 seconds - reduces unnecessary refetches
-    refetchOnWindowFocus: false, // Prevent refetch on focus
-    retry: 2, // Retry failed requests
-    enabled: !isSearching, // Only run when not actively typing
+    staleTime: 30000,
+    refetchOnWindowFocus: false,
+    retry: 2,
+    enabled: !isSearching,
   });
 
   // Fetch services for reference

@@ -15,16 +15,16 @@ const ServiceCard = ({
 
   return (
     <article
-      className="bg-white rounded-2xl shadow-md border border-[#e7cfa7] p-6 flex flex-col items-center text-center transition-transform duration-200 hover:scale-105 hover:shadow-lg focus-within:scale-105 focus-within:shadow-lg min-h-80"
+      className="bg-white rounded-2xl shadow-md border border-[#c8a45e] p-6 flex flex-col items-center text-center transition-transform duration-200 hover:scale-105 hover:shadow-lg focus-within:scale-105 focus-within:shadow-lg min-h-80"
       tabIndex={0}
       aria-label={title}
     >
-      <div className="mb-4 flex items-center justify-center w-16 h-16 rounded-full bg-[#faf6f0] border-2 border-[#c8a45e]">
+      <div className="mb-4 flex items-center justify-center w-16 h-16 rounded-full bg-[#09142b] border-2 border-[#09142b]">
         {Icon && (
           <Icon className="text-3xl text-[#c8a45e]" aria-hidden="true" />
         )}
       </div>
-      <h3 className="text-lg font-bold text-[#c8a45e] mb-3">{title}</h3>
+      <h3 className="text-lg font-bold text-[#09142b] mb-3">{title}</h3>
       {desc && (
         <p className="text-[#09142b] text-sm opacity-80 mb-4 leading-relaxed">
           {desc}
@@ -47,21 +47,21 @@ const ServiceCard = ({
           )}
         </ul>
       )}
-
       {/* Action Buttons */}
-      <div className="flex flex-col gap-3 w-full mt-auto">
+      <div className="flex gap-3 w-full mt-auto">
         {route && (
           <Link
             to={route}
-            className="px-6 py-2 bg-[#c8a45e] text-white font-semibold rounded-lg hover:bg-[#b48b5a] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#c8a45e] focus:ring-offset-2"
+            className="px-6 py-2 bg-[#09142b] text-white font-semibold rounded-lg hover:bg-[#282737] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#09142b] focus:ring-offset-2"
             aria-label={isRTL ? "عرض المزيد" : "See More"}
           >
             {isRTL ? "عرض المزيد" : "See More"}
           </Link>
         )}
+        
         <Link
           to={`/request-service/${serviceId}`}
-          className="px-6 py-2 bg-white text-[#c8a45e] font-semibold rounded-lg border-2 border-[#c8a45e] hover:bg-[#faf6f0] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#c8a45e] focus:ring-offset-2"
+          className="px-6 py-2 bg-[#c8a45e] text-white font-semibold rounded-lg hover:bg-[#b48b5a] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#09142b] focus:ring-offset-2"
           aria-label={isRTL ? "اطلب الخدمة" : "Request Service"}
         >
           {isRTL ? "اطلب الخدمة" : "Request Service"}

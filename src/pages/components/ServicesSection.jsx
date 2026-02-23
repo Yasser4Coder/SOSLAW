@@ -42,9 +42,7 @@ const ServicesSection = () => {
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#c8a45e] rounded-full mb-6">
-            <FaGavel className="w-8 h-8 text-white" />
-          </div>
+          
           <h2
             className={`font-bold text-[#09142b] mb-4 ${
               currentLanguage === "ar"
@@ -73,7 +71,7 @@ const ServicesSection = () => {
             return (
               <ServiceCard
                 key={service.id}
-                icon={IconComponent}
+                icon={service.icon}
                 title={service.title[currentLanguage] || service.title.en}
                 desc={
                   service.description[currentLanguage] || service.description.en

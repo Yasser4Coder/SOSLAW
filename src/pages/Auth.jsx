@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, useLocation, Link } from "react-router-dom";
+import toast from "react-hot-toast";
 import { useAuth } from "../contexts/useAuth.js";
 import { useLogin, useRegister } from "../hooks/useAuthMutations";
 import EmailVerification from "../components/auth/EmailVerification";
@@ -14,8 +15,8 @@ import {
   FiEye,
   FiEyeOff,
   FiArrowRight,
-  FiCheck,
   FiX,
+  FiHome,
 } from "react-icons/fi";
 
 const Auth = () => {
@@ -79,10 +80,9 @@ const Auth = () => {
     });
   };
 
-  // Handle email verification resend
   const handleEmailVerificationResend = () => {
     setFormError("");
-    setMessage("تم إعادة إرسال بريد التأكيد.");
+    toast.success("تم إعادة إرسال بريد التأكيد.");
   };
 
   // Redirect if already authenticated
@@ -215,6 +215,11 @@ const Auth = () => {
     );
   }
 
+  const inputBase =
+    "w-full rounded-xl border bg-white py-3.5 text-slate-800 placeholder-slate-400 transition focus:outline-none focus:ring-2 focus:ring-[#c8a45e]/40 focus:border-[#c8a45e] text-right";
+  const inputError = "border-red-400 bg-red-50/50";
+  const inputNormal = "border-slate-200 pr-11 pl-4";
+
   return (
     <>
       <Helmet>
@@ -233,288 +238,219 @@ const Auth = () => {
         />
       </Helmet>
 
-      {/* Main Auth Container */}
-      <div className="min-h-screen bg-gradient-to-br from-[#09142b] via-[#1a2a4a] to-[#09142b] flex items-center justify-center px-4 py-8 relative overflow-hidden">
-        {/* Background decorative elements */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 right-20 w-40 h-40 bg-[#c8a45e] rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 left-20 w-60 h-60 bg-[#e7cfa7] rounded-full blur-3xl"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#c8a45e] bg-opacity-20 rounded-full blur-3xl"></div>
+      <div
+        className="min-h-screen flex items-center justify-center px-4 py-10 relative overflow-hidden bg-[#09142b]"
+        dir="rtl"
+      >
+        {/* Background */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-[#c8a45e] rounded-full blur-[120px]" />
+          <div className="absolute bottom-0 right-0 w-80 h-80 bg-[#1e3a5f] rounded-full blur-[100px]" />
         </div>
 
-        {/* Auth Card */}
-        <div className="w-full max-w-6xl mx-auto relative z-10">
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
-            {/* Left Side - Branding & Info */}
-            <div className="text-center lg:text-right text-white space-y-8">
-              <div className="space-y-4">
-                <div className="flex justify-center lg:justify-start">
-                  <Logo size="large" />
-                </div>
-                <h1 className="text-4xl lg:text-5xl font-bold">
-                  {isLogin
-                    ? t("authLoginTitle", "مرحباً بعودتك")
-                    : t("authRegisterTitle", "انضم إلينا اليوم")}
-                </h1>
-                <p className="text-xl text-[#e7cfa7] max-w-md mx-auto lg:mx-0">
-                  {isLogin
-                    ? t(
-                        "authLoginDesc",
-                        "سجل دخولك للوصول إلى خدماتنا القانونية المتكاملة"
-                      )
-                    : t(
-                        "authRegisterDesc",
-                        "ابدأ رحلتك القانونية معنا واستفد من خبرتنا الواسعة"
-                      )}
-                </p>
-              </div>
+        <div className="w-full max-w-2xl relative z-10">
+          {/* Back to home */}
+          <Link
+            to="/"
+            className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-white/80 hover:text-white transition"
+          >
+            <FiHome className="h-4 w-4" />
+            العودة للرئيسية
+          </Link>
 
-              {/* Features List */}
-              <div className="space-y-4 text-right">
-                <div className="flex items-center justify-center lg:justify-start space-x-3 space-x-reverse">
-                  <div className="w-2 h-2 bg-[#c8a45e] rounded-full"></div>
-                  <span className="text-[#e7cfa7]">
-                    استشارات قانونية متخصصة
-                  </span>
-                </div>
-                <div className="flex items-center justify-center lg:justify-start space-x-3 space-x-reverse">
-                  <div className="w-2 h-2 bg-[#c8a45e] rounded-full"></div>
-                  <span className="text-[#e7cfa7]">مكتبة قانونية شاملة</span>
-                </div>
-                <div className="flex items-center justify-center lg:justify-start space-x-3 space-x-reverse">
-                  <div className="w-2 h-2 bg-[#c8a45e] rounded-full"></div>
-                  <span className="text-[#e7cfa7]">
-                    دعم فني على مدار الساعة
-                  </span>
-                </div>
-              </div>
+          {/* Card */}
+          <div className="rounded-2xl border border-white/10 bg-white shadow-2xl overflow-hidden">
+            {/* Tab switcher */}
+            <div className="flex border-b border-slate-200">
+              <button
+                type="button"
+                onClick={() => setIsLogin(true)}
+                className={`flex-1 py-4 text-sm font-semibold transition ${
+                  isLogin
+                    ? "bg-[#09142b] text-white"
+                    : "bg-slate-50 text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                تسجيل الدخول
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsLogin(false)}
+                className={`flex-1 py-4 text-sm font-semibold transition ${
+                  !isLogin
+                    ? "bg-[#09142b] text-white"
+                    : "bg-slate-50 text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                إنشاء حساب
+              </button>
             </div>
 
-            {/* Right Side - Form */}
-            <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 lg:p-12 border border-white/20">
-              {/* Form Header */}
-              <div className="text-center mb-8">
-                <h2 className="text-2xl lg:text-3xl font-bold text-[#09142b] mb-2">
-                  {isLogin ? "تسجيل الدخول" : "إنشاء حساب جديد"}
-                </h2>
-                <p className="text-[#6b7280]">
-                  {isLogin
-                    ? "أدخل بياناتك للوصول إلى حسابك"
-                    : "املأ البيانات التالية لإنشاء حسابك"}
-                </p>
+            <div className="p-8 sm:p-12">
+              <div className="mb-6 flex justify-center">
+                <Logo size="large" />
               </div>
+              <p className="text-center text-slate-600 text-sm mb-6">
+                {isLogin
+                  ? "أدخل بريدك وكلمة المرور للوصول إلى حسابك"
+                  : "املأ البيانات لإنشاء حسابك والاستفادة من الخدمات"}
+              </p>
 
-              {/* Error Message */}
               {formError && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center">
-                  <FiX className="w-5 h-5 text-red-600 ml-2" />
-                  <p className="text-red-800 text-sm">{formError}</p>
+                <div className="mb-5 flex items-center gap-3 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-red-800 text-sm">
+                  <FiX className="h-5 w-5 shrink-0 text-red-500" />
+                  <span>{formError}</span>
                 </div>
               )}
 
-              {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-5">
                 {!isLogin && (
                   <>
-                    {/* Full Name */}
                     <div>
-                      <label className="block text-[#09142b] font-semibold mb-2 text-right">
-                        {t("authFullName", "الاسم الكامل")}
+                      <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                        {t("authFullName", "الاسم الكامل")} <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
-                        <FiUser className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6b7280]" />
+                        <FiUser className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                         <input
                           type="text"
                           name="fullName"
                           value={formData.fullName}
                           onChange={handleInputChange}
-                          className={`w-full pr-10 pl-4 py-4 border rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300 text-right ${
-                            hasFieldError("fullName")
-                              ? "border-red-500 bg-red-50"
-                              : "border-gray-300 focus:border-[#c8a45e]"
-                          }`}
-                          placeholder="أدخل اسمك الكامل"
+                          className={`${inputBase} ${hasFieldError("fullName") ? inputError : inputNormal}`}
+                          placeholder="الاسم الكامل"
                         />
                       </div>
                       {getFieldError("fullName") && (
-                        <p className="text-red-500 text-sm mt-1 text-right">
-                          {getFieldError("fullName")}
-                        </p>
+                        <p className="mt-1 text-sm text-red-600">{getFieldError("fullName")}</p>
                       )}
                     </div>
-
-                    {/* Phone Number */}
                     <div>
-                      <label className="block text-[#09142b] font-semibold mb-2 text-right">
-                        <span className="inline-block">رقم الهاتف</span>
-                        <span className="text-sm text-[#6b7280] mr-2">
-                          (الجزائر فقط)
-                        </span>
+                      <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                        رقم الهاتف <span className="text-slate-400 text-xs">(الجزائر)</span>{" "}
+                        <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
-                        <FiPhone className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6b7280]" />
+                        <FiPhone className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                         <input
                           type="tel"
                           name="phoneNumber"
                           value={formData.phoneNumber}
                           onChange={handleInputChange}
-                          className={`w-full pr-10 pl-4 py-4 border rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300 text-right ${
-                            hasFieldError("phoneNumber")
-                              ? "border-red-500 bg-red-50"
-                              : "border-gray-300 focus:border-[#c8a45e]"
-                          }`}
+                          className={`${inputBase} ${hasFieldError("phoneNumber") ? inputError : inputNormal}`}
                           placeholder="0555123456"
                         />
                       </div>
                       {getFieldError("phoneNumber") && (
-                        <p className="text-red-500 text-sm mt-1 text-right">
-                          {getFieldError("phoneNumber")}
-                        </p>
+                        <p className="mt-1 text-sm text-red-600">{getFieldError("phoneNumber")}</p>
                       )}
                     </div>
                   </>
                 )}
 
-                {/* Email */}
                 <div>
-                  <label className="block text-[#09142b] font-semibold mb-2 text-right">
-                    {t("authEmail", "البريد الإلكتروني")}
+                  <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                    {t("authEmail", "البريد الإلكتروني")} <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                    <FiMail className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6b7280]" />
+                    <FiMail className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className={`w-full pr-10 pl-4 py-4 border rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300 text-right ${
-                        hasFieldError("email")
-                          ? "border-red-500 bg-red-50"
-                          : "border-gray-300 focus:border-[#c8a45e]"
-                      }`}
+                      className={`${inputBase} ${hasFieldError("email") ? inputError : inputNormal}`}
                       placeholder="example@email.com"
                     />
                   </div>
                   {getFieldError("email") && (
-                    <p className="text-red-500 text-sm mt-1 text-right">
-                      {getFieldError("email")}
-                    </p>
+                    <p className="mt-1 text-sm text-red-600">{getFieldError("email")}</p>
                   )}
                 </div>
 
-                {/* Password */}
                 <div>
-                  <label className="block text-[#09142b] font-semibold mb-2 text-right">
-                    {t("authPassword", "كلمة المرور")}
+                  <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                    {t("authPassword", "كلمة المرور")} <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                    <FiLock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6b7280]" />
+                    <FiLock className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                     <input
                       type={showPassword ? "text" : "password"}
                       name="password"
                       value={formData.password}
                       onChange={handleInputChange}
-                      className={`w-full pr-10 pl-4 py-4 border rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300 text-right ${
-                        hasFieldError("password")
-                          ? "border-red-500 bg-red-50"
-                          : "border-gray-300 focus:border-[#c8a45e]"
-                      }`}
-                      placeholder="أدخل كلمة المرور"
+                      className={`${inputBase} ${hasFieldError("password") ? inputError : inputNormal}`}
+                      placeholder="كلمة المرور"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6b7280] hover:text-[#09142b] transition-colors cursor-pointer"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"
+                      aria-label={showPassword ? "إخفاء" : "إظهار"}
                     >
-                      {showPassword ? <FiEyeOff /> : <FiEye />}
+                      {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
                     </button>
                   </div>
                   {getFieldError("password") && (
-                    <p className="text-red-500 text-sm mt-1 text-right">
-                      {getFieldError("password")}
-                    </p>
+                    <p className="mt-1 text-sm text-red-600">{getFieldError("password")}</p>
                   )}
                 </div>
 
-                {/* Confirm Password - Only for registration */}
                 {!isLogin && (
                   <div>
-                    <label className="block text-[#09142b] font-semibold mb-2 text-right">
-                      {t("authConfirmPassword", "تأكيد كلمة المرور")}
+                    <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                      {t("authConfirmPassword", "تأكيد كلمة المرور")} <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
-                      <FiLock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6b7280]" />
+                      <FiLock className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                       <input
                         type={showConfirmPassword ? "text" : "password"}
                         name="confirmPassword"
                         value={formData.confirmPassword}
                         onChange={handleInputChange}
-                        className={`w-full pr-10 pl-4 py-4 border rounded-xl focus:ring-2 focus:ring-[#c8a45e] focus:border-transparent transition-all duration-300 text-right ${
-                          hasFieldError("confirmPassword")
-                            ? "border-red-500 bg-red-50"
-                            : "border-gray-300 focus:border-[#c8a45e]"
-                        }`}
+                        className={`${inputBase} ${hasFieldError("confirmPassword") ? inputError : inputNormal}`}
                         placeholder="أعد إدخال كلمة المرور"
                       />
                       <button
                         type="button"
-                        onClick={() =>
-                          setShowConfirmPassword(!showConfirmPassword)
-                        }
-                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6b7280] hover:text-[#09142b] transition-colors cursor-pointer"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"
+                        aria-label={showConfirmPassword ? "إخفاء" : "إظهار"}
                       >
-                        {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                        {showConfirmPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
                       </button>
                     </div>
                     {getFieldError("confirmPassword") && (
-                      <p className="text-red-500 text-sm mt-1 text-right">
-                        {getFieldError("confirmPassword")}
-                      </p>
+                      <p className="mt-1 text-sm text-red-600">{getFieldError("confirmPassword")}</p>
                     )}
                   </div>
                 )}
 
-                {/* Submit Button */}
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-[#c8a45e] to-[#b8944a] text-white py-4 px-6 rounded-xl font-semibold transition-all duration-300 hover:from-[#b8944a] hover:to-[#c8a45e] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center space-x-2 space-x-reverse shadow-lg hover:shadow-xl"
+                  className="w-full rounded-xl bg-[#09142b] py-4 font-semibold text-white shadow-lg transition hover:bg-[#0b1a36] disabled:opacity-60 flex items-center justify-center gap-2"
                 >
                   {isLoading ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <>
                       <span>{isLogin ? "تسجيل الدخول" : "إنشاء الحساب"}</span>
-                      <FiArrowRight className="w-5 h-5" />
+                      <FiArrowRight className="h-5 w-5" />
                     </>
                   )}
                 </button>
 
-                {/* Forgot Password Link - Only show for login */}
                 {isLogin && (
                   <div className="text-center">
                     <Link
                       to="/forgot-password"
-                      className="text-[#c8a45e] hover:text-[#09142b] font-medium transition-colors text-sm"
+                      className="text-sm font-medium text-[#c8a45e] hover:text-[#09142b] transition"
                     >
                       {t("forgotPassword", "نسيت كلمة المرور؟")}
                     </Link>
                   </div>
                 )}
-
-                {/* Toggle between login/register */}
-                <div className="text-center">
-                  <p className="text-[#6b7280]">
-                    {isLogin ? "ليس لديك حساب؟" : "لديك حساب بالفعل؟"}{" "}
-                    <button
-                      type="button"
-                      onClick={() => setIsLogin(!isLogin)}
-                      className="text-[#c8a45e] hover:text-[#09142b] font-semibold transition-colors cursor-pointer"
-                    >
-                      {isLogin ? "أنشئ حسابك الآن" : "سجل دخولك"}
-                    </button>
-                  </p>
-                </div>
               </form>
             </div>
           </div>

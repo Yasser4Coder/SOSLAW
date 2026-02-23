@@ -105,6 +105,24 @@ const DataTable = ({ data, columns, searchTerm = "", pagination = null }) => {
 
   const { currentPageNumber, startItem, endItem } = getCurrentPageInfo();
 
+  // Build a short list of page numbers to show (with ellipsis)
+  const getVisiblePages = () => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    const delta = 2; // pages to show on each side of current
+    const left = Math.max(2, currentPageNumber - delta);
+    const right = Math.min(totalPages - 1, currentPageNumber + delta);
+    const pages = [1];
+    if (left > 2) pages.push("ellipsis-left");
+    for (let p = left; p <= right; p++) {
+      if (p !== 1 && p !== totalPages) pages.push(p);
+    }
+    if (right < totalPages - 1) pages.push("ellipsis-right");
+    if (totalPages > 1) pages.push(totalPages);
+    return pages;
+  };
+
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) {
       return <FiChevronDown className="text-gray-400" size={16} />;
@@ -221,19 +239,27 @@ const DataTable = ({ data, columns, searchTerm = "", pagination = null }) => {
                   className={`relative inline-flex items-center px-2 py-2 ${
                     isRTL ? "rounded-l-md" : "rounded-r-md"
                   } border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed`}
+                  aria-label={t("previous", "السابق")}
                 >
                   {isRTL ? (
-                    <FiChevronLeft size={16} />
+                    <FiChevronRight size={16} aria-hidden />
                   ) : (
-                    <FiChevronRight size={16} />
+                    <FiChevronLeft size={16} aria-hidden />
                   )}
                 </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
+                {getVisiblePages().map((page, idx) =>
+                  page === "ellipsis-left" || page === "ellipsis-right" ? (
+                    <span
+                      key={page === "ellipsis-left" ? "ellipsis-l" : "ellipsis-r"}
+                      className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm text-gray-500"
+                    >
+                      …
+                    </span>
+                  ) : (
                     <button
                       key={page}
                       onClick={() => handlePageChange(page)}
-                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                      className={`relative inline-flex items-center min-w-[2.5rem] justify-center px-3 py-2 border text-sm font-medium ${
                         currentPageNumber === page
                           ? "z-10 bg-[#09142b] border-[#09142b] text-white"
                           : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
@@ -253,11 +279,12 @@ const DataTable = ({ data, columns, searchTerm = "", pagination = null }) => {
                   className={`relative inline-flex items-center px-2 py-2 ${
                     isRTL ? "rounded-r-md" : "rounded-l-md"
                   } border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed`}
+                  aria-label={t("next", "التالي")}
                 >
                   {isRTL ? (
-                    <FiChevronRight size={16} />
+                    <FiChevronLeft size={16} aria-hidden />
                   ) : (
-                    <FiChevronLeft size={16} />
+                    <FiChevronRight size={16} aria-hidden />
                   )}
                 </button>
               </nav>

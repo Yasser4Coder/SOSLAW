@@ -223,12 +223,12 @@ const Header = () => {
   return (
     <header id="main-header" className="w-full">
       {/* Top Bar: Contact Info, Language Switcher, Work Time (Desktop Only) */}
-      <div className="hidden md:flex items-center justify-between px-8 h-10 bg-[#faf6f0] text-[#c8a45e] text-sm border-b border-[#e7cfa7]">
+      <div className="hidden md:flex items-center justify-between px-8 h-10 bg-[#09142b] text-[#c8a45e] text-sm border-b border-[#e7cfa7]">
         {/* Left: Contact Info */}
         <div className="flex items-center gap-6">
           <span className="flex items-center gap-1">
             <FiPhone />
-            <span className="text-[#09142b] font-medium">{getMainPhone()}</span>
+            <span className="text-white font-medium">{getMainPhone()}</span>
           </span>
         </div>
 
@@ -236,13 +236,13 @@ const Header = () => {
         <div className="flex items-center gap-6">
           <span className="flex items-center gap-1">
             <FiClock />
-            <span className="text-[#09142b]">{getMainHours()}</span>
+            <span className="text-white">{getMainHours()}</span>
           </span>
         </div>
         {/* Center: Language Switcher */}
         <div className="relative" ref={langRef}>
           <button
-            className="flex items-center gap-1 px-2 py-1 rounded border border-[#c8a45e] text-[#c8a45e] bg-white hover:bg-[#e7cfa7]/20 focus:outline-none cursor-pointer"
+            className="flex items-center gap-1 px-1 py-[0.5px] rounded border border-[#c8a45e] text-[#c8a45e] hover:bg-white bg-[#e7cfa7]/20 focus:outline-none cursor-pointer"
             aria-haspopup="listbox"
             aria-expanded={showLang}
             aria-label="Select language"

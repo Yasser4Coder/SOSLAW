@@ -75,18 +75,28 @@ const ConsultantsManagement = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Reset to page 1 when filter changes
+  // Reset to page 1 when filter or search changes (so results from any page appear)
   React.useEffect(() => {
     setCurrentPage(1);
   }, [selectedFilter]);
 
-  // Fetch consultants with React Query - only filter by status, not search
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  // Fetch consultants with React Query - server-side search across all consultants
   const {
     data: consultantsData,
     isLoading: isLoadingConsultants,
     error: consultantsError,
   } = useQuery({
-    queryKey: ["consultants", selectedFilter, currentPage, itemsPerPage],
+    queryKey: [
+      "consultants",
+      selectedFilter,
+      currentPage,
+      itemsPerPage,
+      searchTerm.trim() || null,
+    ],
     queryFn: () => {
       const offset = (currentPage - 1) * itemsPerPage;
       return consultantService.getAllConsultants({
@@ -94,6 +104,7 @@ const ConsultantsManagement = () => {
         language: "ar",
         limit: itemsPerPage,
         offset: offset,
+        ...(searchTerm.trim() ? { search: searchTerm.trim() } : {}),
       });
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -166,27 +177,9 @@ const ConsultantsManagement = () => {
     },
   });
 
-  // Extract consultants from API response
-  const allConsultants = consultantsData?.data?.consultants || [];
+  // Extract consultants from API response (search is done on the server)
+  const consultants = consultantsData?.data?.consultants || [];
   const totalConsultants = consultantsData?.data?.total || 0;
-
-  // Filter consultants based on search term (client-side filtering)
-  const consultants = React.useMemo(() => {
-    if (!searchTerm.trim()) return allConsultants;
-
-    const searchLower = searchTerm.toLowerCase().trim();
-
-    return allConsultants.filter((consultant) => {
-      return (
-        (consultant.nameAr && consultant.nameAr.toLowerCase().includes(searchLower)) ||
-        (consultant.nameEn && consultant.nameEn.toLowerCase().includes(searchLower)) ||
-        (consultant.nameFr && consultant.nameFr.toLowerCase().includes(searchLower)) ||
-        (consultant.titleAr && consultant.titleAr.toLowerCase().includes(searchLower)) ||
-        (consultant.specializationAr && consultant.specializationAr.toLowerCase().includes(searchLower)) ||
-        (consultant.experienceAr && consultant.experienceAr.toLowerCase().includes(searchLower))
-      );
-    });
-  }, [allConsultants, searchTerm]);
 
   // Table columns
   const columns = [

@@ -7,6 +7,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/Home";
 import About from "./pages/About";
+import Consultants from "./pages/Consultants";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import VerifyEmail from "./pages/VerifyEmail";
@@ -21,6 +22,7 @@ import RequestService from "./pages/RequestService";
 import ServiceRequests from "./pages/ServiceRequests";
 import PaymentDetails from "./pages/PaymentDetails";
 import NationalConferenceRegistration from "./pages/NationalConferenceRegistration";
+import TrainingCourse from "./pages/TrainingCourse";
 import { HelmetProvider } from "react-helmet-async";
 import "./App.css";
 
@@ -60,6 +62,7 @@ function App() {
                   <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/about" element={<About />} />
+                    <Route path="/consultants" element={<Consultants />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route
                       path="/forgot-password"
@@ -78,15 +81,7 @@ function App() {
                       element={<Navigate to="/join-team" replace />}
                     />
 
-                    {/* Protected routes - require authentication */}
-                    <Route
-                      path="/contact"
-                      element={
-                        <ProtectedRoute requireEmailVerification={true}>
-                          <Contact />
-                        </ProtectedRoute>
-                      }
-                    />
+                    <Route path="/contact" element={<Contact />} />
                     <Route
                       path="/join-team"
                       element={
@@ -106,9 +101,9 @@ function App() {
                     <Route
                       path="/services/:serviceId"
                       element={
-                        <ProtectedRoute>
+                        
                           <ServicePage />
-                        </ProtectedRoute>
+                        
                       }
                     />
                     <Route
@@ -121,16 +116,13 @@ function App() {
                     />
                     <Route
                       path="/request-service/:serviceId?"
-                      element={
-                        <ProtectedRoute requireEmailVerification={true}>
-                          <RequestService />
-                        </ProtectedRoute>
-                      }
+                      element={<RequestService />}
                     />
                     <Route
                       path="/national-conference-registration"
                       element={<NationalConferenceRegistration />}
                     />
+                    <Route path="/training-course" element={<TrainingCourse />} />
                     <Route
                       path="/service-requests"
                       element={

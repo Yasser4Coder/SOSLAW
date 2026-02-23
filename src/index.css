@@ -208,6 +208,25 @@ body[lang="ar"] *,
   overflow: hidden;
 }
 
+/* Buttons and clickables: pointer cursor */
+button,
+[type="button"],
+[type="submit"],
+[type="reset"],
+a[href],
+[role="button"],
+select,
+label[for] {
+  cursor: pointer;
+}
+
+/* Disabled buttons keep default cursor */
+button:disabled,
+[type="submit"]:disabled,
+[type="button"]:disabled {
+  cursor: not-allowed;
+}
+
 /* Smooth scrolling behavior */
 html {
   scroll-behavior: smooth;

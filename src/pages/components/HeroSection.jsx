@@ -1,9 +1,12 @@
-import bg from "../../assets/bgs/heroBG1.webp";
+import bg from "../../assets/bgs/bg.webp";
+import bg2 from "../../assets/bgs/bg1.webp";
+import bg3 from "../../assets/bgs/heroBG1.webp";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSmoothScroll } from "../../hooks/useSmoothScroll";
-import heroLawyerImg from "../../assets/heroLawyer1.webp";
+// import heroLawyerImg from "../../assets/heroLawyer1.webp";
+import logoBlueBg from "../../assets/logoBlueBg.svg";
 
 const JusticeIcon = ({ className = "" }) => (
   <svg
@@ -32,6 +35,23 @@ const HeroSection = () => {
   const contentRef = useRef(null);
   const imageFadeRef = useRef(null);
 
+  // Automatic background slider
+  const backgrounds = [
+    { img: bg, dots: ["#b48b5a", "white", "white"] },
+    { img: bg2, dots: ["white", "#b48b5a", "white"] },
+    { img: bg3, dots: ["white", "white", "#b48b5a"] },
+  ];
+
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Auto slide with interval
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % backgrounds.length);
+    }, 5000); // 5 seconds
+    return () => clearInterval(interval);
+  }, []);
+
   // Fade-in animation on mount
   useEffect(() => {
     if (contentRef.current) {
@@ -47,100 +67,61 @@ const HeroSection = () => {
   }, [lang]);
 
   return (
-    <section className="relative w-full min-h-[calc(100vh-80px)] flex items-start md:items-center justify-center overflow-hidden">
-      {/* Background Image with Overlay */}
-      <img
-        src={bg}
-        alt={t("heroBGAlt") || "Justice background"}
-        className={`absolute inset-0 w-full h-full object-cover z-0 ${
-          isRTL ? "scale-x-[-1]" : "scale-x-100"
-        }`}
-        draggable="false"
-      />
+    <section className="relative w-full min-h-[calc(100vh-40px)] flex items-center justify-center overflow-hidden">
+      {/* Background Images */}
+      {backgrounds.map((bgItem, index) => (
+        <img
+          key={index}
+          src={bgItem.img}
+          alt={t("heroBGAlt") || "Justice background"}
+          className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-1000 ${
+            index === currentSlide ? "opacity-100" : "opacity-0"
+          } ${isRTL ? "scale-x-[-1]" : "scale-x-100"}`}
+          draggable="false"
+        />
+      ))}
+
       <div className="absolute inset-0 bg-black/60 z-0" aria-hidden="true" />
-      {/* Container for content and testimonial */}
+      
+      {/* Container for content */}
       <div className="relative w-full max-w-[1600px] mx-auto h-full px-4 md:px-8 flex flex-col justify-center">
         <div
           className={`flex flex-col md:flex-row ${
             lang === "ar" ? "md:flex-row-reverse" : "md:flex-row"
-          } justify-between gap-8 items-center h-full w-full`}
+          } justify-center gap-8 items-center h-full w-full`}
           style={{ height: "100%" }}
         >
-          {/* Testimonial Card (desktop & mobile) - always first in RTL */}
-          <div
-            ref={imageFadeRef}
-            className={`flex flex-col justify-center w-full md:w-auto h-full ${
-              isRTL ? "md:order-1" : "md:order-2"
-            } items-center mt-8 md:mt-0 opacity-0 translate-y-8 transition-all duration-1000`}
-          >
-            {/* Hero Lawyer Image */}
-            <img
-              src={heroLawyerImg}
-              alt={t("lawyerAlt") || "Lawyer"}
-              className={`w-full max-w-xs md:max-w-md lg:max-w-lg h-auto object-contain drop-shadow-xl pointer-events-none ${
-                lang === "ar" ? "" : "scale-x-[-1]"
-              }`}
-              draggable="false"
-            />
-          </div>
-          {/* Main Content - always second in RTL */}
+          {/* Main Content */}
           <div
             ref={contentRef}
-            className={`flex flex-col justify-center w-full md:w-auto h-full ${
+            className={`flex flex-col justify-center items-center text-center w-full md:w-auto h-full ${
               isRTL ? "md:order-2" : "md:order-1"
             } opacity-0 translate-y-8 transition-all duration-1000`}
             dir={isRTL ? "rtl" : "ltr"}
           >
-            {/* Icon + Subtitle */}
-            <div
-              className={`flex items-center mb-4 md:mb-6 gap-2 ${
-                isRTL ? "text-sm md:text-lg" : ""
-              }`}
-            >
-              <JusticeIcon className="w-5 h-5 md:w-6 md:h-6 text-[#b48b5a]" />
-              <h2
-                className={`uppercase tracking-widest text-[#b48b5a] text-sm md:text-lg font-semibold ${
-                  isRTL ? "text-base md:text-xl" : ""
-                }`}
-              >
-                {t("heroSubtitle")}
-              </h2>
-            </div>
+            {/* Logo */}
+            <img
+              src={logoBlueBg}
+              alt="SOS Law Logo"
+              className="w-48 md:w-64 lg:w-80 mb-6 md:mb-8 h-auto object-contain drop-shadow-lg"
+              draggable="false"
+            />
             {/* Main Title */}
             <h1
               className={`font-serif text-white font-extrabold mb-4 md:mb-6 leading-tight drop-shadow-lg ${
                 isRTL
-                  ? "text-2xl md:text-5xl lg:text-6xl"
-                  : "text-3xl md:text-5xl lg:text-6xl"
+                  ? "text-2xl md:text-6xl lg:text-7xl"
+                  : "text-xl md:text-4xl lg:text-5xl"
               }`}
             >
               {t("heroTitle")}
             </h1>
-            {/* Tagline */}
-            <div className="mb-4 md:mb-6">
-              <h2
-                className={`text-white font-bold mb-2 drop-shadow-md ${
-                  isRTL
-                    ? "text-base md:text-xl lg:text-2xl"
-                    : "text-base md:text-lg lg:text-xl"
-                }`}
-              >
-                {t("heroTagline")}
-              </h2>
-              <p
-                className={`text-[#b48b5a] font-semibold drop-shadow-md ${
-                  isRTL ? "text-sm md:text-lg" : "text-sm md:text-base"
-                }`}
-              >
-                {t("heroTaglineSubtitle")}
-              </p>
-            </div>
             {/* Description */}
             <p
               className={`text-white mb-8 max-w-xl drop-shadow-md ${
                 isRTL
-                  ? "text-sm md:text-lg lg:text-xl"
-                  : "text-sm md:text-base lg:text-lg"
+                  ? "text-xs md:text-lg lg:text-xl"
+                  : "text-xs md:text-base lg:text-lg"
               }`}
             >
               {t("heroDesc1")}
@@ -148,7 +129,7 @@ const HeroSection = () => {
               {t("heroDesc2")}
             </p>
             {/* CTA Buttons */}
-            <div className="flex gap-4 mb-8">
+            <div className="flex gap-4 mb-8 justify-center">
               <Link
                 to="/contact"
                 className={`px-6 py-2 md:px-8 md:py-3 bg-[#b48b5a] text-white font-bold rounded shadow-lg hover:bg-[#a07a4a] active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#b48b5a] cursor-pointer ${
@@ -168,14 +149,42 @@ const HeroSection = () => {
                 {t("learnMore") || "Learn More"}
               </button>
             </div>
-            {/* Slider Dots */}
+            {/* Slider Dots (clickable) */}
             <div className="flex items-center gap-3 mt-2 md:mt-4">
-              <span className="w-3 h-3 md:w-4 md:h-4 bg-[#b48b5a] rotate-45 inline-block" />
-              <span className="w-2 h-2 md:w-3 md:h-3 bg-white rounded-full inline-block" />
-              <span className="w-2 h-2 md:w-3 md:h-3 bg-white rounded-full inline-block opacity-60" />
+              {backgrounds.map((bgItem, idx) => (
+                <span
+                  key={idx}
+                  onClick={() => setCurrentSlide(idx)}
+                  className={`cursor-pointer ${
+                    idx === 0
+                      ? "w-3 h-3 md:w-4 md:h-4 rotate-45"
+                      : "w-2 h-2 md:w-3 md:h-3 rounded-full"
+                  } inline-block transition-all duration-300`}
+                  style={{
+                    backgroundColor: bgItem.dots[idx] || "#fff",
+                    opacity: idx === currentSlide ? 1 : 0.5,
+                  }}
+                />
+              ))}
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Wave Divider */}
+      <div className="absolute bottom-0 left-0 w-full z-10">
+        <svg
+          viewBox="0 0 1440 120"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-full h-16 md:h-24 lg:h-32"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M0,80 C360,20 720,100 1080,40 C1260,10 1380,30 1440,50 L1440,120 L0,120 Z"
+            fill="white"
+          />
+        </svg>
       </div>
     </section>
   );

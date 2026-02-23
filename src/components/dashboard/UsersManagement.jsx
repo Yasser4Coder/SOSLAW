@@ -49,7 +49,7 @@ const UsersManagement = () => {
     isActive: true,
   });
 
-  // API hooks
+  // API hooks - include search so backend searches across all users
   const {
     data: usersData,
     isLoading: isLoadingUsers,
@@ -57,6 +57,7 @@ const UsersManagement = () => {
   } = useUsers({
     ...pagination,
     ...filters,
+    ...(searchTerm.trim() ? { search: searchTerm.trim() } : {}),
   });
 
   const { data: statsData, isLoading: isLoadingStats } = useUserStats();
@@ -182,6 +183,11 @@ const UsersManagement = () => {
     setAlert({ show: false, type: "info", title: "", message: "" });
   };
 
+  // Reset to first page when search term changes (so results from any page appear)
+  React.useEffect(() => {
+    setPagination((prev) => ({ ...prev, offset: 0 }));
+  }, [searchTerm]);
+
   const handleFilterChange = (key, value) => {
     // Only set filter if it has a value, otherwise remove it
     if (value && value.trim() !== "") {
@@ -271,22 +277,8 @@ const UsersManagement = () => {
     ),
   }));
 
-  // Filter data based on search term
-  const filteredTableData = React.useMemo(() => {
-    if (!searchTerm.trim()) return tableData;
-
-    const searchLower = searchTerm.toLowerCase().trim();
-
-    return tableData.filter((user) => {
-      return (
-        (user.fullName && user.fullName.toLowerCase().includes(searchLower)) ||
-        (user.email && user.email.toLowerCase().includes(searchLower)) ||
-        (user.phoneNumber &&
-          user.phoneNumber.toLowerCase().includes(searchLower)) ||
-        (user.role && user.role.toLowerCase().includes(searchLower))
-      );
-    });
-  }, [tableData, searchTerm]);
+  // Search is done on the server; tableData is already the (paginated) search result
+  const tableDataToShow = tableData;
 
   const isLoading =
     isLoadingUsers ||
@@ -354,14 +346,11 @@ const UsersManagement = () => {
         {searchTerm && (
           <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg transition-all duration-200">
             <p className="text-sm text-blue-800 text-right">
-              نتائج البحث: {filteredTableData.length} من {tableData.length}{" "}
-              مستخدم
-              {searchTerm && (
-                <span className="text-blue-600 font-medium">
-                  {" "}
-                  - "{searchTerm}"
-                </span>
-              )}
+              نتائج البحث: {totalUsers} نتيجة
+              <span className="text-blue-600 font-medium">
+                {" "}
+                - "{searchTerm}"
+              </span>
             </p>
           </div>
         )}
@@ -420,7 +409,7 @@ const UsersManagement = () => {
             )}
             {searchTerm && (
               <div className="absolute left-12 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">
-                {filteredTableData.length} من {tableData.length}
+                {totalUsers} نتيجة
               </div>
             )}
             {searchTerm && (
@@ -492,15 +481,11 @@ const UsersManagement = () => {
             {searchTerm && (
               <div className="p-4 border-b border-gray-200 bg-gray-50">
                 <p className="text-sm text-gray-600 text-right">
-                  عرض {filteredTableData.length} من {tableData.length} مستخدم
-                  <span className="text-blue-600 font-medium">
-                    {" "}
-                    - البحث: "{searchTerm}"
-                  </span>
+                  عرض النتائج من كل الصفحات - البحث: "{searchTerm}"
                 </p>
               </div>
             )}
-            {searchTerm && filteredTableData.length === 0 ? (
+            {searchTerm && totalUsers === 0 ? (
               <div className="p-8 text-center">
                 <div className="text-gray-400 mb-4">
                   <svg
@@ -543,7 +528,7 @@ const UsersManagement = () => {
               </div>
             ) : (
               <DataTable
-                data={filteredTableData}
+                data={tableDataToShow}
                 columns={columns}
                 pagination={{
                   total: totalUsers,

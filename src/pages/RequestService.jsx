@@ -1,29 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import {
   FiUser,
-  FiMail,
-  FiPhone,
   FiFileText,
-  FiCalendar,
-  FiMapPin,
   FiClock,
   FiCheckCircle,
-  FiAlertCircle,
   FiLoader,
   FiSend,
+  FiLogIn,
 } from "react-icons/fi";
 import serviceRequestService from "../services/serviceRequestService";
 import toast from "react-hot-toast";
 import { services } from "./components/servicesData";
 import { getServiceDatabaseId } from "../utils/serviceMapping";
-import Cookies from "js-cookie";
 import API_BASE_URL from "../config/api.js";
+import { useAuth } from "../contexts/useAuth";
 
 const RequestService = () => {
   const { serviceId: urlServiceId } = useParams();
-  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const [formData, setFormData] = useState({
     serviceId: "",
@@ -46,28 +41,21 @@ const RequestService = () => {
   // Use static services data
   const servicesList = services;
 
-  // Fetch consultants on component mount
   useEffect(() => {
     const fetchConsultants = async () => {
       try {
         setLoadingConsultants(true);
-        console.log('Fetching consultants from API...');
         const response = await fetch(`${API_BASE_URL}/api/v1/consultants/public`);
-        console.log('Response status:', response.status);
         if (response.ok) {
           const data = await response.json();
-          console.log('Consultants data:', data);
           setConsultants(data.data || []);
-        } else {
-          console.error('API response not ok:', response.status, response.statusText);
         }
-      } catch (error) {
-        console.error('Error fetching consultants:', error);
+      } catch {
+        // ignore
       } finally {
         setLoadingConsultants(false);
       }
     };
-
     fetchConsultants();
   }, []);
 
@@ -101,18 +89,13 @@ const RequestService = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      toast.error("يجب تسجيل الدخول لطلب الخدمة وتتبع طلبك");
+      return;
+    }
     setIsSubmitting(true);
 
     try {
-      // Check if user is authenticated
-      const token = Cookies.get("jwt");
-      if (!token) {
-        toast.error("يجب تسجيل الدخول أولاً لطلب الخدمة");
-        navigate("/login");
-        setIsSubmitting(false);
-        return;
-      }
-
       // Validate required fields
       const requiredFields = [
         "serviceId",
@@ -169,10 +152,6 @@ const RequestService = () => {
         serviceId: databaseServiceId,
       };
 
-      // Log the data being sent for debugging
-      console.log('📤 Sending service request data:', requestData);
-      console.log('📤 Selected Plan:', requestData.selectedPlan);
-
       // Send the request to the backend
       const response = await serviceRequestService.createServiceRequest(
         requestData
@@ -183,9 +162,7 @@ const RequestService = () => {
           "تم إرسال طلب الخدمة بنجاح! يمكنك مراجعة طلباتك في صفحة 'طلباتك'"
         );
 
-        // Force refresh of notification counts to update the badge immediately
         window.dispatchEvent(new CustomEvent("refreshNotifications"));
-        console.log("Service request created - refreshing notifications");
 
         // Reset form
         setFormData({
@@ -209,8 +186,7 @@ const RequestService = () => {
 
       // Handle specific error cases
       if (error.response?.status === 401) {
-        toast.error("انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى");
-        navigate("/login");
+        toast.error("انتهت صلاحية الجلسة. يرجى المحاولة مرة أخرى");
       } else if (error.response?.status === 403) {
         toast.error("ليس لديك صلاحية لطلب هذه الخدمة");
       } else if (error.response?.data?.message) {
@@ -223,508 +199,372 @@ const RequestService = () => {
     }
   };
 
-  const getUrgencyColor = (urgency) => {
-    switch (urgency) {
-      case "urgent":
-        return "text-red-600 bg-red-50 border-red-200";
-      case "high":
-        return "text-orange-600 bg-orange-50 border-orange-200";
-      case "normal":
-        return "text-blue-600 bg-blue-50 border-blue-200";
-      case "low":
-        return "text-green-600 bg-green-50 border-green-200";
-      default:
-        return "text-gray-600 bg-gray-50 border-gray-200";
-    }
-  };
-
-  const getUrgencyText = (urgency) => {
-    switch (urgency) {
-      case "urgent":
-        return "عاجل";
-      case "high":
-        return "عالية";
-      case "normal":
-        return "عادية";
-      case "low":
-        return "منخفضة";
-      default:
-        return "عادية";
-    }
-  };
+  const isLegalConsultation = formData.serviceId === "legal-consultation";
+  const inputClass =
+    "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-800 placeholder-slate-400 transition focus:border-[#c8a45e] focus:outline-none focus:ring-2 focus:ring-[#c8a45e]/30";
+  const labelClass = "mb-1.5 block text-sm font-medium text-slate-700";
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">اطلب الخدمة</h1>
+    <div className="min-h-screen bg-slate-100 py-8 sm:py-12" dir="rtl">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Hero */}
+        <header className="mb-8 text-center sm:mb-10">
+          <h1 className="text-2xl font-bold text-[#09142b] sm:text-3xl">
+            طلب خدمة
+          </h1>
           {selectedService ? (
-            <div className="mb-6">
-              <div className="inline-flex items-center px-4 py-2 bg-blue-50 border border-blue-200 rounded-full mb-4">
-                <span className="text-blue-600 font-medium">
-                  الخدمة المختارة: {selectedService.title.ar}
-                </span>
-              </div>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <>
+              <p className="mt-2 text-[#c8a45e] font-medium">
+                {selectedService.title.ar}
+              </p>
+              <p className="mt-1 max-w-xl mx-auto text-slate-600 text-sm">
                 {selectedService.description.ar}
               </p>
-            </div>
+            </>
           ) : (
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              اختر الخدمة التي تحتاجها واملأ النموذج أدناه. سنقوم بمراجعة طلبك
-              والتواصل معك في أقرب وقت ممكن.
+            <p className="mt-2 text-slate-600 text-sm max-w-lg mx-auto">
+              اختر الخدمة واملأ البيانات. سنراجع طلبك ونتواصل معك في أقرب وقت.
             </p>
           )}
-        </div>
+        </header>
 
-        {/* Service Request Form */}
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Service Information */}
-            {selectedService && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-blue-900 mb-4 flex items-center">
-                  <FiFileText className="ml-2" />
-                  معلومات الخدمة
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      اسم الخدمة
-                    </label>
-                    <div className="px-4 py-3 bg-white border border-gray-300 rounded-lg">
-                      <span className="text-gray-900 font-medium">
-                        {selectedService.title.ar}
+        {/* Login required notice for guests */}
+        {!isAuthenticated && (
+          <div className="mb-6 rounded-2xl border-2 border-amber-200 bg-amber-50 p-5 text-center shadow-sm">
+            <p className="font-medium text-amber-900">
+              لطلب الخدمة وتتبع طلبك، يرجى تسجيل الدخول أو إنشاء حساب.
+            </p>
+            <p className="mt-1 text-sm text-amber-800">
+              يمكنك تصفح الصفحة وملء البيانات، لكن إرسال الطلب يتطلب حساباً.
+            </p>
+            <Link
+              to="/auth"
+              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#09142b] px-5 py-2.5 font-semibold text-white transition hover:bg-[#0b1a36]"
+            >
+              <FiLogIn className="h-5 w-5" />
+              تسجيل الدخول / إنشاء حساب
+            </Link>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Service picker (when no service in URL) */}
+          {!selectedService && (
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <label className={labelClass}>
+                الخدمة <span className="text-rose-500">*</span>
+              </label>
+              <select
+                name="serviceId"
+                value={formData.serviceId}
+                onChange={handleInputChange}
+                required
+                className={inputClass}
+              >
+                <option value="">اختر الخدمة</option>
+                {servicesList.map((s) => (
+                  <option key={s.id} value={s.id}>{s.title.ar}</option>
+                ))}
+              </select>
+            </section>
+          )}
+
+          {/* Plan selection – legal consultation only, shown first */}
+          {isLegalConsultation && (
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-lg font-bold text-[#09142b] mb-1">
+                اختر الباقة <span className="text-rose-500">*</span>
+              </h2>
+              <p className="text-slate-600 text-sm mb-4">
+                حدد الباقة المناسبة لاحتياجك. الدفع يتم لاحقاً بعد التأكيد.
+              </p>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {[
+                  {
+                    id: "free-special-needs",
+                    title: "ذوي الاحتياجات الخاصة",
+                    desc: "30 دقيقة · عن بُعد أو حضوري",
+                    price: "مجانًا",
+                    icon: FiUser,
+                    color: "text-amber-600",
+                    bg: "bg-amber-50",
+                    border: "border-amber-200",
+                  },
+                  {
+                    id: "mini-15min",
+                    title: "باقة Mini",
+                    desc: "15 دقيقة · سؤال محدد · عن بُعد",
+                    price: "1000 دج",
+                    icon: FiClock,
+                    color: "text-blue-600",
+                    bg: "bg-blue-50",
+                    border: "border-blue-200",
+                  },
+                  {
+                    id: "standard-30min",
+                    title: "باقة Standard",
+                    desc: "30 دقيقة · تحليل + توجيه · عن بُعد",
+                    price: "2000 دج",
+                    icon: FiFileText,
+                    color: "text-emerald-600",
+                    bg: "bg-emerald-50",
+                    border: "border-emerald-200",
+                  },
+                  {
+                    id: "premium-45min",
+                    title: "باقة Premium",
+                    desc: "45 دقيقة · استشارة معمقة · ملاحظات مكتوبة",
+                    price: "3000 دج",
+                    icon: FiCheckCircle,
+                    color: "text-violet-600",
+                    bg: "bg-violet-50",
+                    border: "border-violet-200",
+                  },
+                ].map((plan) => {
+                  const Icon = plan.icon;
+                  const selected = formData.selectedPlan === plan.id;
+                  return (
+                    <button
+                      key={plan.id}
+                      type="button"
+                      onClick={() =>
+                        setFormData((prev) => ({ ...prev, selectedPlan: plan.id }))
+                      }
+                      className={`flex items-start gap-4 rounded-xl border-2 p-4 text-right transition hover:shadow-md ${
+                        selected
+                          ? `border-[#c8a45e] bg-amber-50/50 shadow-sm`
+                          : `border-slate-200 bg-white hover:border-slate-300`
+                      }`}
+                    >
+                      <span
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${selected ? "bg-[#c8a45e] text-white" : plan.bg + " " + plan.color}`}
+                      >
+                        <Icon className="h-5 w-5" />
                       </span>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      وصف الخدمة
-                    </label>
-                    <div className="px-4 py-3 bg-white border border-gray-300 rounded-lg">
-                      <span className="text-gray-700 text-sm">
-                        {selectedService.description.ar}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold text-[#09142b]">
+                          {plan.title}
+                        </div>
+                        <div className="mt-0.5 text-xs text-slate-500">
+                          {plan.desc}
+                        </div>
+                        <div className="mt-2 font-bold text-[#09142b]">
+                          {plan.price}
+                        </div>
+                      </div>
+                      {selected && (
+                        <span className="shrink-0 text-[#c8a45e]">
+                          <FiCheckCircle className="h-6 w-6" />
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
-            )}
+              {!formData.selectedPlan && (
+                <p className="mt-2 text-sm text-rose-600">
+                  يرجى اختيار باقة للمتابعة
+                </p>
+              )}
+            </section>
+          )}
 
-            {/* Service Selection (if no service pre-selected) */}
-            {!selectedService && (
+          {/* Your details */}
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-[#09142b] mb-4 flex items-center gap-2">
+              <FiUser className="h-5 w-5 text-[#c8a45e]" />
+              بياناتك
+            </h2>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  الخدمة <span className="text-red-500">*</span>
+                <label className={labelClass}>
+                  الاسم الكامل <span className="text-rose-500">*</span>
                 </label>
-                <select
-                  name="serviceId"
-                  value={formData.serviceId}
+                <input
+                  type="text"
+                  name="clientName"
+                  value={formData.clientName}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">اختر الخدمة</option>
-                  {servicesList.map((service) => (
-                    <option key={service.id} value={service.id}>
-                      {service.title.ar}
-                    </option>
-                  ))}
-                </select>
+                  className={inputClass}
+                  placeholder="الاسم الكامل"
+                />
               </div>
-            )}
-
-            {/* Client Information */}
-            <div className="border-t border-gray-200 pt-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
-                <FiUser className="ml-2" />
-                المعلومات الشخصية
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    الاسم الكامل <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="clientName"
-                    value={formData.clientName}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="أدخل اسمك الكامل"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    البريد الإلكتروني <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    name="clientEmail"
-                    value={formData.clientEmail}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="example@email.com"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    رقم الهاتف <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    name="clientPhone"
-                    value={formData.clientPhone}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="+213 123 456 789"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    العنوان
-                  </label>
-                  <input
-                    type="text"
-                    name="clientAddress"
-                    value={formData.clientAddress}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="أدخل عنوانك"
-                  />
-                </div>
+              <div>
+                <label className={labelClass}>
+                  البريد الإلكتروني <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  name="clientEmail"
+                  value={formData.clientEmail}
+                  onChange={handleInputChange}
+                  required
+                  className={inputClass}
+                  placeholder="example@email.com"
+                />
+              </div>
+              <div>
+                <label className={labelClass}>
+                  رقم الهاتف <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  name="clientPhone"
+                  value={formData.clientPhone}
+                  onChange={handleInputChange}
+                  required
+                  className={inputClass}
+                  placeholder="+213 550 00 00 00"
+                />
+              </div>
+              <div>
+                <label className={labelClass}>العنوان (اختياري)</label>
+                <input
+                  type="text"
+                  name="clientAddress"
+                  value={formData.clientAddress}
+                  onChange={handleInputChange}
+                  className={inputClass}
+                  placeholder="المدينة أو العنوان"
+                />
               </div>
             </div>
+          </section>
 
-            {/* Service Details */}
-            <div className="border-t border-gray-200 pt-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
-                <FiFileText className="ml-2" />
-                تفاصيل الخدمة
-              </h3>
-              <div className="space-y-6">
+          {/* Service details */}
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-[#09142b] mb-4 flex items-center gap-2">
+              <FiFileText className="h-5 w-5 text-[#c8a45e]" />
+              تفاصيل الطلب
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <label className={labelClass}>
+                  وصف الخدمة المطلوبة <span className="text-rose-500">*</span>
+                </label>
+                <textarea
+                  name="serviceDescription"
+                  value={formData.serviceDescription}
+                  onChange={handleInputChange}
+                  required
+                  rows={4}
+                  className={inputClass + " resize-y min-h-[100px]"}
+                  placeholder="اشرح ما تحتاجه بالتفصيل..."
+                />
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    وصف الخدمة المطلوبة <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    name="serviceDescription"
-                    value={formData.serviceDescription}
+                  <label className={labelClass}>مستوى الأولوية</label>
+                  <select
+                    name="urgency"
+                    value={formData.urgency}
                     onChange={handleInputChange}
-                    required
-                    rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="اشرح بالتفصيل الخدمة التي تحتاجها..."
+                    className={inputClass}
+                  >
+                    <option value="low">منخفضة</option>
+                    <option value="normal">عادية</option>
+                    <option value="high">عالية</option>
+                    <option value="urgent">عاجل</option>
+                  </select>
+                </div>
+                <div>
+                  <label className={labelClass}>التاريخ المفضل (اختياري)</label>
+                  <input
+                    type="date"
+                    name="preferredDate"
+                    value={formData.preferredDate}
+                    onChange={handleInputChange}
+                    className={inputClass}
                   />
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      مستوى الأولوية
-                    </label>
-                    <select
-                      name="urgency"
-                      value={formData.urgency}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="low">منخفضة</option>
-                      <option value="normal">عادية</option>
-                      <option value="high">عالية</option>
-                      <option value="urgent">عاجل</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      التاريخ المفضل
-                    </label>
-                    <input
-                      type="date"
-                      name="preferredDate"
-                      value={formData.preferredDate}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    متطلبات إضافية
-                  </label>
-                  <textarea
-                    name="additionalRequirements"
-                    value={formData.additionalRequirements}
-                    onChange={handleInputChange}
-                    rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="أي متطلبات إضافية أو ملاحظات..."
-                  />
-                </div>
-
-                {/* Plan Selection - Only for legal-consultation service */}
-                {formData.serviceId === 'legal-consultation' && (
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-4">
-                      اختر الباقة التي تناسبك <span className="text-red-500">*</span>
-                    </label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                      {/* Free Plan for Special Needs */}
-                      <div
-                        onClick={() => setFormData(prev => ({ ...prev, selectedPlan: 'free-special-needs' }))}
-                        className={`p-3 border-2 rounded-lg cursor-pointer transition-all ${
-                          formData.selectedPlan === 'free-special-needs'
-                            ? 'border-blue-500 bg-blue-50 shadow-md'
-                            : 'border-gray-200 hover:border-blue-300 hover:shadow'
-                        }`}
-                      >
-                        <div className="flex items-center justify-center mb-2">
-                          <FiUser className="text-orange-500 text-xl" />
-                        </div>
-                        <h4 className="text-center text-sm font-semibold text-gray-900 mb-2">
-                          ذوي الاحتياجات الخاصة
-                        </h4>
-                        <div className="space-y-1 text-xs text-gray-600 mb-2">
-                          <div className="flex items-center justify-center">
-                            <FiClock className="ml-1 text-gray-400" size={12} />
-                            <span>30 دقيقة</span>
-                          </div>
-                          <div className="flex items-center justify-center">
-                            <FiCheckCircle className="ml-1 text-gray-400" size={12} />
-                            <span>عن بُعد أو حضوري</span>
-                          </div>
-                        </div>
-                        <div className="text-center">
-                          <span className="text-base font-bold text-green-600">مجانًا</span>
-                        </div>
-                      </div>
-
-                      {/* Mini Plan */}
-                      <div
-                        onClick={() => setFormData(prev => ({ ...prev, selectedPlan: 'mini-15min' }))}
-                        className={`p-3 border-2 rounded-lg cursor-pointer transition-all ${
-                          formData.selectedPlan === 'mini-15min'
-                            ? 'border-blue-500 bg-blue-50 shadow-md'
-                            : 'border-gray-200 hover:border-blue-300 hover:shadow'
-                        }`}
-                      >
-                        <div className="flex items-center justify-center mb-2">
-                          <FiClock className="text-blue-500 text-xl" />
-                        </div>
-                        <h4 className="text-center text-sm font-semibold text-gray-900 mb-2">
-                          باقة Mini
-                        </h4>
-                        <div className="space-y-1 text-xs text-gray-600 mb-2">
-                          <div className="flex items-center justify-center">
-                            <FiClock className="ml-1 text-gray-400" size={12} />
-                            <span>15 دقيقة</span>
-                          </div>
-                          <div className="flex items-center justify-center">
-                            <FiCheckCircle className="ml-1 text-gray-400" size={12} />
-                            <span>سؤال محدد</span>
-                          </div>
-                          <div className="flex items-center justify-center">
-                            <FiPhone className="ml-1 text-gray-400" size={12} />
-                            <span>عن بُعد</span>
-                          </div>
-                        </div>
-                        <div className="text-center">
-                          <span className="text-base font-bold text-blue-600">1000 دج</span>
-                        </div>
-                      </div>
-
-                      {/* Standard Plan */}
-                      <div
-                        onClick={() => setFormData(prev => ({ ...prev, selectedPlan: 'standard-30min' }))}
-                        className={`p-3 border-2 rounded-lg cursor-pointer transition-all ${
-                          formData.selectedPlan === 'standard-30min'
-                            ? 'border-blue-500 bg-blue-50 shadow-md'
-                            : 'border-gray-200 hover:border-blue-300 hover:shadow'
-                        }`}
-                      >
-                        <div className="flex items-center justify-center mb-2">
-                          <FiFileText className="text-green-500 text-xl" />
-                        </div>
-                        <h4 className="text-center text-sm font-semibold text-gray-900 mb-2">
-                          باقة Standard
-                        </h4>
-                        <div className="space-y-1 text-xs text-gray-600 mb-2">
-                          <div className="flex items-center justify-center">
-                            <FiClock className="ml-1 text-gray-400" size={12} />
-                            <span>30 دقيقة</span>
-                          </div>
-                          <div className="flex items-center justify-center">
-                            <FiCheckCircle className="ml-1 text-gray-400" size={12} />
-                            <span>تحليل + توجيه</span>
-                          </div>
-                          <div className="flex items-center justify-center">
-                            <FiPhone className="ml-1 text-gray-400" size={12} />
-                            <span>عن بُعد</span>
-                          </div>
-                        </div>
-                        <div className="text-center">
-                          <span className="text-base font-bold text-green-600">2000 دج</span>
-                        </div>
-                      </div>
-
-                      {/* Premium Plan */}
-                      <div
-                        onClick={() => setFormData(prev => ({ ...prev, selectedPlan: 'premium-45min' }))}
-                        className={`p-3 border-2 rounded-lg cursor-pointer transition-all ${
-                          formData.selectedPlan === 'premium-45min'
-                            ? 'border-blue-500 bg-blue-50 shadow-md'
-                            : 'border-gray-200 hover:border-blue-300 hover:shadow'
-                        }`}
-                      >
-                        <div className="flex items-center justify-center mb-2">
-                          <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                          </svg>
-                        </div>
-                        <h4 className="text-center text-sm font-semibold text-gray-900 mb-2">
-                          باقة Premium
-                        </h4>
-                        <div className="space-y-1 text-xs text-gray-600 mb-2">
-                          <div className="flex items-center justify-center">
-                            <FiClock className="ml-1 text-gray-400" size={12} />
-                            <span>45 دقيقة</span>
-                          </div>
-                          <div className="flex items-center justify-center">
-                            <FiCheckCircle className="ml-1 text-gray-400" size={12} />
-                            <span>استشارة معمقة</span>
-                          </div>
-                          <div className="flex items-center justify-center">
-                            <FiFileText className="ml-1 text-gray-400" size={12} />
-                            <span>ملاحظات مكتوبة</span>
-                          </div>
-                        </div>
-                        <div className="text-center">
-                          <span className="text-base font-bold text-purple-600">3000 دج</span>
-                        </div>
-                      </div>
-                    </div>
-                    {!formData.selectedPlan && (
-                      <p className="text-red-500 text-sm mt-2">يرجى اختيار باقة للمتابعة</p>
-                    )}
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    المستشار المفضل (اختياري)
-                  </label>
-                  {loadingConsultants ? (
-                    <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 flex items-center">
-                      <FiLoader className="animate-spin ml-2" />
-                      <span className="text-gray-500">جاري تحميل المستشارين...</span>
-                    </div>
-                  ) : (
-                    <select
-                      name="preferredConsultantId"
-                      value={formData.preferredConsultantId}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">اختر مستشار (اختياري)</option>
-                      {consultants.map((consultant) => (
-                        <option key={consultant.id} value={consultant.id}>
-                          {consultant.name} - {consultant.specialization || 'مستشار قانوني'}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                  <p className="text-sm text-gray-500 mt-1">
-                    يمكنك اختيار مستشار معين إذا كان لديك تفضيل، أو ترك هذا الحقل فارغاً
-                  </p>
-                </div>
               </div>
-            </div>
-
-            {/* Priority Indicator */}
-            {formData.urgency && (
-              <div className="border-t border-gray-200 pt-6">
-                <div
-                  className={`inline-flex items-center px-4 py-2 rounded-full border ${getUrgencyColor(
-                    formData.urgency
-                  )}`}
-                >
-                  <FiClock className="ml-2" />
-                  <span className="font-medium">
-                    مستوى الأولوية: {getUrgencyText(formData.urgency)}
-                  </span>
-                </div>
+              <div>
+                <label className={labelClass}>متطلبات إضافية (اختياري)</label>
+                <textarea
+                  name="additionalRequirements"
+                  value={formData.additionalRequirements}
+                  onChange={handleInputChange}
+                  rows={2}
+                  className={inputClass + " resize-y"}
+                  placeholder="ملاحظات أو متطلبات إضافية..."
+                />
               </div>
-            )}
-
-            {/* Submit Button */}
-            <div className="border-t border-gray-200 pt-8">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-4 px-6 rounded-lg transition-colors flex items-center justify-center"
-              >
-                {isSubmitting ? (
-                  <>
-                    <FiLoader className="animate-spin ml-2" />
-                    جاري الإرسال...
-                  </>
+              <div>
+                <label className={labelClass}>المستشار المفضل (اختياري)</label>
+                {loadingConsultants ? (
+                  <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-500">
+                    <FiLoader className="h-5 w-5 animate-spin" />
+                    <span className="text-sm">جاري تحميل المستشارين...</span>
+                  </div>
                 ) : (
-                  <>
-                    <FiSend className="ml-2" />
-                    إرسال طلب الخدمة
-                  </>
+                  <select
+                    name="preferredConsultantId"
+                    value={formData.preferredConsultantId}
+                    onChange={handleInputChange}
+                    className={inputClass}
+                  >
+                    <option value="">بدون تفضيل</option>
+                    {consultants.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name} – {c.specialization || "مستشار قانوني"}
+                      </option>
+                    ))}
+                  </select>
                 )}
-              </button>
+              </div>
             </div>
-          </form>
-        </div>
+          </section>
 
-        {/* Information Section */}
-        <div className="mt-12 bg-blue-50 rounded-lg p-8">
-          <h3 className="text-xl font-semibold text-blue-900 mb-4 flex items-center">
-            <FiCheckCircle className="ml-2" />
-            ما يحدث بعد إرسال الطلب؟
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <span className="text-blue-600 font-bold">1</span>
-              </div>
-              <h4 className="font-medium text-blue-900 mb-2">مراجعة الطلب</h4>
-              <p className="text-blue-700 text-sm">
-                سنقوم بمراجعة طلبك بعناية وتحديد المتطلبات
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <span className="text-blue-600 font-bold">2</span>
-              </div>
-              <h4 className="font-medium text-blue-900 mb-2">التواصل معك</h4>
-              <p className="text-blue-700 text-sm">
-                سنتواصل معك خلال 24 ساعة لمناقشة التفاصيل
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <span className="text-blue-600 font-bold">3</span>
-              </div>
-              <h4 className="font-medium text-blue-900 mb-2">بدء العمل</h4>
-              <p className="text-blue-700 text-sm">
-                بعد الموافقة على الشروط، سنبدأ في تنفيذ الخدمة
-              </p>
-            </div>
+          {/* Submit */}
+          <div className="flex flex-col gap-4">
+            <button
+              type="submit"
+              disabled={isSubmitting || !isAuthenticated}
+              className="w-full rounded-xl bg-[#09142b] py-4 px-6 font-semibold text-white shadow-lg transition hover:bg-[#0b1a36] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <FiLoader className="h-5 w-5 animate-spin" />
+                  جاري الإرسال...
+                </>
+              ) : (
+                <>
+                  <FiSend className="h-5 w-5" />
+                  إرسال طلب الخدمة
+                </>
+              )}
+            </button>
+            <p className="text-center text-slate-500 text-sm">
+              {isAuthenticated
+                ? "سنراجع طلبك ونتواصل معك خلال 24 ساعة. يمكنك تتبع الطلب من صفحة طلباتك."
+                : "سجّل الدخول لتمكين إرسال الطلب وتتبّع طلباتك."}
+            </p>
           </div>
-        </div>
+        </form>
+
+        {/* What happens next */}
+        <section className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 className="text-lg font-bold text-[#09142b] mb-4 flex items-center gap-2">
+            <FiCheckCircle className="h-5 w-5 text-[#c8a45e]" />
+            ماذا يحدث بعد الإرسال؟
+          </h3>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            {[
+              { step: 1, title: "مراجعة الطلب", text: "نراجع طلبك ونحدد المتطلبات" },
+              { step: 2, title: "التواصل معك", text: "نتواصل خلال 24 ساعة لمناقشة التفاصيل" },
+              { step: 3, title: "بدء الخدمة", text: "بعد الموافقة نبدأ تنفيذ الخدمة" },
+            ].map(({ step, title, text }) => (
+              <div key={step} className="text-center">
+                <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-[#09142b] text-sm font-bold text-[#c8a45e]">
+                  {step}
+                </div>
+                <h4 className="font-semibold text-[#09142b]">{title}</h4>
+                <p className="mt-1 text-sm text-slate-600">{text}</p>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );

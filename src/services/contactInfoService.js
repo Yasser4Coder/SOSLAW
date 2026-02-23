@@ -134,15 +134,15 @@ const contactInfoService = {
       // Return default fallback data
       return {
         phones: [
-          { key: "main_phone", value: "+ 383 (21) 23 43984", order: 1 },
-          { key: "contact_phone", value: "+213 555 123 456", order: 2 },
+          { key: "main_phone", value: "+213 550069695", order: 1 },
+          { key: "contact_phone", value: "+213 550069695", order: 2 },
         ],
         emails: [
-          { key: "main_email", value: "Sos.law.35@gmail.com", order: 1 },
-          { key: "contact_email", value: "info@soslaw.com", order: 2 },
+          { key: "main_email", value: "contact@soslawdz.com", order: 1 },
+          { key: "contact_email", value: "contact@soslawdz.com", order: 2 },
         ],
         addresses: [
-          { key: "main_address", value: "الجزائر العاصمة، الجزائر", order: 1 },
+          { key: "main_address", value: "بومرداس ، بومرداس - يسرف", order: 1 },
         ],
         hours: [
           {

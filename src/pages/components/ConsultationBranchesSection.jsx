@@ -32,8 +32,8 @@ const ConsultationBranchesSection = () => {
         "rentalHousingIssues",
         "damageCompensation",
       ],
-      color: "bg-blue-50 border-blue-200",
-      iconColor: "text-blue-600",
+      color: "bg-white border-[#09142b]",
+      iconColor: "text-[#c8a45e]",
     },
     {
       id: "commercial",
@@ -45,8 +45,8 @@ const ConsultationBranchesSection = () => {
         "commercialDisputes",
         "bankruptcyJudicialSettlement",
       ],
-      color: "bg-green-50 border-green-200",
-      iconColor: "text-green-600",
+      color: "bg-white border-[#09142b]",
+      iconColor: "text-[#c8a45e]",
     },
     {
       id: "realEstate",
@@ -58,8 +58,8 @@ const ConsultationBranchesSection = () => {
         "documentationRegistration",
         "propertyRental",
       ],
-      color: "bg-purple-50 border-purple-200",
-      iconColor: "text-purple-600",
+      color: "bg-white border-[#09142b]",
+      iconColor: "text-[#c8a45e]",
     },
     {
       id: "labor",
@@ -71,8 +71,8 @@ const ConsultationBranchesSection = () => {
         "employmentContracts",
         "socialSecurityDisputes",
       ],
-      color: "bg-orange-50 border-orange-200",
-      iconColor: "text-orange-600",
+      color: "bg-white border-[#09142b]",
+      iconColor: "text-[#c8a45e]",
     },
     {
       id: "criminal",
@@ -83,8 +83,8 @@ const ConsultationBranchesSection = () => {
         "investigationDefense",
         "criminalCourtProcedures",
       ],
-      color: "bg-red-50 border-red-200",
-      iconColor: "text-red-600",
+      color: "bg-white border-[#09142b]",
+      iconColor: "text-[#c8a45e]",
     },
     {
       id: "family",
@@ -95,8 +95,8 @@ const ConsultationBranchesSection = () => {
         "custodyChildVisitation",
         "inheritanceWills",
       ],
-      color: "bg-pink-50 border-pink-200",
-      iconColor: "text-pink-600",
+      color: "bg-white border-[#09142b]",
+      iconColor: "text-[#c8a45e]",
     },
     {
       id: "administrative",
@@ -107,16 +107,16 @@ const ConsultationBranchesSection = () => {
         "administrativeDisputes",
         "publicEmployment",
       ],
-      color: "bg-indigo-50 border-indigo-200",
-      iconColor: "text-indigo-600",
+      color: "bg-white border-[#09142b]",
+      iconColor: "text-[#c8a45e]",
     },
     {
       id: "intellectualProperty",
       icon: FiGlobe,
       titleKey: "intellectualPropertyConsultationTitle",
       services: ["trademarkProtection", "patentProtection", "digitalContent"],
-      color: "bg-teal-50 border-teal-200",
-      iconColor: "text-teal-600",
+      color: "bg-white border-[#09142b]",
+      iconColor: "text-[#c8a45e]",
     },
     {
       id: "publicProcurement",
@@ -127,8 +127,8 @@ const ConsultationBranchesSection = () => {
         "procurementAppeals",
         "governmentContracting",
       ],
-      color: "bg-amber-50 border-amber-200",
-      iconColor: "text-amber-600",
+      color: "bg-white border-[#09142b]",
+      iconColor: "text-[#c8a45e]",
     },
     {
       id: "investment",
@@ -139,8 +139,8 @@ const ConsultationBranchesSection = () => {
         "taxFinancialLegislation",
         "newInvestorSupport",
       ],
-      color: "bg-emerald-50 border-emerald-200",
-      iconColor: "text-emerald-600",
+      color: "bg-white border-[#09142b]",
+      iconColor: "text-[#c8a45e]",
     },
   ];
 
@@ -181,7 +181,7 @@ const ConsultationBranchesSection = () => {
                 }`}
               >
                 <div
-                  className={`${branch.iconColor} p-3 rounded-xl ml-[10px] bg-white shadow-sm group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}
+                  className={`${branch.iconColor} p-3 rounded-xl ml-[10px] bg-[#09142b] shadow-sm group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}
                 >
                   <branch.icon size={24} />
                 </div>
@@ -202,7 +202,7 @@ const ConsultationBranchesSection = () => {
                         }`}
                       >
                         <FiCheck
-                          className={`text-[#c8a45e] flex-shrink-0 ${
+                          className={`text-[#09142b ] flex-shrink-0 ${
                             isRTL ? "ml-2 mr-2" : "mr-2 ml-2"
                           }`}
                           size={14}

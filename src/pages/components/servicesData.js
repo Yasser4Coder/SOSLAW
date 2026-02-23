@@ -1,6 +1,109 @@
 // Service data for the ServicesSection
+
 // New structure with multilingual support
+import {
+  FiBriefcase,
+  FiUsers,
+  FiShield,
+  FiFileText,
+  FiPhone,
+  FiEdit,
+  FiBell,
+  FiGlobe,
+  FiBook,
+  FiAward,
+  FiTrendingUp,
+  FiHome,
+} from "react-icons/fi";
+import { FaGavel, FaHandshake, FaBalanceScale } from "react-icons/fa";
+import lawconsulting from "../../assets/lawconsulting.png"
+
+const iconMap = {
+  "legal-translation": FiFileText,
+  "legal-documents": FiEdit,
+  "arbitration-mediation": FaHandshake,
+  "legal-content": FiEdit,
+  "legal-audit": FiShield,
+  "legal-consultation": FiPhone,
+  "nursery-legal-package": FiHome,
+  "legal-training": FiBook,
+  "comprehensive-business-support": FiTrendingUp,
+  "elite-legal-package-students": FiUsers,
+  "academic-leadership-support": FiAward,
+};
+
 export const services = [
+  {
+    id: "legal-consultation",
+    title: {
+      ar: "الاستشارة القانونية",
+      fr: "Consultation juridique",
+      en: "Legal Consultation",
+    },
+    description: {
+      ar: "رأي قانوني موثوق لحل مشاكلك واتخاذ القرار الصحيح.",
+      fr: "Avis juridique fiable pour résoudre vos problèmes et prendre la bonne décision.",
+      en: "Trusted legal advice to solve your issues and make the right decision.",
+    },
+    details: {
+      ar: "نوفر استشارات قانونية متخصصة لتوضيح الوضع القانوني وتوجيهك نحو الحل الأنسب، مع إمكانية تقديم تقرير مكتوب عند الطلب.",
+      fr: "Nous proposons des consultations juridiques spécialisées pour clarifier votre situation et vous orienter vers la meilleure solution, avec rapport écrit sur demande.",
+      en: "We provide specialized legal consultations to clarify your legal situation and guide you to the best solution, with written reports available on request.",
+    },
+    modes: {
+      ar: [
+        "حضوريًا في مقر SOS LAW",
+        "عن بُعد عبر الهاتف، البريد الإلكتروني أو جلسات فيديو",
+        "مكتوبة بتقرير استشاري مفصل عند الطلب",
+      ],
+      fr: [
+        "Présentiel au siège de SOS LAW",
+        "À distance par téléphone, email ou sessions vidéo",
+        "Écrit sous forme de rapport consultatif sur demande",
+      ],
+      en: [
+        "In person at SOS LAW offices",
+        "Remote via phone, email or video sessions",
+        "Written advisory report on request",
+      ],
+    },
+    deliverables: {
+      ar: ["نصيحة شفهية أو مكتوبة", "تقرير استشاري مفصّل (عند الطلب)"],
+      fr: [
+        "Conseil oral ou écrit",
+        "Rapport consultatif détaillé (sur demande)",
+      ],
+      en: ["Oral or written advice", "Detailed advisory report (on request)"],
+    },
+    why_choose: {
+      ar: [
+        "فريق مختص",
+        "لغة قانونية واضحة",
+        "سرّية تامة",
+        "توجيه عملي وقابل للتنفيذ"
+      ],
+      fr: [
+        "Équipe spécialisée",
+        "Langage juridique clair",
+        "Confidentialité totale",
+        "Orientation pratique et applicable"
+      ],
+      en: [
+        "Specialized team",
+        "Clear legal language",
+        "Full confidentiality",
+        "Practical and actionable guidance"
+      ],
+    },
+    tags: ["consulting", "advice", "legal"],
+    availability: {
+      ar: "حضوريًا أو عن بُعد",
+      fr: "Présentiel ou à distance",
+      en: "In person or remote",
+    },
+    icon: FiPhone,
+    image: lawconsulting
+  },
   {
     id: "legal-translation",
     title: {
@@ -64,6 +167,8 @@ export const services = [
       fr: "À distance ou sur place",
       en: "Remote or in person",
     },
+    icon: FiFileText,
+    image: ""
   },
 
   {
@@ -151,6 +256,7 @@ export const services = [
       fr: "Présentiel ou à distance (plateforme, WhatsApp, Email)",
       en: "In person or remotely (platform, WhatsApp, Email)",
     },
+    icon: FiEdit,
   },
 
   {
@@ -269,6 +375,7 @@ export const services = [
       fr: "Présentiel ou à distance",
       en: "In person or remote",
     },
+    icon: FaHandshake,
   },
 
   {
@@ -411,6 +518,7 @@ export const services = [
       fr: "À distance ou sur place",
       en: "Remote or in person",
     },
+    icon: FiEdit,
   },
 
   {
@@ -495,63 +603,8 @@ export const services = [
       fr: "À distance ou sur place",
       en: "Remote or in person",
     },
+    icon: FiShield,
   },
-
-  {
-    id: "legal-consultation",
-    title: {
-      ar: "الاستشارة القانونية",
-      fr: "Consultation juridique",
-      en: "Legal Consultation",
-    },
-    description: {
-      ar: "رأي قانوني موثوق لحل مشاكلك واتخاذ القرار الصحيح.",
-      fr: "Avis juridique fiable pour résoudre vos problèmes et prendre la bonne décision.",
-      en: "Trusted legal advice to solve your issues and make the right decision.",
-    },
-    details: {
-      ar: "نوفر استشارات قانونية متخصصة لتوضيح الوضع القانوني وتوجيهك نحو الحل الأنسب، مع إمكانية تقديم تقرير مكتوب عند الطلب.",
-      fr: "Nous proposons des consultations juridiques spécialisées pour clarifier votre situation et vous orienter vers la meilleure solution, avec rapport écrit sur demande.",
-      en: "We provide specialized legal consultations to clarify your legal situation and guide you to the best solution, with written reports available on request.",
-    },
-    modes: {
-      ar: [
-        "حضوريًا في مقر SOS LAW",
-        "عن بُعد عبر الهاتف، البريد الإلكتروني أو جلسات فيديو",
-        "مكتوبة بتقرير استشاري مفصل عند الطلب",
-      ],
-      fr: [
-        "Présentiel au siège de SOS LAW",
-        "À distance par téléphone, email ou sessions vidéo",
-        "Écrit sous forme de rapport consultatif sur demande",
-      ],
-      en: [
-        "In person at SOS LAW offices",
-        "Remote via phone, email or video sessions",
-        "Written advisory report on request",
-      ],
-    },
-    deliverables: {
-      ar: ["نصيحة شفهية أو مكتوبة", "تقرير استشاري مفصّل (عند الطلب)"],
-      fr: [
-        "Conseil oral ou écrit",
-        "Rapport consultatif détaillé (sur demande)",
-      ],
-      en: ["Oral or written advice", "Detailed advisory report (on request)"],
-    },
-    why_choose: {
-      ar: "فريق مختص، لغة قانونية واضحة، سرّية تامة، توجيه عملي وقابل للتنفيذ.",
-      fr: "Équipe spécialisée, langage juridique clair, confidentialité totale, orientation pratique et applicable.",
-      en: "Specialized team, clear legal language, full confidentiality, practical and actionable guidance.",
-    },
-    tags: ["consulting", "advice", "legal"],
-    availability: {
-      ar: "حضوريًا أو عن بُعد",
-      fr: "Présentiel ou à distance",
-      en: "In person or remote",
-    },
-  },
-
   {
     id: "nursery-legal-package",
     title: {
@@ -608,6 +661,7 @@ export const services = [
       fr: "À distance ou sur place",
       en: "Remote or in person",
     },
+    icon: FiHome,
   },
 
   {
@@ -678,6 +732,7 @@ export const services = [
       fr: "Présentiel ou à distance",
       en: "In person or remote",
     },
+    icon: FiBook,
   },
 
   {
@@ -751,6 +806,7 @@ export const services = [
       fr: "Présentiel ou à distance",
       en: "In person or remote",
     },
+    icon: FiTrendingUp,
   },
 
   {
@@ -833,6 +889,7 @@ export const services = [
       fr: "Présentiel ou à distance",
       en: "In person or remote",
     },
+    icon: FiUsers,
   },
 
   {
@@ -892,5 +949,6 @@ export const services = [
       fr: "Présentiel ou à distance",
       en: "In person or remote",
     },
+    icon: FiAward,
   },
 ];

@@ -5,6 +5,7 @@ import ServicesSection from "./components/ServicesSection";
 import TestimonialsSection from "./components/TestimonialsSection";
 import ConsultationBranchesSection from "./components/ConsultationBranchesSection";
 import FAQSection from "./components/FAQSection";
+import TrainingCourseAnnouncement from "./components/TrainingCourseAnnouncement";
 import SEO from "../components/SEO";
 import EmailVerificationBanner from "../components/EmailVerificationBanner";
 import { useTranslation } from "react-i18next";
@@ -218,9 +219,10 @@ const Home = () => {
         </div>
       )}
       <HeroSection />
-      <NationalConferenceAnnouncement />
-      <ConsultantsSection />
+      {/* <TrainingCourseAnnouncement /> */}
+      {/* <NationalConferenceAnnouncement /> */}
       <ServicesSection />
+      <ConsultantsSection />
       <TestimonialsSection />
       <ConsultationBranchesSection />
       <FAQSection />

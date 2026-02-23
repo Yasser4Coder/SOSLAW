@@ -45,7 +45,7 @@ const Contact = () => {
       "@type": "LegalService",
       name: "SOSLAW",
       telephone: "+213-XXX-XXX-XXX",
-      email: "info@soslaw.com",
+      email: "contact@soslawdz.com",
       address: {
         "@type": "PostalAddress",
         addressCountry: "DZ",
