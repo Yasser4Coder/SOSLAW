@@ -116,6 +116,19 @@ const HeroSection = () => {
             >
               {t("heroTitle")}
             </h1>
+            {/* Platform pillars — high visibility */}
+            <div
+              className={`mb-5 md:mb-6 max-w-2xl mx-auto rounded-2xl border border-white/25 bg-white/10 backdrop-blur-md px-4 py-3 md:px-6 md:py-4 ${
+                isRTL ? "text-center" : "text-center"
+              }`}
+            >
+              <p className="text-[#e7cfa7] text-xs md:text-sm font-semibold tracking-wide uppercase mb-2">
+                {t("heroPlatformEyebrow", "أول منصة في الجزائر تجمع بين")}
+              </p>
+              <p className="text-white text-sm md:text-lg lg:text-xl font-bold leading-relaxed drop-shadow-md">
+                {t("heroPlatformTagline", "القانون + ريادة الأعمال + التدريب")}
+              </p>
+            </div>
             {/* Description */}
             <p
               className={`text-white mb-8 max-w-xl drop-shadow-md ${
@@ -130,24 +143,25 @@ const HeroSection = () => {
             </p>
             {/* CTA Buttons */}
             <div className="flex gap-4 mb-8 justify-center">
-              <Link
-                to="/contact"
+              <button
+                type="button"
+                onClick={() => scrollToSection("services")}
                 className={`px-6 py-2 md:px-8 md:py-3 bg-[#b48b5a] text-white font-bold rounded shadow-lg hover:bg-[#a07a4a] active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#b48b5a] cursor-pointer ${
                   isRTL ? "text-sm md:text-lg" : "text-base md:text-lg"
                 }`}
                 aria-label={t("heroRequestNow")}
               >
                 {t("heroRequestNow")}
-              </Link>
-              <button
-                onClick={() => scrollToSection("services")}
-                className={`px-6 py-2 md:px-8 md:py-3 bg-white/20 text-white font-semibold rounded border border-white/40 hover:bg-white/30 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#b48b5a] cursor-pointer backdrop-blur-sm ${
+              </button>
+              <Link
+                to="/about"
+                className={`px-6 py-2 md:px-8 md:py-3 bg-white/20 text-white font-semibold rounded border border-white/40 hover:bg-white/30 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#b48b5a] cursor-pointer backdrop-blur-sm inline-block text-center ${
                   isRTL ? "text-sm md:text-lg" : "text-base md:text-lg"
                 }`}
                 aria-label={t("learnMore") || "Learn More"}
               >
                 {t("learnMore") || "Learn More"}
-              </button>
+              </Link>
             </div>
             {/* Slider Dots (clickable) */}
             <div className="flex items-center gap-3 mt-2 md:mt-4">

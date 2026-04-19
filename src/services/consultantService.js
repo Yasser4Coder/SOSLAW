@@ -45,6 +45,28 @@ const consultantService = {
     }
   },
 
+  // Get consultant by ID with all languages
+  async getConsultantByIdAllLanguages(id) {
+    try {
+      const response = await api.get(`/api/v1/consultants/${id}/all-languages`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching consultant (all languages):", error);
+      throw error;
+    }
+  },
+
+  // Get consultant statistics
+  async getConsultantStats() {
+    try {
+      const response = await api.get("/api/v1/consultants/stats");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching consultant stats:", error);
+      throw error;
+    }
+  },
+
   // Create consultant
   async createConsultant(data) {
     try {

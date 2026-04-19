@@ -37,9 +37,9 @@ const NAV_LINKS = [
   { to: "/", label: "home" },
   { to: "/about", label: "about" },
   { to: "/", scrollTo: "services", label: "servicesTitle" },
+  { to: "/shop", label: "shop" },
+  { to: "/courses", label: "courses" },
   { to: "/contact", label: "contact" },
-  { to: "/join", label: "joinUs" },
-
   {
     dropdown: "more",
     label: "more",
@@ -49,6 +49,7 @@ const NAV_LINKS = [
       { to: "/", scrollTo: "consultants", label: "consultantsTitle" },
       { to: "/", scrollTo: "consultation-branches", label: "consulting" },
       { to: "/", scrollTo: "faq", label: "faqSectionTitle" },
+      { to: "/join", label: "joinUs" },
     ],
   },
 ];

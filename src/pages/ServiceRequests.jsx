@@ -13,11 +13,66 @@ import {
   FiDollarSign,
   FiMessageCircle,
   FiEye,
-  FiDownload,
   FiAlertCircle,
   FiCreditCard,
-  FiPhone,
+  FiLoader,
+  FiCalendar,
 } from "react-icons/fi";
+
+// Order status: one source of truth for labels and styling
+const ORDER_STATUS_CONFIG = {
+  pending: {
+    ar: "في الانتظار",
+    en: "Pending",
+    fr: "En attente",
+    color: "bg-amber-50 text-amber-800 border-amber-200",
+    icon: FiClock,
+  },
+  pending_payment: {
+    ar: "في انتظار الدفع",
+    en: "Pending Payment",
+    fr: "En attente de paiement",
+    color: "bg-orange-50 text-orange-800 border-orange-200",
+    icon: FiDollarSign,
+  },
+  approved: {
+    ar: "مقبول",
+    en: "Approved",
+    fr: "Approuvé",
+    color: "bg-green-50 text-green-800 border-green-200",
+    icon: FiCheckCircle,
+  },
+  in_progress: {
+    ar: "قيد التنفيذ",
+    en: "In Progress",
+    fr: "En cours",
+    color: "bg-blue-50 text-blue-800 border-blue-200",
+    icon: FiLoader,
+  },
+  completed: {
+    ar: "مكتمل",
+    en: "Completed",
+    fr: "Terminé",
+    color: "bg-emerald-50 text-emerald-800 border-emerald-200",
+    icon: FiCheckCircle,
+  },
+  rejected: {
+    ar: "مرفوض",
+    en: "Rejected",
+    fr: "Rejeté",
+    color: "bg-red-50 text-red-800 border-red-200",
+    icon: FiXCircle,
+  },
+};
+
+const PAYMENT_STATUS_CONFIG = {
+  pending: { ar: "في الانتظار", en: "Pending", fr: "En attente", color: "bg-amber-50 text-amber-800 border-amber-200" },
+  processing: { ar: "قيد المعالجة", en: "Processing", fr: "En cours", color: "bg-blue-50 text-blue-800 border-blue-200" },
+  completed: { ar: "مُدفوع", en: "Paid", fr: "Payé", color: "bg-green-50 text-green-800 border-green-200" },
+  failed: { ar: "فشل", en: "Failed", fr: "Échoué", color: "bg-red-50 text-red-800 border-red-200" },
+  cancelled: { ar: "ملغي", en: "Cancelled", fr: "Annulé", color: "bg-slate-100 text-slate-600 border-slate-200" },
+  refunded: { ar: "مسترد", en: "Refunded", fr: "Remboursé", color: "bg-purple-50 text-purple-800 border-purple-200" },
+};
 
 const ServiceRequests = () => {
   const { t, i18n } = useTranslation();
@@ -46,6 +101,25 @@ const ServiceRequests = () => {
   });
 
   const consultants = consultantsData?.data || [];
+  const lang = i18n.language === "ar" ? "ar" : i18n.language === "fr" ? "fr" : "en";
+
+  const getOrderStatusLabel = (rawStatus) => {
+    const c = ORDER_STATUS_CONFIG[rawStatus] || ORDER_STATUS_CONFIG.pending;
+    return c[lang];
+  };
+  const getPaymentStatusLabel = (rawPaymentStatus) => {
+    const c = PAYMENT_STATUS_CONFIG[rawPaymentStatus] || PAYMENT_STATUS_CONFIG.pending;
+    return c[lang];
+  };
+  const getPriorityText = (priority, l) => {
+    const priorityMap = {
+      urgent: { ar: "عاجل", en: "Urgent", fr: "Urgent" },
+      high: { ar: "عالية", en: "High", fr: "Élevée" },
+      normal: { ar: "عادية", en: "Normal", fr: "Normale" },
+      low: { ar: "منخفضة", en: "Low", fr: "Faible" },
+    };
+    return priorityMap[priority]?.[l] || priorityMap.normal[l];
+  };
 
   // Handle view details click - mark as viewed in backend
   const handleViewDetails = async (mappedRequest) => {
@@ -89,140 +163,52 @@ const ServiceRequests = () => {
     }
   };
 
-  // Helper function to map API data to display format
+  // Map API data to display format (raw status keys for styling)
   const mapServiceRequestData = (request) => {
     const service = request.service || {};
-    const payment =
-      request.payments && request.payments.length > 0
-        ? request.payments[0]
-        : null;
+    const rawStatus = request.status || "pending";
+    const rawPaymentStatus = request.paymentStatus || "pending";
 
     return {
       id: request.id,
-      serviceName:
-        service.titleAr || request.serviceDescription || "خدمة قانونية",
+      receiptToken: request.receiptToken || null,
+      rawStatus,
+      rawPaymentStatus,
+      serviceName: service.titleAr || "خدمة قانونية",
       serviceNameEn: service.titleEn || "Legal Service",
       serviceNameFr: service.titleFr || "Service juridique",
-      status: getStatusText(request.status, "ar"), // Default to Arabic
-      statusAr: getStatusText(request.status, "ar"),
-      statusEn: getStatusText(request.status, "en"),
-      statusFr: getStatusText(request.status, "fr"),
+      status: getOrderStatusLabel(rawStatus),
+      statusAr: ORDER_STATUS_CONFIG[rawStatus]?.ar ?? ORDER_STATUS_CONFIG.pending.ar,
+      statusEn: ORDER_STATUS_CONFIG[rawStatus]?.en ?? ORDER_STATUS_CONFIG.pending.en,
+      statusFr: ORDER_STATUS_CONFIG[rawStatus]?.fr ?? ORDER_STATUS_CONFIG.pending.fr,
       createdAt: (request.createdAt || request.created_at)
-        ? new Date(request.createdAt || request.created_at).toLocaleDateString("en-US")
-        : "غير محدد",
+        ? new Date(request.createdAt || request.created_at).toLocaleDateString("ar-DZ", { year: "numeric", month: "short", day: "numeric" })
+        : "—",
       description: request.serviceDescription || "طلب خدمة قانونية",
       descriptionEn: "Legal service request",
       descriptionFr: "Demande de service juridique",
-      priority: getPriorityText(request.urgency || "normal", "ar"), // Default to Arabic
+      rawPriority: request.urgency || "normal",
+      priority: getPriorityText(request.urgency || "normal", "ar"),
       priorityAr: getPriorityText(request.urgency || "normal", "ar"),
       priorityEn: getPriorityText(request.urgency || "normal", "en"),
       priorityFr: getPriorityText(request.urgency || "normal", "fr"),
       consultant: (() => {
-        // Find consultant name from the consultants list using assignedTo
         const consultant = consultants.find((c) => c.id === request.assignedTo);
-
-        return (
-          consultant?.name ||
-          request.assignedConsultant?.fullName ||
-          "لم يتم تعيين مستشار بعد"
-        );
+        return consultant?.name || request.assignedConsultant?.fullName || null;
       })(),
-      consultantEn: "No consultant assigned yet",
-      consultantFr: "Aucun consultant assigné",
+      consultantEn: null,
+      consultantFr: null,
       replies: request.replies || [],
-      paymentRequired: request.paymentRequired || false,
-      paymentAmount: request.paymentAmount || 0,
-      paymentCurrency: request.paymentCurrency || "DA",
-      paymentStatus: getPaymentStatusText(
-        request.paymentStatus || "pending",
-        "ar"
-      ), // Default to Arabic
-      paymentStatusAr: getPaymentStatusText(
-        request.paymentStatus || "pending",
-        "ar"
-      ),
-      paymentStatusEn: getPaymentStatusText(
-        request.paymentStatus || "pending",
-        "en"
-      ),
-      paymentStatusFr: getPaymentStatusText(
-        request.paymentStatus || "pending",
-        "fr"
-      ),
+      paymentRequired: !!request.paymentRequired,
+      paymentAmount: request.paymentAmount != null ? Number(request.paymentAmount) : 0,
+      paymentCurrency: request.paymentCurrency || "د.ج",
+      paymentStatus: getPaymentStatusLabel(rawPaymentStatus),
+      paymentStatusAr: PAYMENT_STATUS_CONFIG[rawPaymentStatus]?.ar ?? PAYMENT_STATUS_CONFIG.pending.ar,
+      paymentStatusEn: PAYMENT_STATUS_CONFIG[rawPaymentStatus]?.en ?? PAYMENT_STATUS_CONFIG.pending.en,
+      paymentStatusFr: PAYMENT_STATUS_CONFIG[rawPaymentStatus]?.fr ?? PAYMENT_STATUS_CONFIG.pending.fr,
       paymentId: request.paymentId || `PAY-${request.id}`,
-      paymentMethod: request.paymentMethod || "ccp",
+      paymentMethod: request.paymentMethod || "chargily",
     };
-  };
-
-  const getPriorityText = (priority, lang) => {
-    const priorityMap = {
-      urgent: { ar: "عاجل", en: "Urgent", fr: "Urgent" },
-      high: { ar: "عالية", en: "High", fr: "Élevée" },
-      normal: { ar: "عادية", en: "Normal", fr: "Normale" },
-      low: { ar: "منخفضة", en: "Low", fr: "Faible" },
-    };
-    return priorityMap[priority]?.[lang] || priorityMap.normal[lang];
-  };
-
-  const getStatusText = (status, lang) => {
-    const statusMap = {
-      pending: { ar: "في الانتظار", en: "Pending", fr: "En attente" },
-      pending_payment: {
-        ar: "في انتظار الدفع",
-        en: "Pending Payment",
-        fr: "En attente de paiement",
-      },
-      in_progress: { ar: "قيد التنفيذ", en: "In Progress", fr: "En cours" },
-      completed: { ar: "مكتمل", en: "Completed", fr: "Terminé" },
-      rejected: { ar: "مرفوض", en: "Rejected", fr: "Rejeté" },
-    };
-    return statusMap[status]?.[lang] || statusMap.pending[lang];
-  };
-
-  const getPaymentStatusText = (status, lang) => {
-    const statusMap = {
-      pending: { ar: "في الانتظار", en: "Pending", fr: "En attente" },
-      processing: {
-        ar: "قيد المعالجة",
-        en: "Processing",
-        fr: "En cours de traitement",
-      },
-      completed: { ar: "مكتمل", en: "Completed", fr: "Terminé" },
-      failed: { ar: "فشل", en: "Failed", fr: "Échoué" },
-      cancelled: { ar: "ملغي", en: "Cancelled", fr: "Annulé" },
-      refunded: { ar: "مسترد", en: "Refunded", fr: "Remboursé" },
-    };
-    return statusMap[status]?.[lang] || statusMap.pending[lang];
-  };
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "pending_payment":
-        return <FiDollarSign className="w-5 h-5 text-yellow-500" />;
-      case "in_progress":
-        return <FiClock className="w-5 h-5 text-blue-500" />;
-      case "completed":
-        return <FiCheckCircle className="w-5 h-5 text-green-500" />;
-      case "rejected":
-        return <FiXCircle className="w-5 h-5 text-red-500" />;
-      default:
-        return <FiClock className="w-5 h-5 text-gray-500" />;
-    }
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "pending_payment":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "in_progress":
-        return "bg-blue-100 text-blue-800 border-blue-200";
-      case "completed":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "rejected":
-        return "bg-red-100 text-red-800 border-red-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
   };
 
   const getPriorityColor = (priority) => {
@@ -254,162 +240,158 @@ const ServiceRequests = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       <SEOHead
         title={title}
         description={desc}
         keywords="طلبات الخدمات, الخدمات القانونية, تتبع الطلبات"
       />
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-8 sm:py-10">
         {/* Header */}
         <div className="mb-8">
-          <h1
-            className="text-3xl font-bold text-[#09142b] mb-4"
-            dir={isRTL ? "rtl" : "ltr"}
-          >
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#09142b] mb-2" dir={isRTL ? "rtl" : "ltr"}>
             {title}
           </h1>
-          <p className="text-[#6b7280]" dir={isRTL ? "rtl" : "ltr"}>
+          <p className="text-slate-600 text-sm sm:text-base" dir={isRTL ? "rtl" : "ltr"}>
             {desc}
           </p>
         </div>
 
         {/* Service Requests List */}
-        <div className="grid gap-6">
+        <div className="space-y-4">
           {loading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#c8a45e] mx-auto mb-4"></div>
-              <p className="text-gray-600">{t("loading")}</p>
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-12 text-center">
+              <div className="animate-spin rounded-full h-10 w-10 border-2 border-slate-200 border-t-[#09142b] mx-auto mb-4" />
+              <p className="text-slate-600 text-sm">{t("loading")}</p>
             </div>
           ) : error ? (
-            <div className="text-center py-12">
-              <FiAlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-red-600 mb-2">
-                {t("error")}
-              </h3>
-              <p className="text-gray-600">{error}</p>
+            <div className="bg-white rounded-2xl border border-red-200 shadow-sm p-8 text-center">
+              <FiAlertCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
+              <h3 className="text-lg font-semibold text-red-700 mb-1">{t("error")}</h3>
+              <p className="text-slate-600 text-sm">{error}</p>
             </div>
           ) : serviceRequests.length === 0 ? (
-            <div className="text-center py-12">
-              <FiMessageCircle className="w-16 h-16 text-[#c8a45e] mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-[#09142b] mb-2">
-                {t("noServiceRequests")}
-              </h3>
-              <p className="text-gray-600">{t("noServiceRequestsDesc")}</p>
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-12 text-center">
+              <FiMessageCircle className="w-14 h-14 text-slate-300 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-[#09142b] mb-1">{t("noServiceRequests")}</h3>
+              <p className="text-slate-600 text-sm">{t("noServiceRequestsDesc")}</p>
             </div>
           ) : (
             serviceRequests.map((request) => {
               const mappedRequest = mapServiceRequestData(request);
+              const orderStatus = ORDER_STATUS_CONFIG[mappedRequest.rawStatus] || ORDER_STATUS_CONFIG.pending;
+              const OrderIcon = orderStatus.icon;
+              const payStatusConfig = mappedRequest.paymentRequired
+                ? (PAYMENT_STATUS_CONFIG[mappedRequest.rawPaymentStatus] || PAYMENT_STATUS_CONFIG.pending)
+                : null;
+              const isPaid = mappedRequest.rawPaymentStatus === "completed";
+
               return (
                 <div
                   key={request.id}
-                  className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow"
+                  className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+                  dir={isRTL ? "rtl" : "ltr"}
                 >
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                    {/* Request Info */}
-                    <div className="flex-1">
-                      <div className="flex items-start gap-3 mb-3">
-                        {getStatusIcon(request.status)}
-                        <div className="flex-1">
-                          <h3
-                            className="text-lg font-semibold text-[#09142b] mb-1"
-                            dir={isRTL ? "rtl" : "ltr"}
-                          >
-                            {getLocalizedText(mappedRequest, "serviceName")}
-                          </h3>
-                          <p
-                            className="text-[#6b7280] text-sm mb-2"
-                            dir={isRTL ? "rtl" : "ltr"}
-                          >
-                            {getLocalizedText(mappedRequest, "description")}
+                  {/* Card header: ref + service name */}
+                  <div className="p-5 pb-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-slate-500 text-sm font-medium mb-0.5">
+                          {mappedRequest.receiptToken
+                            ? `طلب · مرجع …${mappedRequest.receiptToken.slice(-6)}`
+                            : "طلب"}
+                        </p>
+                        <h3 className="text-lg font-bold text-[#09142b] truncate">
+                          {getLocalizedText(mappedRequest, "serviceName")}
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Status row: one pill for order status, one for payment if applicable */}
+                  <div className="px-5 pb-4 flex flex-wrap items-center gap-2">
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border ${orderStatus.color}`}>
+                      <OrderIcon className="w-4 h-4 shrink-0" />
+                      {getLocalizedText(mappedRequest, "status")}
+                    </span>
+                    {mappedRequest.paymentRequired && payStatusConfig && (
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border ${payStatusConfig.color}`}>
+                        <FiCreditCard className="w-4 h-4 shrink-0" />
+                        {getLocalizedText(mappedRequest, "paymentStatus")}
+                      </span>
+                    )}
+                    <span className={`inline-flex px-2.5 py-1 rounded-md text-xs font-medium ${getPriorityColor(mappedRequest.rawPriority)}`}>
+                      {getLocalizedText(mappedRequest, "priority")}
+                    </span>
+                  </div>
+
+                  {/* Meta: date, consultant */}
+                  <div className="px-5 pb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-600">
+                    <span className="inline-flex items-center gap-1">
+                      <FiCalendar className="w-4 h-4 text-slate-400" />
+                      {mappedRequest.createdAt}
+                    </span>
+                    {mappedRequest.consultant && (
+                      <span>{t("consultant", "المستشار")}: {mappedRequest.consultant}</span>
+                    )}
+                  </div>
+
+                  {/* Payment summary (if applicable) */}
+                  {mappedRequest.paymentRequired && (
+                    <div className="px-5 py-4 bg-slate-50/80 border-t border-slate-100">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                          <p className="text-xs text-slate-500 mb-0.5">{t("amount", "المبلغ")}</p>
+                          <p className="text-lg font-bold text-[#09142b]">
+                            {mappedRequest.paymentAmount.toLocaleString("ar-DZ")} {mappedRequest.paymentCurrency}
                           </p>
-                          <div className="flex flex-wrap gap-2 mb-3">
-                            <span
-                              className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
-                                mappedRequest.status
-                              )}`}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {!isPaid && (
+                            <button
+                              type="button"
+                              onClick={() => window.open(`/payment-details/${encodeURIComponent(mappedRequest.receiptToken || mappedRequest.id)}`, "_blank")}
+                              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 text-white font-medium text-sm hover:bg-amber-600 transition-colors"
                             >
-                              {getLocalizedText(mappedRequest, "status")}
-                            </span>
-                            <span
-                              className={`px-3 py-1 rounded-full text-xs font-medium ${getPriorityColor(
-                                mappedRequest.priority
-                              )}`}
+                              <FiCreditCard className="w-4 h-4" />
+                              {t("payNow", "ادفع الآن")}
+                            </button>
+                          )}
+                          {isPaid && (
+                            <button
+                              type="button"
+                              onClick={() => window.open(`/payment-details/${encodeURIComponent(mappedRequest.receiptToken || mappedRequest.id)}`, "_blank")}
+                              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-200 text-slate-700 font-medium text-sm hover:bg-slate-300 transition-colors"
                             >
-                              {getLocalizedText(mappedRequest, "priority")}
-                            </span>
-                            {mappedRequest.paymentRequired && (
-                              <span
-                                className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                  mappedRequest.paymentStatus === "completed"
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-yellow-100 text-yellow-800"
-                                }`}
-                              >
-                                {getLocalizedText(
-                                  mappedRequest,
-                                  "paymentStatus"
-                                )}
-                              </span>
-                            )}
-                          </div>
-                          <div className="text-sm text-[#6b7280]">
-                            <span>
-                              {t("createdAt", "تاريخ الإنشاء")}:{" "}
-                              {mappedRequest.createdAt}
-                            </span>
-                            {mappedRequest.consultant && (
-                              <span className="mr-4">
-                                {t("consultant", "المستشار")}:{" "}
-                                {getLocalizedText(mappedRequest, "consultant")}
-                              </span>
-                            )}
-                          </div>
+                              <FiCreditCard className="w-4 h-4" />
+                              {t("viewPayment", "عرض الدفع")}
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleViewDetails(mappedRequest)}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#09142b] text-white font-medium text-sm hover:bg-[#0b1a36] transition-colors"
+                          >
+                            <FiEye className="w-4 h-4" />
+                            {t("viewDetails", "عرض التفاصيل")}
+                          </button>
                         </div>
                       </div>
                     </div>
+                  )}
 
-                    {/* Actions */}
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      {mappedRequest.paymentRequired && (
-                        <button
-                          onClick={() =>
-                            window.open(
-                              `/payment-details/${mappedRequest.id}`,
-                              "_blank"
-                            )
-                          }
-                          className="flex items-center gap-2 px-4 py-2 bg-[#c8a45e] text-white rounded-lg hover:bg-[#c8a45e]/80 transition-colors cursor-pointer"
-                        >
-                          <FiCreditCard className="w-4 h-4" />
-                          {mappedRequest.paymentStatus === "pending"
-                            ? t("payNow", "ادفع الآن")
-                            : t("viewPayment", "عرض الدفع")}
-                        </button>
-                      )}
+                  {/* Actions when no payment */}
+                  {!mappedRequest.paymentRequired && (
+                    <div className="px-5 py-4 border-t border-slate-100">
                       <button
+                        type="button"
                         onClick={() => handleViewDetails(mappedRequest)}
-                        className="flex items-center gap-2 px-4 py-2 bg-[#09142b] text-white rounded-lg hover:bg-[#09142b]/80 transition-colors cursor-pointer"
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#09142b] text-white font-medium text-sm hover:bg-[#0b1a36] transition-colors"
                       >
                         <FiEye className="w-4 h-4" />
                         {t("viewDetails", "عرض التفاصيل")}
                       </button>
-                    </div>
-                  </div>
-
-                  {/* Payment Amount */}
-                  {mappedRequest.paymentRequired && (
-                    <div className="mt-4 pt-4 border-t border-gray-200">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-[#6b7280]">
-                          {t("amount", "المبلغ")}:
-                        </span>
-                        <span className="text-lg font-semibold text-[#09142b]">
-                          {mappedRequest.paymentAmount.toLocaleString()}{" "}
-                          {mappedRequest.paymentCurrency}
-                        </span>
-                      </div>
                     </div>
                   )}
                 </div>
@@ -425,7 +407,7 @@ const ServiceRequests = () => {
           request={selectedRequest}
           onClose={() => setSelectedRequest(null)}
           onPay={() =>
-            window.open(`/payment-details/${selectedRequest.id}`, "_blank")
+            window.open(`/payment-details/${encodeURIComponent(selectedRequest.receiptToken || selectedRequest.id)}`, "_blank")
           }
         />
       )}
@@ -437,58 +419,33 @@ const ServiceRequests = () => {
 const RequestDetailsModal = ({ request, onClose, onPay }) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
+  const orderStatus = ORDER_STATUS_CONFIG[request.rawStatus] || ORDER_STATUS_CONFIG.pending;
+  const OrderIcon = orderStatus.icon;
+  const payStatusConfig = request.paymentRequired
+    ? (PAYMENT_STATUS_CONFIG[request.rawPaymentStatus] || PAYMENT_STATUS_CONFIG.pending)
+    : null;
+  const isPaid = request.rawPaymentStatus === "completed";
 
-  const getLocalizedText = (request, field) => {
-    const lang = i18n.language;
-    if (lang === "ar") return request[field];
-    if (lang === "fr") return request[`${field}Fr`];
-    return request[`${field}En`];
-  };
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "pending_payment":
-        return <FiDollarSign className="w-5 h-5 text-yellow-500" />;
-      case "in_progress":
-        return <FiClock className="w-5 h-5 text-blue-500" />;
-      case "completed":
-        return <FiCheckCircle className="w-5 h-5 text-green-500" />;
-      case "rejected":
-        return <FiXCircle className="w-5 h-5 text-red-500" />;
-      default:
-        return <FiClock className="w-5 h-5 text-gray-500" />;
-    }
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "pending_payment":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "in_progress":
-        return "bg-blue-100 text-blue-800 border-blue-200";
-      case "completed":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "rejected":
-        return "bg-red-100 text-red-800 border-red-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
+  const getLocalizedText = (req, field) => {
+    const l = i18n.language;
+    if (l === "ar") return req[field];
+    if (l === "fr") return req[`${field}Fr`];
+    return req[`${field}En`];
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-slate-200">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2
-            className="text-xl font-semibold text-[#09142b]"
-            dir={isRTL ? "rtl" : "ltr"}
-          >
+        <div className="flex items-center justify-between p-6 border-b border-slate-200">
+          <h2 className="text-xl font-bold text-[#09142b]" dir={isRTL ? "rtl" : "ltr"}>
             {t("requestDetails", "تفاصيل الطلب")}
           </h2>
           <button
+            type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+            className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+            aria-label="إغلاق"
           >
             <FiXCircle className="w-6 h-6" />
           </button>
@@ -498,49 +455,35 @@ const RequestDetailsModal = ({ request, onClose, onPay }) => {
         <div className="p-6 space-y-6">
           {/* Request Info */}
           <div className="space-y-4">
-            <h3
-              className="text-lg font-semibold text-[#09142b]"
-              dir={isRTL ? "rtl" : "ltr"}
-            >
+            <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
               {t("requestInfo", "معلومات الطلب")}
             </h3>
             <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                {getStatusIcon(request.status)}
-                <div>
-                  <p className="font-medium text-[#09142b]">
-                    {getLocalizedText(request, "serviceName")}
-                  </p>
-                  <p className="text-sm text-[#6b7280]">
-                    {getLocalizedText(request, "description")}
-                  </p>
-                </div>
-              </div>
+              <p className="font-bold text-lg text-[#09142b]">
+                {getLocalizedText(request, "serviceName")}
+              </p>
+              <p className="text-sm text-slate-600" dir={isRTL ? "rtl" : "ltr"}>
+                {getLocalizedText(request, "description")}
+              </p>
               <div className="flex flex-wrap gap-2">
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
-                    request.status
-                  )}`}
-                >
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border ${orderStatus.color}`}>
+                  <OrderIcon className="w-4 h-4" />
                   {getLocalizedText(request, "status")}
                 </span>
+                {request.paymentRequired && payStatusConfig && (
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border ${payStatusConfig.color}`}>
+                    <FiCreditCard className="w-4 h-4" />
+                    {getLocalizedText(request, "paymentStatus")}
+                  </span>
+                )}
               </div>
-              <div className="text-sm text-[#6b7280] space-y-1">
-                <p>
-                  <span className="font-medium">
-                    {t("createdAt", "تاريخ الإنشاء")}:
-                  </span>{" "}
-                  {(request.createdAt || request.created_at)
-                    ? new Date(request.createdAt || request.created_at).toLocaleDateString("en-US")
-                    : "غير محدد"}
-                </p>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-600">
+                <span className="inline-flex items-center gap-1">
+                  <FiCalendar className="w-4 h-4 text-slate-400" />
+                  {request.createdAt}
+                </span>
                 {request.consultant && (
-                  <p>
-                    <span className="font-medium">
-                      {t("consultant", "المستشار")}:
-                    </span>{" "}
-                    {getLocalizedText(request, "consultant")}
-                  </p>
+                  <span>{t("consultant", "المستشار")}: {request.consultant}</span>
                 )}
               </div>
             </div>
@@ -634,31 +577,41 @@ const RequestDetailsModal = ({ request, onClose, onPay }) => {
 
           {/* Payment Info */}
           {request.paymentRequired && (
-            <div className="space-y-4">
-              <h3
-                className="text-lg font-semibold text-[#09142b]"
-                dir={isRTL ? "rtl" : "ltr"}
-              >
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
                 {t("paymentInfo", "معلومات الدفع")}
               </h3>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <div className="flex items-center justify-between">
+              <div className="bg-slate-50 rounded-xl border border-slate-200 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <p className="font-medium text-yellow-800">
-                      {t("amount", "المبلغ")}: {request.paymentAmount}{" "}
-                      {request.paymentCurrency}
+                    <p className="text-xs text-slate-500 mb-0.5">{t("amount", "المبلغ")}</p>
+                    <p className="text-xl font-bold text-[#09142b]">
+                      {request.paymentAmount != null ? request.paymentAmount.toLocaleString("ar-DZ") : "—"} {request.paymentCurrency}
                     </p>
-                    <p className="text-sm text-yellow-700">
-                      {t("paymentStatus", "حالة الدفع")}:{" "}
-                      {getLocalizedText(request, "paymentStatus")}
+                    <p className="text-sm text-slate-600 mt-1">
+                      {t("paymentStatus", "حالة الدفع")}: {getLocalizedText(request, "paymentStatus")}
                     </p>
                   </div>
-                  <button
-                    onClick={onPay}
-                    className="px-4 py-2 bg-[#c8a45e] text-white rounded-lg hover:bg-[#b8944f] transition-colors cursor-pointer"
-                  >
-                    {t("payNow", "ادفع الآن")}
-                  </button>
+                  <div className="flex gap-2">
+                    {!isPaid && (
+                      <button
+                        type="button"
+                        onClick={onPay}
+                        className="px-4 py-2 rounded-xl bg-amber-500 text-white font-medium text-sm hover:bg-amber-600 transition-colors"
+                      >
+                        {t("payNow", "ادفع الآن")}
+                      </button>
+                    )}
+                    {isPaid && (
+                      <button
+                        type="button"
+                        onClick={onPay}
+                        className="px-4 py-2 rounded-xl bg-slate-200 text-slate-700 font-medium text-sm hover:bg-slate-300 transition-colors"
+                      >
+                        {t("viewPayment", "عرض الدفع")}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -666,10 +619,11 @@ const RequestDetailsModal = ({ request, onClose, onPay }) => {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200">
+        <div className="flex items-center justify-end gap-3 p-6 border-t border-slate-200">
           <button
+            type="button"
             onClick={onClose}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+            className="px-5 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-medium hover:bg-slate-200 transition-colors"
           >
             {t("close", "إغلاق")}
           </button>

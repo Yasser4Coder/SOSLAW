@@ -17,138 +17,125 @@ import {
 } from "react-icons/fi";
 import aboutlogo from "../assets/soslawLogoHorizontalColor.svg";
 
+// —— Hero: full-bleed with one bold headline; bg image from public/bgs/65.png ——
 const AboutHero = () => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   return (
-    <section className="relative w-full bg-gradient-to-br from-[#faf6f0] via-[#e7cfa7]/20 to-[#c8a45e]/10 py-20 px-4 md:px-8 flex flex-col items-center text-center overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-[#c8a45e] rounded-full blur-3xl"></div>
-        <div className="absolute bottom-10 right-10 w-40 h-40 bg-[#09142b] rounded-full blur-3xl"></div>
-      </div>
-
-      <div className="relative z-10 max-w-5xl mx-auto">
-        <div className="flex items-center justify-center gap-3 mb-6">
-          <FiStar
-            className={`text-[#c8a45e] animate-pulse ${
-              isRTL ? "text-xl md:text-2xl" : "text-2xl"
-            }`}
-          />
-          <span
-            className={`text-[#c8a45e] font-bold ${
-              isRTL ? "text-sm md:text-lg" : "text-lg"
-            }`}
-          >
-            SOS Law
-          </span>
-          <FiStar
-            className={`text-[#c8a45e] animate-pulse ${
-              isRTL ? "text-xl md:text-2xl" : "text-2xl"
-            }`}
-          />
-        </div>
-
-        <h1
-          className={`font-extrabold text-[#09142b] mb-6 leading-tight ${
-            isRTL ? "text-3xl md:text-6xl" : "text-4xl md:text-6xl"
-          }`}
-          dir={isRTL ? "rtl" : "ltr"}
-        >
-          {t("aboutPageTitle", "About Us")}
-        </h1>
-
-        <p
-          className={`text-[#6b7280] max-w-4xl mx-auto mb-8 leading-relaxed ${
-            isRTL ? "text-sm md:text-xl" : "text-lg md:text-xl"
-          }`}
-          dir={isRTL ? "rtl" : "ltr"}
-        >
-          {t(
-            "aboutPageIntro",
-            "SOS Law is an Algerian legal institution and innovative digital platform, aiming to revolutionize access to legal information and consultations in Algeria and the Arab world."
-          )}
-        </p>
-
-        <div className="flex items-center justify-center gap-4">
-          <FiGlobe
-            className={`text-[#c8a45e] ${
-              isRTL ? "text-2xl md:text-3xl" : "text-3xl"
-            }`}
-            aria-hidden="true"
-          />
-          <span
-            className={`text-[#c8a45e] font-semibold ${
-              isRTL ? "text-base md:text-xl" : "text-xl"
-            }`}
-          >
-            {t("aboutInnovativePlatform", "Innovative Digital Legal Platform")}
-          </span>
+    <section
+      className="relative min-h-[50vh] flex items-center bg-[#09142b] overflow-hidden"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-90"
+        style={{ backgroundImage: "url(/bgs/65.png)" }}
+        aria-hidden
+      />
+      <div className="absolute inset-0 bg-gradient-to-l from-[#09142b]/85 via-[#09142b]/50 to-[#09142b]/25" />
+      <div className="absolute inset-0 bg-[#09142b]/20" />
+      <div className="relative z-10 w-full max-w-6xl mx-auto px-4 md:px-8 py-16 md:py-24">
+        <div className={`max-w-2xl ${isRTL ? "mr-0 ml-auto" : "ml-0 mr-auto"} text-white`}>
+          <h1 className="text-3xl font-bold leading-tight md:text-4xl lg:text-5xl mb-4">
+            {t(
+              "aboutHeroHeadline",
+              "شركاؤك القانونيون الموثوقون — مستشارون مكرّسون لاحتياجاتك القانونية"
+            )}
+          </h1>
+          <p className="text-[#e7cfa7] text-base md:text-lg leading-relaxed">
+            {t(
+              "aboutPageIntro",
+              "SOS Law هي مؤسسة قانونية جزائرية ومنصة رقمية مبتكرة، تهدف إلى إحداث ثورة في كيفية الوصول إلى المعلومات والاستشارات القانونية في الجزائر والعالم العربي."
+            )}
+          </p>
         </div>
       </div>
     </section>
   );
 };
 
+// —— Specialization: what the platform focuses on (no emojis) ——
+const AboutSpecialization = () => {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === "ar";
+  const items = [
+    t("aboutSpecItem1", "الاستشارات والخدمات القانونية"),
+    t("aboutSpecItem2", "مرافقة المشاريع وريادة الأعمال"),
+    t("aboutSpecItem3", "التكوين والتدريب الاحترافي"),
+    t("aboutSpecItem4", "الموارد التعليمية القانونية"),
+  ];
+  return (
+    <section
+      className="w-full bg-[#faf6f0] py-12 md:py-16 px-4 md:px-8 border-y border-[#e7cfa7]"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
+      <div className="max-w-6xl mx-auto">
+        <h2 className={`text-xl md:text-2xl font-bold text-[#09142b] mb-6 ${isRTL ? "text-right" : "text-left"}`}>
+          {t("aboutSpecializationTitle", "منصة متخصصة في:")}
+        </h2>
+        <ul className={`grid grid-cols-1 sm:grid-cols-2 gap-4 ${isRTL ? "text-right" : "text-left"}`}>
+          {items.map((item) => (
+            <li
+              key={item}
+              className="flex items-start gap-3 rounded-xl border border-[#e7cfa7] bg-white px-4 py-3 text-[#09142b] font-medium shadow-sm"
+            >
+              <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#c8a45e]" aria-hidden />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+};
+
+// —— Who We Are: large heading + subtitle, then two columns (text + logo) ——
 const AboutWhoWeAre = () => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   return (
-    <section className="w-full bg-white py-16 px-4 md:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-[#faf6f0] px-4 py-2 rounded-full mb-4">
-            <FiCheckCircle
-              className={`text-[#c8a45e] ${
-                isRTL ? "text-base md:text-lg" : "text-lg"
-              }`}
-            />
-            <span
-              className={`text-[#09142b] font-semibold ${
-                isRTL ? "text-sm md:text-base" : "text-base"
-              }`}
-            >
-              {t("aboutWhoWeAreTitle", "Who We Are")}
-            </span>
-          </div>
-        </div>
+    <section
+      id="who-we-are"
+      className="w-full bg-white py-14 md:py-20 px-4 md:px-8"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
+      <div className="max-w-6xl mx-auto">
+        <header className={`mb-12 md:mb-16 ${isRTL ? "text-right" : "text-left"}`}>
+          <h2 className="text-2xl font-bold text-[#09142b] md:text-4xl lg:text-5xl mb-3">
+            {t("aboutWhoWeAreTitle", "Who We Are")}
+          </h2>
+          <p className="text-[#4b5563] text-base md:text-lg max-w-2xl">
+            {t(
+              "aboutWhoWeAreSubtitle",
+              "مؤسسة قانونية رقمية توفّر الوصول إلى الاستشارات والخدمات القانونية بثقة وشفافية."
+            )}
+          </p>
+        </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div
-            className={`space-y-6 ${isRTL ? "text-right" : "text-left"}`}
-            dir={isRTL ? "rtl" : "ltr"}
-          >
-            <p
-              className={`text-[#09142b] leading-relaxed ${
-                isRTL ? "text-sm md:text-lg" : "text-lg"
-              }`}
-            >
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+          <div className={`space-y-6 ${isRTL ? "lg:order-2" : "lg:order-1"}`}>
+            <p className="text-[#09142b] text-base md:text-lg leading-relaxed">
               {t(
                 "aboutWhoWeAreDesc1",
                 "We operate under a dual model that combines physical presence through a licensed legal institution and technical interaction through an integrated digital platform, providing individuals and companies with a modern and secure way to access reliable legal services."
               )}
             </p>
-
-            <p
-              className={`text-[#09142b] leading-relaxed ${
-                isRTL ? "text-sm md:text-lg" : "text-lg"
-              }`}
-            >
+            <p className="text-[#4b5563] text-base md:text-lg leading-relaxed">
               {t(
                 "aboutWhoWeAreDesc2",
                 "At SOS Law, we believe that legal knowledge is not exclusive to specialists only, but a right for every individual. That's why we've made technology a means to spread awareness, simplify access to lawyers and consultants, and provide fast and modern legal solutions that consider the needs of Algerian society in all its segments."
               )}
             </p>
           </div>
-
-          <div className="flex items-center justify-center">
-            <img
-              src={aboutlogo}
-              alt="SOS Law Digital Platform"
-              className="w-full max-w-md object-contain drop-shadow-2xl"
-              loading="lazy"
-              draggable="false"
-            />
+          <div className={`flex justify-center ${isRTL ? "lg:order-1" : "lg:order-2"}`}>
+            <div className="rounded-2xl border border-[#e7cfa7] bg-[#fefcf8] p-8 shadow-sm">
+              <img
+                src={aboutlogo}
+                alt="SOS Law"
+                className="w-full max-w-sm object-contain"
+                loading="lazy"
+                draggable="false"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -156,278 +143,156 @@ const AboutWhoWeAre = () => {
   );
 };
 
+// —— Features: long title + 3-column grid (icon, title, short desc) ——
 const AboutDistinctiveFeatures = () => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
 
   const features = [
-    {
-      icon: <FiZap className="text-2xl" />,
-      text: t(
-        "aboutFeature1",
-        "First Algerian legal platform offering fully interactive services"
-      ),
-    },
-    {
-      icon: <FiUsers className="text-2xl" />,
-      text: t(
-        "aboutFeature2",
-        "Direct connection between client and lawyer via the application"
-      ),
-    },
-    {
-      icon: <FiTrendingUp className="text-2xl" />,
-      text: t("aboutFeature3", "Legal consultation available within minutes"),
-    },
-    {
-      icon: <FiEye className="text-2xl" />,
-      text: t("aboutFeature4", "Transparent and announced prices"),
-    },
-    {
-      icon: <FiGlobe className="text-2xl" />,
-      text: t(
-        "aboutFeature5",
-        "Professional legal coverage for interior and remote areas"
-      ),
-    },
-    {
-      icon: <FiAward className="text-2xl" />,
-      text: t(
-        "aboutFeature6",
-        "Special portal for companies and startup owners"
-      ),
-    },
-    {
-      icon: <FiStar className="text-2xl" />,
-      text: t("aboutFeature7", "Trilingual content: Arabic, English, French"),
-    },
+    { icon: FiZap, text: t("aboutFeature1", "First Algerian legal platform offering fully interactive services") },
+    { icon: FiUsers, text: t("aboutFeature2", "Direct connection between client and lawyer via the application") },
+    { icon: FiTrendingUp, text: t("aboutFeature3", "Legal consultation available within minutes") },
+    { icon: FiEye, text: t("aboutFeature4", "Transparent and announced prices") },
+    { icon: FiGlobe, text: t("aboutFeature5", "Professional legal coverage for interior and remote areas") },
+    { icon: FiAward, text: t("aboutFeature6", "Special portal for companies and startup owners") },
+    { icon: FiStar, text: t("aboutFeature7", "Trilingual content: Arabic, English, French") },
   ];
 
   return (
-    <section className="w-full bg-gradient-to-br from-[#faf6f0] to-[#e7cfa7]/30 py-16 px-4 md:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full mb-4 shadow-md">
-            <FiStar
-              className={`text-[#c8a45e] ${
-                isRTL ? "text-base md:text-lg" : "text-lg"
-              }`}
-            />
-            <span
-              className={`text-[#09142b] font-semibold ${
-                isRTL ? "text-sm md:text-base" : "text-base"
-              }`}
-            >
-              {t("aboutDistinctiveTitle", "What Distinguishes SOS Law?")}
-            </span>
-          </div>
-        </div>
+    <section
+      id="what-distinguishes-us"
+      className="w-full bg-[#09142b] py-14 md:py-20 px-4 md:px-8"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
+      <div className="max-w-6xl mx-auto">
+        <header className={`mb-12 md:mb-14 ${isRTL ? "text-right" : "text-left"}`}>
+          <h2 className="text-2xl font-bold text-white md:text-3xl lg:text-4xl mb-2">
+            {t("aboutDistinctiveTitle", "What Distinguishes SOS Law?")}
+          </h2>
+          <p className="text-[#e7cfa7] text-base md:text-lg max-w-2xl">
+            {t("aboutDistinctiveSubtitle", "لماذا يختارنا الأفراد والشركات للاستشارات والخدمات القانونية.")}
+          </p>
+        </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className={`bg-white rounded-xl p-6 shadow-md border border-[#e7cfa7] transition-all duration-300 hover:shadow-lg hover:scale-105 ${
-                isRTL ? "text-right" : "text-left"
-              }`}
-              dir={isRTL ? "rtl" : "ltr"}
-            >
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-10 h-10 bg-[#c8a45e] rounded-lg flex items-center justify-center text-white">
-                  {feature.icon}
-                </div>
-                <p
-                  className={`text-[#09142b] font-medium leading-relaxed ${
-                    isRTL ? "text-sm md:text-base" : "text-base"
+        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 list-none p-0 m-0">
+          {features.map((feature, index) => {
+            const Icon = feature.icon;
+            return (
+              <li key={index}>
+                <div
+                  className={`rounded-xl border border-[#e7cfa7]/40 bg-white/5 p-6 transition-all hover:bg-white/10 hover:border-[#c8a45e]/50 ${
+                    isRTL ? "text-right" : "text-left"
                   }`}
                 >
-                  {feature.text}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+                  <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#c8a45e] text-white mb-4" aria-hidden>
+                    <Icon className="h-6 w-6" />
+                  </span>
+                  <p className="text-white font-medium text-sm md:text-base leading-relaxed">
+                    {feature.text}
+                  </p>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </section>
   );
 };
 
+// —— Values: compact grid ——
 const AboutValues = () => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
 
   const values = [
-    {
-      icon: <FiAward className="text-2xl" />,
-      title: t("aboutValue1Title", "Professionalism"),
-      desc: t(
-        "aboutValue1Desc",
-        "We commit to the highest standards of legal quality."
-      ),
-    },
-    {
-      icon: <FiZap className="text-2xl" />,
-      title: t("aboutValue2Title", "Innovation"),
-      desc: t(
-        "aboutValue2Desc",
-        "We integrate technology in the service of law."
-      ),
-    },
-    {
-      icon: <FiEye className="text-2xl" />,
-      title: t("aboutValue3Title", "Transparency"),
-      desc: t(
-        "aboutValue3Desc",
-        "We put the client's interest first and clarify all procedures."
-      ),
-    },
-    {
-      icon: <FiLock className="text-2xl" />,
-      title: t("aboutValue4Title", "Confidentiality"),
-      desc: t(
-        "aboutValue4Desc",
-        "We respect the privacy and data of our clients."
-      ),
-    },
-    {
-      icon: <FiHeart className="text-2xl" />,
-      title: t("aboutValue5Title", "Fair Access"),
-      desc: t(
-        "aboutValue5Desc",
-        "We make law accessible to everyone, without complexity."
-      ),
-    },
+    { icon: FiAward, title: t("aboutValue1Title", "Professionalism"), desc: t("aboutValue1Desc", "We commit to the highest standards of legal quality.") },
+    { icon: FiZap, title: t("aboutValue2Title", "Innovation"), desc: t("aboutValue2Desc", "We integrate technology in the service of law.") },
+    { icon: FiEye, title: t("aboutValue3Title", "Transparency"), desc: t("aboutValue3Desc", "We put the client's interest first and clarify all procedures.") },
+    { icon: FiLock, title: t("aboutValue4Title", "Confidentiality"), desc: t("aboutValue4Desc", "We respect the privacy and data of our clients.") },
+    { icon: FiHeart, title: t("aboutValue5Title", "Fair Access"), desc: t("aboutValue5Desc", "We make law accessible to everyone, without complexity.") },
   ];
 
   return (
-    <section className="w-full bg-white py-16 px-4 md:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-[#faf6f0] px-4 py-2 rounded-full mb-4">
-            <FiHeart
-              className={`text-[#c8a45e] ${
-                isRTL ? "text-base md:text-lg" : "text-lg"
-              }`}
-            />
-            <span
-              className={`text-[#09142b] font-semibold ${
-                isRTL ? "text-sm md:text-base" : "text-base"
-              }`}
-            >
-              {t("aboutValuesTitle", "Our Values")}
-            </span>
-          </div>
-        </div>
+    <section
+      id="our-values"
+      className="w-full bg-[#faf6f0] py-14 md:py-20 px-4 md:px-8"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
+      <div className="max-w-6xl mx-auto">
+        <header className={`mb-12 ${isRTL ? "text-right" : "text-left"}`}>
+          <h2 className="text-2xl font-bold text-[#09142b] md:text-4xl mb-2">
+            {t("aboutValuesTitle", "Our Values")}
+          </h2>
+          <p className="text-[#4b5563] text-base md:text-lg max-w-2xl">
+            {t("aboutValuesSubtitle", "المبادئ التي نعمل بها في كل استشارة وخدمة نقدمها.")}
+          </p>
+        </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {values.map((value, index) => (
-            <div
-              key={index}
-              className={`bg-gradient-to-br from-[#faf6f0] to-[#e7cfa7]/30 rounded-xl p-8 text-center transition-all duration-300 hover:shadow-lg hover:scale-105 ${
-                isRTL ? "text-right" : "text-left"
-              }`}
-              dir={isRTL ? "rtl" : "ltr"}
-            >
-              <div className="w-16 h-16 bg-[#c8a45e] rounded-full flex items-center justify-center mx-auto mb-4 text-white">
-                {value.icon}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {values.map((value, index) => {
+            const Icon = value.icon;
+            return (
+              <div
+                key={index}
+                className={`rounded-xl border border-[#e7cfa7] bg-white p-6 transition-all hover:shadow-md hover:border-[#c8a45e]/50 ${
+                  isRTL ? "text-right" : "text-left"
+                }`}
+              >
+                <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#09142b] text-[#c8a45e] mb-4" aria-hidden>
+                  <Icon className="h-6 w-6" />
+                </span>
+                <h3 className="font-bold text-[#09142b] text-lg mb-1">{value.title}</h3>
+                <p className="text-[#4b5563] text-sm leading-relaxed">{value.desc}</p>
               </div>
-              <h3
-                className={`font-bold text-[#09142b] mb-3 ${
-                  isRTL ? "text-lg md:text-xl" : "text-xl"
-                }`}
-              >
-                {value.title}
-              </h3>
-              <p
-                className={`text-[#6b7280] leading-relaxed ${
-                  isRTL ? "text-sm md:text-base" : "text-base"
-                }`}
-              >
-                {value.desc}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
   );
 };
 
+// —— Vision & Mission: two cards side by side ——
 const AboutVisionMission = () => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
 
   return (
-    <section className="w-full bg-gradient-to-br from-[#faf6f0] via-[#e7cfa7]/40 to-[#c8a45e]/20 py-16 px-4 md:px-8 relative overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-10 right-10 w-32 h-32 bg-[#c8a45e] rounded-full blur-3xl"></div>
-        <div className="absolute bottom-10 left-10 w-40 h-40 bg-[#09142b] rounded-full blur-3xl"></div>
-      </div>
-
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Vision */}
-          <div
-            className={`bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7] ${
-              isRTL ? "text-right" : "text-left"
-            }`}
-            dir={isRTL ? "rtl" : "ltr"}
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#c8a45e] to-[#b48b5a] rounded-full flex items-center justify-center shadow-md">
-                <FiTarget className="text-white text-xl" />
-              </div>
-              <h2
-                className={`font-bold text-[#09142b] ${
-                  isRTL ? "text-xl md:text-2xl" : "text-2xl"
-                }`}
-              >
+    <section
+      id="vision-mission"
+      className="w-full bg-white py-14 md:py-20 px-4 md:px-8"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
+          <article className="rounded-2xl border border-[#e7cfa7] bg-[#fefcf8] p-8 md:p-10">
+            <div className="flex items-center gap-4 mb-6">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#09142b] text-[#c8a45e]">
+                <FiTarget className="h-6 w-6" aria-hidden />
+              </span>
+              <h2 className="font-bold text-[#09142b] text-xl md:text-2xl">
                 {t("aboutVisionTitle", "Our Vision")}
               </h2>
             </div>
-            <p
-              className={`leading-relaxed text-[#6b7280] ${
-                isRTL ? "text-sm md:text-lg" : "text-lg"
-              }`}
-            >
-              {t(
-                "aboutVisionDesc",
-                "To be the first digital legal reference in Algeria and the region, by combining real-world expertise with modern technology."
-              )}
+            <p className={`text-[#4b5563] text-base md:text-lg leading-relaxed ${isRTL ? "text-right" : "text-left"}`}>
+              {t("aboutVisionDesc", "To be the first digital legal reference in Algeria and the region, by combining real-world expertise with modern technology.")}
             </p>
-          </div>
+          </article>
 
-          {/* Mission */}
-          <div
-            className={`bg-white rounded-2xl p-8 shadow-lg border border-[#e7cfa7] ${
-              isRTL ? "text-right" : "text-left"
-            }`}
-            dir={isRTL ? "rtl" : "ltr"}
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#c8a45e] to-[#b48b5a] rounded-full flex items-center justify-center shadow-md">
-                <FiShield className="text-white text-xl" />
-              </div>
-              <h2
-                className={`font-bold text-[#09142b] ${
-                  isRTL ? "text-xl md:text-2xl" : "text-2xl"
-                }`}
-              >
+          <article className="rounded-2xl border border-[#e7cfa7] bg-[#fefcf8] p-8 md:p-10">
+            <div className="flex items-center gap-4 mb-6">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#09142b] text-[#c8a45e]">
+                <FiShield className="h-6 w-6" aria-hidden />
+              </span>
+              <h2 className="font-bold text-[#09142b] text-xl md:text-2xl">
                 {t("aboutMissionTitle", "Our Mission")}
               </h2>
             </div>
-            <p
-              className={`leading-relaxed text-[#6b7280] ${
-                isRTL ? "text-sm md:text-lg" : "text-lg"
-              }`}
-            >
-              {t(
-                "aboutMissionDesc",
-                "To provide professional, simplified, and secure legal services that ensure individuals and companies access their legal rights, and contribute to building a more law-aware society."
-              )}
+            <p className={`text-[#4b5563] text-base md:text-lg leading-relaxed ${isRTL ? "text-right" : "text-left"}`}>
+              {t("aboutMissionDesc", "To provide professional, simplified, and secure legal services that ensure individuals and companies access their legal rights, and contribute to building a more law-aware society.")}
             </p>
-          </div>
+          </article>
         </div>
       </div>
     </section>
@@ -435,43 +300,31 @@ const AboutVisionMission = () => {
 };
 
 const About = () => {
-  const { t } = useTranslation();
-  const title = t(
-    "aboutSeoTitle",
-    "عن منصة SOSLAW | خدمات واستشارات قانونية رقمية في الجزائر"
-  );
-  const desc = t(
-    "aboutSeoDesc",
-    "تعرف على منصة SOSLAW، منصة جزائرية رقمية رائدة في مجال الاستشارات والخدمات القانونية. نؤسس لثقافة قانونية رقمية حديثة تناسب الجيل الجديد وتلبي احتياجات المجتمع الجزائري المتطور."
-  );
-  const keywords =
-    "عن SOSLAW, منصة قانونية, خدمات قانونية, استشارات قانونية, محاماة رقمية, قانون جزائري, فريق قانوني, خبراء قانونيين";
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === "ar";
 
-  // Structured data for About page
+  const title = t("aboutSeoTitle", "عن منصة SOSLAW | خدمات واستشارات قانونية رقمية في الجزائر");
+  const desc = t("aboutSeoDesc", "تعرف على منصة SOSLAW، منصة جزائرية رقمية رائدة في مجال الاستشارات والخدمات القانونية. نؤسس لثقافة قانونية رقمية حديثة تناسب الجيل الجديد وتلبي احتياجات المجتمع الجزائري المتطور.");
+  const keywords = "عن SOSLAW, منصة قانونية, خدمات قانونية, استشارات قانونية, محاماة رقمية, قانون جزائري, فريق قانوني, خبراء قانونيين";
+
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "AboutPage",
     name: "عن منصة SOSLAW",
     description: desc,
-    url: "https://soslaw.com/about",
+    url: "https://soslawdz.com/about",
     mainEntity: {
       "@type": "LegalService",
       name: "SOSLAW",
       description: "خدمات واستشارات قانونية رقمية في الجزائر",
-      founder: {
-        "@type": "Organization",
-        name: "SOSLAW Team",
-      },
+      founder: { "@type": "Organization", name: "SOSLAW Team" },
       foundingDate: "2024",
-      areaServed: {
-        "@type": "Country",
-        name: "Algeria",
-      },
+      areaServed: { "@type": "Country", name: "Algeria" },
     },
   };
 
   return (
-    <main className="">
+    <main dir={isRTL ? "rtl" : "ltr"} className="min-h-screen">
       <SEOHead
         title={title}
         description={desc}
@@ -481,6 +334,7 @@ const About = () => {
       />
 
       <AboutHero />
+      <AboutSpecialization />
       <AboutWhoWeAre />
       <AboutDistinctiveFeatures />
       <AboutValues />

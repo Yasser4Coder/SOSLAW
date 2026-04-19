@@ -18,6 +18,8 @@ import {
   FiStar,
   FiTag,
   FiDollarSign,
+  FiPackage,
+  FiShoppingCart,
 } from "react-icons/fi";
 import { useFontLoader } from "../hooks/useFontLoader";
 import { useScrollToTop } from "../hooks/useScrollToTop";
@@ -38,6 +40,9 @@ import RoleManagement from "../components/dashboard/RoleManagement";
 import JoinTeamApplicationsManagement from "../components/dashboard/JoinTeamApplicationsManagement";
 import ServiceRequestsManagement from "../components/dashboard/ServiceRequestsManagement";
 import PaymentsManagement from "../components/dashboard/PaymentsManagement";
+import ShopProductsManagement from "../components/dashboard/ShopProductsManagement";
+import ShopOrdersManagement from "../components/dashboard/ShopOrdersManagement";
+import CoursesManagement from "../components/dashboard/CoursesManagement";
 import Settings from "../components/dashboard/Settings";
 import NotificationDropdown from "../components/dashboard/NotificationDropdown";
 import AllNotifications from "../components/dashboard/AllNotifications";
@@ -153,6 +158,24 @@ const DashboardLayout = () => {
         current: location.pathname === "/dashboard/payments",
       },
       {
+        name: "منتجات المتجر",
+        href: "/dashboard/shop-products",
+        icon: FiPackage,
+        current: location.pathname === "/dashboard/shop-products",
+      },
+      {
+        name: "مبيعات المتجر",
+        href: "/dashboard/shop-orders",
+        icon: FiShoppingCart,
+        current: location.pathname === "/dashboard/shop-orders",
+      },
+      {
+        name: "الدورات والتكوين",
+        href: "/dashboard/courses",
+        icon: FiCalendar,
+        current: location.pathname === "/dashboard/courses",
+      },
+      {
         name: "الإعدادات",
         href: "/dashboard/settings",
         icon: FiSettings,
@@ -259,6 +282,9 @@ const DashboardLayout = () => {
                   element={<JoinTeamApplicationsManagement />}
                 />
                 <Route path="/payments" element={<PaymentsManagement />} />
+                <Route path="/shop-products" element={<ShopProductsManagement />} />
+                <Route path="/shop-orders" element={<ShopOrdersManagement />} />
+                <Route path="/courses" element={<CoursesManagement />} />
                 <Route path="/notifications" element={<AllNotifications />} />
                 <Route path="/settings" element={<Settings />} />
               </>

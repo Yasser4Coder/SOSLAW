@@ -4,11 +4,7 @@ import API_BASE_URL from "../config/api.js";
 
 // Public route for creating applications
 export const createApplication = (formData) => {
-  return axios.post(`${API_BASE_URL}/api/v1/join-team-applications`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  return axios.post(`${API_BASE_URL}/api/v1/join-team-applications`, formData);
 };
 
 // Protected routes (admin)

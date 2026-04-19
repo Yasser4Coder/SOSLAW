@@ -21,6 +21,7 @@ import {
   FiDollarSign,
   FiEdit,
   FiMessageCircle,
+  FiChevronDown,
 } from "react-icons/fi";
 import serviceRequestService from "../../services/serviceRequestService";
 import serviceService from "../../services/serviceService";
@@ -34,8 +35,6 @@ const ServiceRequestsManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
-  const [selectedConsultantFilter, setSelectedConsultantFilter] =
-    useState("all");
   const [isSearching, setIsSearching] = useState(false);
 
   // Professional debounced search with proper state management
@@ -55,19 +54,17 @@ const ServiceRequestsManagement = () => {
   // Reset to page 1 when filters or search change
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedFilter, selectedConsultantFilter, debouncedSearchTerm]);
+  }, [selectedFilter, debouncedSearchTerm]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showAssignModal, setShowAssignModal] = useState(false);
   const [showReplyModal, setShowReplyModal] = useState(false);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [editFormData, setEditFormData] = useState({});
   const [replyMessage, setReplyMessage] = useState("");
-  const [selectedConsultant, setSelectedConsultant] = useState("");
+  const [openActionsId, setOpenActionsId] = useState(null);
   const searchInputRef = useRef(null);
 
   const queryClient = useQueryClient();
@@ -109,7 +106,6 @@ const ServiceRequestsManagement = () => {
     queryKey: [
       "service-requests",
       selectedFilter,
-      selectedConsultantFilter,
       currentPage,
       itemsPerPage,
       debouncedSearchTerm.trim() || null,
@@ -119,10 +115,6 @@ const ServiceRequestsManagement = () => {
         page: currentPage,
         limit: itemsPerPage,
         status: selectedFilter === "all" ? undefined : selectedFilter,
-        assignedTo:
-          selectedConsultantFilter === "all"
-            ? undefined
-            : selectedConsultantFilter,
         ...(debouncedSearchTerm.trim()
           ? { search: debouncedSearchTerm.trim() }
           : {}),
@@ -167,15 +159,10 @@ const ServiceRequestsManagement = () => {
 
   // Fetch statistics (only when not searching, since search results show filtered stats)
   const { data: statisticsData } = useQuery({
-    queryKey: ["service-request-statistics", selectedConsultantFilter],
+    queryKey: ["service-request-statistics"],
     queryFn: async () => {
       try {
-        const result = await serviceRequestService.getServiceRequestStatistics({
-          assignedTo:
-            selectedConsultantFilter === "all"
-              ? undefined
-              : selectedConsultantFilter,
-        });
+        const result = await serviceRequestService.getServiceRequestStatistics({});
         return result;
       } catch (error) {
         throw error;
@@ -215,7 +202,18 @@ const ServiceRequestsManagement = () => {
     return service ? service.titleAr : "غير محدد";
   };
 
-  // Table columns
+  // Compact client display (one column instead of three)
+  const renderClient = (request) => (
+    <div className="min-w-0">
+      <div className="font-medium text-slate-800 truncate">{request.clientName}</div>
+      <div className="text-xs text-slate-500 truncate">{request.clientEmail}</div>
+      {request.clientPhone && (
+        <div className="text-xs text-slate-500 truncate">{request.clientPhone}</div>
+      )}
+    </div>
+  );
+
+  // Table columns (slimmer: client merged into one column to avoid horizontal scroll)
   const columns = [
     {
       key: "id",
@@ -225,18 +223,9 @@ const ServiceRequestsManagement = () => {
     },
     {
       key: "clientName",
-      label: "اسم العميل",
+      label: "العميل",
       sortable: true,
-    },
-    {
-      key: "clientEmail",
-      label: "البريد الإلكتروني",
-      sortable: true,
-    },
-    {
-      key: "clientPhone",
-      label: "رقم الهاتف",
-      sortable: true,
+      render: (_, request) => renderClient(request),
     },
     {
       key: "serviceId",
@@ -269,146 +258,126 @@ const ServiceRequestsManagement = () => {
       key: "status",
       label: "الحالة",
       sortable: true,
+      headerClassName: "min-w-[11rem] w-[11rem]",
+      cellClassName: "min-w-[11rem] w-[11rem]",
       render: (value, request) => {
         const statusConfig = {
-          pending: {
-            text: "في الانتظار",
-            icon: FiClock,
-            color: "text-yellow-600 bg-yellow-50",
-          },
-          pending_payment: {
-            text: "في انتظار الدفع",
-            icon: FiDollarSign,
-            color: "text-orange-600 bg-orange-50",
-          },
-          approved: {
-            text: "مقبول",
-            icon: FiCheckCircle,
-            color: "text-green-600 bg-green-50",
-          },
-          rejected: {
-            text: "مرفوض",
-            icon: FiXCircle,
-            color: "text-red-600 bg-red-50",
-          },
-          in_progress: {
-            text: "قيد التنفيذ",
-            icon: FiLoader,
-            color: "text-blue-600 bg-blue-50",
-          },
-          completed: {
-            text: "مكتمل",
-            icon: FiCheck,
-            color: "text-green-600 bg-green-50",
-          },
+          pending: { text: "في الانتظار", color: "text-yellow-700 bg-yellow-50 border-yellow-200" },
+          pending_payment: { text: "في انتظار الدفع", color: "text-orange-700 bg-orange-50 border-orange-200" },
+          approved: { text: "مقبول", color: "text-green-700 bg-green-50 border-green-200" },
+          rejected: { text: "مرفوض", color: "text-red-700 bg-red-50 border-red-200" },
+          in_progress: { text: "قيد التنفيذ", color: "text-blue-700 bg-blue-50 border-blue-200" },
+          completed: { text: "مكتمل", color: "text-green-700 bg-green-50 border-green-200" },
         };
-        // Use request.status if value is not available or incorrect
         const actualStatus = value || request.status;
         const config = statusConfig[actualStatus] || statusConfig.pending;
-        const Icon = config.icon;
 
         return (
-          <div className="flex items-center space-x-2 space-x-reverse">
-            <span
-              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.color}`}
-            >
-              <Icon className="ml-1 w-3 h-3" />
-              {config.text}
-            </span>
-            <select
-              value={value}
-              onChange={(e) => handleStatusChange(request.id, e.target.value)}
-              className="text-xs border border-gray-300 rounded px-1 py-1 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <option value="pending">في الانتظار</option>
-              <option value="pending_payment">في انتظار الدفع</option>
-              <option value="approved">مقبول</option>
-              <option value="rejected">مرفوض</option>
-              <option value="in_progress">قيد التنفيذ</option>
-              <option value="completed">مكتمل</option>
-            </select>
-          </div>
+          <select
+            value={actualStatus}
+            onChange={(e) => handleStatusChange(request.id, e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+            title={config.text}
+            className={`w-full min-w-0 text-xs font-medium rounded-lg border px-3 py-1.5 pe-8 cursor-pointer focus:ring-2 focus:ring-[#09142b]/20 focus:border-[#09142b] outline-none ${config.color}`}
+          >
+            <option value="pending">في الانتظار</option>
+            <option value="pending_payment">في انتظار الدفع</option>
+            <option value="approved">مقبول</option>
+            <option value="rejected">مرفوض</option>
+            <option value="in_progress">قيد التنفيذ</option>
+            <option value="completed">مكتمل</option>
+          </select>
         );
       },
     },
+    // Spacer column (RTL: clear gap between الحالة and المستشار)
     {
-      key: "paymentRequired",
-      label: "متطلبات الدفع",
-      sortable: true,
-      render: (value, request) => {
-        if (!value) {
-          return (
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <span className="text-gray-500 text-sm">لا يتطلب دفع</span>
-              <span className="text-xs text-gray-400">(يمكن إضافة)</span>
-            </div>
-          );
-        }
-        return (
-          <div className="flex items-center space-x-2 space-x-reverse">
-            <span className="text-green-600 font-medium">نعم</span>
-            {request.paymentAmount && (
-              <span className="text-sm text-gray-600">
-                {request.paymentAmount.toLocaleString()}{" "}
-                {request.paymentCurrency || "DA"}
-              </span>
-            )}
-          </div>
-        );
-      },
+      key: "_spacer1",
+      label: "",
+      sortable: false,
+      headerClassName: "w-8 min-w-[2rem] bg-slate-50/80",
+      cellClassName: "w-8 min-w-[2rem] bg-slate-50/80",
+      render: () => null,
     },
     {
-      key: "assignedConsultant",
-      label: "المستشار المكلف",
+      key: "preferredConsultant",
+      label: "المستشار الذي يريده العميل",
       sortable: true,
+      headerClassName: "min-w-[180px] w-[180px]",
+      cellClassName: "min-w-[180px] w-[180px]",
       render: (value, request) => {
-        // Find consultant name from the consultants list
-        const consultant = consultants.find((c) => c.id === request.assignedTo);
-        return (
-          consultant?.name ||
-          request.assignedConsultant?.fullName ||
-          "لم يتم التكليف"
-        );
+        const pref = request.preferredConsultant;
+        const name = pref?.nameAr || pref?.nameEn || pref?.fullName;
+        if (!name && !request.preferredConsultantId) return <span className="text-slate-500">—</span>;
+        if (name) return <span className="text-slate-800">{name}</span>;
+        const consultant = consultants.find((c) => c.id === request.preferredConsultantId);
+        return <span className="text-slate-800">{consultant?.name || "—"}</span>;
       },
     },
     {
       key: "paymentStatus",
-      label: "حالة الدفع",
+      label: "الدفع",
       sortable: true,
       render: (value, request) => {
-        if (!request.paymentRequired) {
-          return <span className="text-gray-500 text-sm">لا يتطلب دفع</span>;
+        if (!request.paymentRequired && !request.paymentAmount) {
+          return <span className="text-slate-500">—</span>;
         }
+        const amount = request.paymentAmount != null ? Number(request.paymentAmount) : 0;
+        const currency = request.paymentCurrency || "د.ج";
+        const amountStr = amount > 0 ? `${amount.toLocaleString("ar-DZ")} ${currency}` : "—";
 
         const statusColors = {
-          pending: "text-yellow-600 bg-yellow-50",
+          pending: "text-amber-600 bg-amber-50",
           processing: "text-blue-600 bg-blue-50",
           completed: "text-green-600 bg-green-50",
           failed: "text-red-600 bg-red-50",
-          cancelled: "text-gray-600 bg-gray-50",
+          cancelled: "text-slate-500 bg-slate-100",
           refunded: "text-purple-600 bg-purple-50",
         };
-
         const statusText = {
           pending: "في الانتظار",
           processing: "قيد المعالجة",
-          completed: "مكتمل",
+          completed: "مُدفوع",
           failed: "فشل",
           cancelled: "ملغي",
           refunded: "مسترد",
         };
-
-        const colorClass = statusColors[value] || "text-gray-600 bg-gray-50";
-        const text = statusText[value] || value;
+        const payStatus = value || request.paymentStatus;
+        const colorClass = statusColors[payStatus] || "text-slate-600 bg-slate-100";
+        const text = statusText[payStatus] || payStatus || "—";
 
         return (
-          <div className="flex items-center space-x-2 space-x-reverse">
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}
-            >
+          <div className="flex flex-col gap-0.5">
+            <span className="font-medium text-slate-800">{amountStr}</span>
+            <span className={`inline-flex w-fit px-2 py-0.5 rounded-full text-xs font-medium ${colorClass}`}>
               {text}
             </span>
+          </div>
+        );
+      },
+    },
+    {
+      key: "replies",
+      label: "الردود",
+      sortable: false,
+      headerClassName: "min-w-[100px]",
+      cellClassName: "min-w-[100px]",
+      render: (_, request) => {
+        const replies = request.replies || [];
+        const count = replies.length;
+        return (
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium ${count > 0 ? "bg-indigo-50 text-indigo-700 border border-indigo-200" : "bg-slate-100 text-slate-500 border border-slate-200"}`}>
+              <FiMessageCircle className="w-3.5 h-3.5" />
+              {count > 0 ? `${count} ${count === 1 ? "رد" : "ردود"}` : "لا ردود"}
+            </span>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); handleView(request); }}
+              className="text-xs text-[#09142b] font-medium hover:underline"
+            >
+              عرض
+            </button>
           </div>
         );
       },
@@ -433,62 +402,61 @@ const ServiceRequestsManagement = () => {
     },
     {
       key: "actions",
-      label: "الإجراءات",
+      label: "",
       sortable: false,
-      render: (_, request) => (
-        <div className="flex items-center space-x-1 space-x-reverse">
-          <button
-            onClick={() => handleView(request)}
-            className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded"
-            title="عرض التفاصيل"
-          >
-            <FiEye className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => handleEdit(request)}
-            className="p-1 text-green-600 hover:text-green-800 hover:bg-green-50 rounded"
-            title="تعديل الطلب"
-          >
-            <FiEdit className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => handleAssign(request)}
-            className="p-1 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded"
-            title="تكليف مستشار"
-          >
-            <FiUser className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => handleReply(request)}
-            className="p-1 text-orange-600 hover:text-orange-800 hover:bg-orange-50 rounded"
-            title="إضافة رد"
-          >
-            <FiMessageCircle className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => handlePayment(request)}
-            className={`p-1 rounded ${
-              request.paymentRequired
-                ? "text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50"
-                : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
-            }`}
-            title={
-              request.paymentRequired
-                ? "تعديل معلومات الدفع"
-                : "إضافة متطلبات الدفع"
-            }
-          >
-            <FiDollarSign className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => handleDelete(request)}
-            className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
-            title="حذف الطلب"
-          >
-            <FiTrash2 className="w-4 h-4" />
-          </button>
-        </div>
-      ),
+      render: (_, request) => {
+        const isOpen = openActionsId === request.id;
+        return (
+          <div className="relative flex justify-center">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpenActionsId(isOpen ? null : request.id);
+              }}
+              className="p-2 rounded-lg text-slate-500 hover:text-[#09142b] hover:bg-slate-100 transition-colors"
+              title="الإجراءات"
+            >
+              <FiChevronDown className={`w-5 h-5 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+            </button>
+            {isOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setOpenActionsId(null)}
+                  aria-hidden="true"
+                />
+                <div className="absolute left-0 top-full mt-1 z-20 min-w-[180px] py-1 bg-white rounded-xl shadow-lg border border-slate-200">
+                  <button
+                    onClick={() => { handleView(request); setOpenActionsId(null); }}
+                    className="w-full px-4 py-2 text-right text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                  >
+                    <FiEye className="w-4 h-4" /> عرض
+                  </button>
+                  <button
+                    onClick={() => { handleEdit(request); setOpenActionsId(null); }}
+                    className="w-full px-4 py-2 text-right text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                  >
+                    <FiEdit className="w-4 h-4" /> تعديل
+                  </button>
+                  <button
+                    onClick={() => { handleReply(request); setOpenActionsId(null); }}
+                    className="w-full px-4 py-2 text-right text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                  >
+                    <FiMessageCircle className="w-4 h-4" /> رد
+                  </button>
+                  <hr className="my-1 border-slate-100" />
+                  <button
+                    onClick={() => { handleDelete(request); setOpenActionsId(null); }}
+                    className="w-full px-4 py-2 text-right text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                  >
+                    <FiTrash2 className="w-4 h-4" /> حذف
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        );
+      },
     },
   ];
 
@@ -543,29 +511,6 @@ const ServiceRequestsManagement = () => {
     },
   });
 
-  // Assign consultant mutation
-  const assignMutation = useMutation({
-    mutationFn: ({ id, consultantId }) =>
-      serviceRequestService.assignConsultant(id, consultantId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["service-requests"],
-        exact: false,
-      });
-      setShowAssignModal(false);
-      setSelectedRequest(null);
-      setSelectedConsultant("");
-      
-      // Trigger notification refresh for clients
-      window.dispatchEvent(new CustomEvent('refreshNotifications'));
-      
-      toast.success("تم تكليف المستشار بنجاح");
-    },
-    onError: (error) => {
-      toast.error("حدث خطأ أثناء تكليف المستشار");
-    },
-  });
-
   // Add reply mutation
   const replyMutation = useMutation({
     mutationFn: ({ serviceRequestId, message, replyType = "admin" }) =>
@@ -596,40 +541,6 @@ const ServiceRequestsManagement = () => {
     },
   });
 
-  // Update payment info mutation
-  const paymentMutation = useMutation({
-    mutationFn: ({ id, paymentData }) =>
-      serviceRequestService.updatePaymentInfo(id, paymentData),
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["service-requests"],
-        exact: false,
-      });
-      setShowPaymentModal(false);
-      setSelectedRequest(null);
-      setEditFormData({});
-
-      // Trigger notification refresh for clients
-      window.dispatchEvent(new CustomEvent('refreshNotifications'));
-
-      // Show different success messages based on action
-      const wasPaymentRequired = selectedRequest?.paymentRequired;
-      const isNowPaymentRequired = variables.paymentData.paymentRequired;
-
-      if (!wasPaymentRequired && isNowPaymentRequired) {
-        toast.success("تم إضافة متطلبات الدفع بنجاح");
-      } else if (wasPaymentRequired && !isNowPaymentRequired) {
-        toast.success("تم إلغاء متطلبات الدفع بنجاح");
-      } else {
-        toast.success("تم تحديث معلومات الدفع بنجاح");
-      }
-    },
-    onError: (error) => {
-      toast.error("حدث خطأ أثناء تحديث معلومات الدفع");
-    },
-  });
-
-
   const handleView = (request) => {
     setSelectedRequest(request);
     setShowViewModal(true);
@@ -647,27 +558,10 @@ const ServiceRequestsManagement = () => {
     setShowEditModal(true);
   };
 
-  const handleAssign = (request) => {
-    setSelectedRequest(request);
-    setSelectedConsultant(request.assignedConsultant?.id || "");
-    setShowAssignModal(true);
-  };
-
   const handleReply = (request) => {
     setSelectedRequest(request);
     setReplyMessage("");
     setShowReplyModal(true);
-  };
-
-  const handlePayment = (request) => {
-    setSelectedRequest(request);
-    setEditFormData({
-      paymentRequired: request.paymentRequired,
-      paymentAmount: request.paymentAmount,
-      paymentCurrency: request.paymentCurrency,
-      paymentDueDate: request.paymentDueDate,
-    });
-    setShowPaymentModal(true);
   };
 
   const handleStatusChange = (requestId, newStatus) => {
@@ -687,261 +581,324 @@ const ServiceRequestsManagement = () => {
 
   if (isLoadingRequests) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <FiLoader className="animate-spin text-4xl text-blue-600" />
+      <div className="space-y-6 animate-pulse">
+        <div className="h-10 w-64 bg-slate-200 rounded-xl" />
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+          {[...Array(7)].map((_, i) => (
+            <div key={i} className="h-20 bg-slate-100 rounded-xl" />
+          ))}
+        </div>
+        <div className="h-14 bg-white rounded-xl border border-slate-200" />
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <div className="h-12 bg-slate-50 border-b border-slate-200" />
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-16 border-b border-slate-100" />
+          ))}
+        </div>
       </div>
     );
   }
 
   if (requestsError) {
-    // Check if it's an authentication error
     if (requestsError.response?.status === 401) {
       return (
-        <div className="text-center py-8">
-          <FiAlertCircle className="text-4xl text-red-500 mx-auto mb-4" />
-          <p className="text-red-600">مطلوب تسجيل الدخول</p>
-          <p className="text-sm text-gray-500 mt-2">
-            يجب تسجيل الدخول لعرض طلبات الخدمات
-          </p>
-          <button
-            onClick={() => window.location.href = '/auth'}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        <div className="flex flex-col items-center justify-center min-h-[320px] bg-white rounded-2xl border border-slate-200 p-8 text-center">
+          <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mb-4">
+            <FiAlertCircle className="w-8 h-8 text-amber-600" />
+          </div>
+          <h3 className="text-lg font-semibold text-[#09142b] mb-1">مطلوب تسجيل الدخول</h3>
+          <p className="text-slate-600 text-sm mb-6">يجب تسجيل الدخول لعرض طلبات الخدمات</p>
+          <a
+            href="/auth"
+            className="px-5 py-2.5 bg-[#09142b] text-white rounded-xl font-medium hover:bg-[#0b1a36] transition-colors"
           >
             تسجيل الدخول
-          </button>
+          </a>
         </div>
       );
     }
-    
     return (
-      <div className="text-center py-8">
-        <FiAlertCircle className="text-4xl text-red-500 mx-auto mb-4" />
-        <p className="text-red-600">حدث خطأ أثناء تحميل البيانات</p>
-        <p className="text-sm text-gray-500 mt-2">
-          {requestsError.message || "خطأ في الاتصال بالخادم"}
-        </p>
+      <div className="flex flex-col items-center justify-center min-h-[320px] bg-white rounded-2xl border border-slate-200 p-8 text-center">
+        <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
+          <FiAlertCircle className="w-8 h-8 text-red-600" />
+        </div>
+        <h3 className="text-lg font-semibold text-[#09142b] mb-1">حدث خطأ أثناء تحميل البيانات</h3>
+        <p className="text-slate-600 text-sm">{requestsError.message || "خطأ في الاتصال بالخادم"}</p>
       </div>
     );
   }
 
+  const statusTabs = [
+    { value: "all", label: "الكل", count: stats.total, icon: FiFileText },
+    { value: "pending", label: "في الانتظار", count: stats.pending, icon: FiClock },
+    { value: "pending_payment", label: "انتظار الدفع", count: stats.pending_payment, icon: FiDollarSign },
+    { value: "approved", label: "مقبول", count: stats.approved, icon: FiCheckCircle },
+    { value: "in_progress", label: "قيد التنفيذ", count: stats.in_progress, icon: FiLoader },
+    { value: "completed", label: "مكتمل", count: stats.completed, icon: FiCheck },
+    { value: "rejected", label: "مرفوض", count: stats.rejected, icon: FiXCircle },
+  ];
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            إدارة طلبات الخدمات
-          </h1>
-          <p className="text-gray-600 mt-1">
-            إدارة جميع طلبات الخدمات من العملاء
-          </p>
-        </div>
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#09142b] tracking-tight">
+          طلبات الخدمات
+        </h1>
+        <p className="text-slate-600 mt-1">
+          إدارة وعرض طلبات العملاء وتحديث حالتها
+        </p>
       </div>
 
-      {/* Statistics Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <FiFileText className="w-5 h-5 text-blue-600" />
-            </div>
-            <div className="mr-3">
-              <p className="text-sm text-gray-600">إجمالي الطلبات</p>
-              <p className="text-xl font-bold text-gray-900">{stats.total}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <div className="flex items-center">
-            <div className="p-2 bg-yellow-100 rounded-lg">
-              <FiClock className="w-5 h-5 text-yellow-600" />
-            </div>
-            <div className="mr-3">
-              <p className="text-sm text-gray-600">في الانتظار</p>
-              <p className="text-xl font-bold text-gray-900">{stats.pending}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <div className="flex items-center">
-            <div className="p-2 bg-orange-100 rounded-lg">
-              <FiDollarSign className="w-5 h-5 text-orange-600" />
-            </div>
-            <div className="mr-3">
-              <p className="text-sm text-gray-600">في انتظار الدفع</p>
-              <p className="text-xl font-bold text-gray-900">
-                {stats.pending_payment}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <FiCheckCircle className="w-5 h-5 text-green-600" />
-            </div>
-            <div className="mr-3">
-              <p className="text-sm text-gray-600">مقبول</p>
-              <p className="text-xl font-bold text-gray-900">
-                {stats.approved}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <FiLoader className="w-5 h-5 text-blue-600" />
-            </div>
-            <div className="mr-3">
-              <p className="text-sm text-gray-600">قيد التنفيذ</p>
-              <p className="text-xl font-bold text-gray-900">
-                {stats.in_progress}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <FiCheck className="w-5 h-5 text-green-600" />
-            </div>
-            <div className="mr-3">
-              <p className="text-sm text-gray-600">مكتمل</p>
-              <p className="text-xl font-bold text-gray-900">
-                {stats.completed}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <div className="flex items-center">
-            <div className="p-2 bg-red-100 rounded-lg">
-              <FiXCircle className="w-5 h-5 text-red-600" />
-            </div>
-            <div className="mr-3">
-              <p className="text-sm text-gray-600">مرفوض</p>
-              <p className="text-xl font-bold text-gray-900">
-                {stats.rejected}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters and Search */}
-      <div className="bg-white p-6 rounded-lg shadow border">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4">
-          {/* Professional Search Input */}
-          <div className="relative flex-1 max-w-md">
-            <FiSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              ref={searchInputRef}
-              type="text"
-              placeholder="البحث في اسم العميل، البريد، أو الهاتف... (Ctrl+F)"
-              value={searchTerm}
-              onChange={(e) => {
-                handleSearchInputChange(e.target.value);
-              }}
-              onKeyDown={(e) => {
-                // Handle Enter key for immediate search
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleImmediateSearch();
-                }
-                // Handle Escape key to clear
-                if (e.key === "Escape") {
-                  handleSearchClear();
-                }
-              }}
-              className={`w-full pl-10 pr-12 py-2 border rounded-lg transition-all duration-200 ${
-                isSearching
-                  ? "border-blue-400 bg-blue-50"
-                  : "border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      {/* Status tabs – quick filters with counts */}
+      <div className="flex flex-wrap gap-2">
+        {statusTabs.map((tab) => {
+          const isActive = selectedFilter === tab.value;
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.value}
+              onClick={() => setSelectedFilter(tab.value)}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                isActive
+                  ? "bg-[#09142b] text-white shadow-md"
+                  : "bg-white text-slate-600 border border-slate-200 hover:border-[#c8a45e] hover:text-[#09142b]"
               }`}
-              autoComplete="off"
-              spellCheck="false"
-              title="البحث في طلبات الخدمات - استخدم Ctrl+F للوصول السريع، Enter للبحث الفوري"
-            />
-            {/* Search Status Indicator */}
-            {isSearching && (
-              <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                <FiLoader className="w-4 h-4 text-blue-500 animate-spin" />
-              </div>
-            )}
-            {/* Clear Button */}
-            {searchTerm && !isSearching && (
-              <button
-                onClick={handleSearchClear}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
-                type="button"
-                title="مسح البحث"
-              >
-                <FiX className="w-4 h-4" />
-              </button>
-            )}
-            {/* Search Results Indicator */}
-            {debouncedSearchTerm && totalRequests > 0 && (
-              <div className="absolute -bottom-6 right-0 text-xs text-gray-500">
-                تم العثور على {totalRequests} نتيجة
-              </div>
-            )}
-          </div>
-
-          {/* Status Filter */}
-          <div className="flex items-center space-x-2 space-x-reverse">
-            <FiFilter className="text-gray-400" />
-            <select
-              value={selectedFilter}
-              onChange={(e) => setSelectedFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="all">جميع الحالات</option>
-              <option value="pending">في الانتظار</option>
-              <option value="pending_payment">في انتظار الدفع</option>
-              <option value="approved">مقبول</option>
-              <option value="rejected">مرفوض</option>
-              <option value="in_progress">قيد التنفيذ</option>
-              <option value="completed">مكتمل</option>
-            </select>
-          </div>
+              <Icon className="w-4 h-4" />
+              <span>{tab.label}</span>
+              <span className={`tabular-nums ${isActive ? "text-white/90" : "text-slate-400"}`}>
+                {tab.count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
 
-          {/* Consultant Filter */}
-          <div className="flex items-center space-x-2 space-x-reverse">
-            <FiFilter className="text-gray-400" />
-            <select
-              value={selectedConsultantFilter}
-              onChange={(e) => setSelectedConsultantFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      {/* Toolbar: search + filters + per page */}
+      <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+        <div className="relative flex-1 max-w-md">
+          <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <input
+            ref={searchInputRef}
+            type="text"
+            placeholder="بحث بالاسم، البريد أو الهاتف..."
+            value={searchTerm}
+            onChange={(e) => handleSearchInputChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") { e.preventDefault(); handleImmediateSearch(); }
+              if (e.key === "Escape") handleSearchClear();
+            }}
+            className={`w-full pl-4 pr-10 py-2.5 rounded-xl border bg-white transition-colors placeholder:text-slate-400 ${
+              isSearching ? "border-[#c8a45e] bg-amber-50/30" : "border-slate-200 focus:border-[#09142b] focus:ring-2 focus:ring-[#09142b]/10"
+            }`}
+            autoComplete="off"
+          />
+          {searchTerm && !isSearching && (
+            <button
+              type="button"
+              onClick={handleSearchClear}
+              className="absolute left-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded"
             >
-              <option value="all">جميع المستشارين</option>
-              <option value="unassigned">غير مكلف</option>
-              {consultants.map((consultant) => (
-                <option key={consultant.id} value={consultant.id}>
-                  {consultant.name}
-                </option>
-              ))}
-            </select>
-          </div>
+              <FiX className="w-4 h-4" />
+            </button>
+          )}
+          {debouncedSearchTerm && totalRequests > 0 && (
+            <p className="absolute -bottom-5 right-0 text-xs text-slate-500">
+              {totalRequests} نتيجة
+            </p>
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <select
+            value={itemsPerPage}
+            onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
+            className="py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm focus:border-[#09142b]"
+          >
+            <option value={5}>5 لكل صفحة</option>
+            <option value={10}>10 لكل صفحة</option>
+            <option value={25}>25 لكل صفحة</option>
+            <option value={50}>50 لكل صفحة</option>
+          </select>
         </div>
       </div>
 
-      {/* Data Table */}
-      <div className="bg-white rounded-lg shadow border">
-        <DataTable
-          data={requests}
-          columns={columns}
-          searchTerm={searchTerm}
-          pagination={{
-            current: currentPage,
-            limit: itemsPerPage,
-            total: totalRequests,
-            offset: (currentPage - 1) * itemsPerPage,
-            onPageChange: (offset) =>
-              setCurrentPage(Math.floor(offset / itemsPerPage) + 1),
-            onItemsPerPageChange: setItemsPerPage,
-          }}
-        />
+      {/* Table / Card container – cards on small screens (no horizontal scroll), table on large */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        {requests.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 px-4">
+            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+              <FiFileText className="w-8 h-8 text-slate-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-[#09142b] mb-1">لا توجد طلبات</h3>
+            <p className="text-slate-500 text-sm text-center max-w-sm">
+              {debouncedSearchTerm || selectedFilter !== "all"
+                ? "لا توجد نتائج تطابق البحث أو الفلاتر. جرّب تغيير المعايير."
+                : "لم يتم إرسال أي طلبات حتى الآن."}
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Card list: visible on small/medium only – no horizontal scroll */}
+            <div className="lg:hidden p-4 space-y-4">
+              {requests.map((request) => {
+                const cardStatusColors = {
+                  pending: "bg-yellow-50 text-yellow-700 border-yellow-200",
+                  pending_payment: "bg-orange-50 text-orange-700 border-orange-200",
+                  approved: "bg-green-50 text-green-700 border-green-200",
+                  rejected: "bg-red-50 text-red-700 border-red-200",
+                  in_progress: "bg-blue-50 text-blue-700 border-blue-200",
+                  completed: "bg-green-50 text-green-700 border-green-200",
+                };
+                const cardStatusLabels = {
+                  pending: "في الانتظار",
+                  pending_payment: "في انتظار الدفع",
+                  approved: "مقبول",
+                  rejected: "مرفوض",
+                  in_progress: "قيد التنفيذ",
+                  completed: "مكتمل",
+                };
+                const pref = request.preferredConsultant;
+                const prefName = pref?.nameAr || pref?.nameEn || consultants.find((c) => c.id === request.preferredConsultantId)?.name || "—";
+                const payAmount = request.paymentAmount != null ? `${Number(request.paymentAmount).toLocaleString("ar-DZ")} ${request.paymentCurrency || "د.ج"}` : "—";
+                const payStatusMap = { pending: "في الانتظار", processing: "قيد المعالجة", completed: "مُدفوع", failed: "فشل", cancelled: "ملغي", refunded: "مسترد" };
+                const payStatus = payStatusMap[request.paymentStatus] || request.paymentStatus || "—";
+                const isOpen = openActionsId === request.id;
+                const cardStatusClass = cardStatusColors[request.status] || cardStatusColors.pending;
+                return (
+                  <div
+                    key={request.id}
+                    className="border border-slate-200 rounded-xl p-4 bg-slate-50/50"
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <span className="text-slate-500 font-medium">#{request.id}</span>
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={request.status}
+                          onChange={(e) => handleStatusChange(request.id, e.target.value)}
+                          onClick={(e) => e.stopPropagation()}
+                          title={cardStatusLabels[request.status] || ""}
+                          className={`text-xs font-medium rounded-lg border px-3 py-1.5 pe-8 cursor-pointer focus:ring-2 focus:ring-[#09142b]/20 outline-none w-full min-w-[11rem] ${cardStatusClass}`}
+                        >
+                          <option value="pending">في الانتظار</option>
+                          <option value="pending_payment">في انتظار الدفع</option>
+                          <option value="approved">مقبول</option>
+                          <option value="rejected">مرفوض</option>
+                          <option value="in_progress">قيد التنفيذ</option>
+                          <option value="completed">مكتمل</option>
+                        </select>
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setOpenActionsId(isOpen ? null : request.id); }}
+                            className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-200"
+                          >
+                            <FiChevronDown className={`w-4 h-4 ${isOpen ? "rotate-180" : ""}`} />
+                          </button>
+                          {isOpen && (
+                            <>
+                              <div className="fixed inset-0 z-10" onClick={() => setOpenActionsId(null)} aria-hidden="true" />
+                              <div className="absolute left-0 top-full mt-1 z-20 min-w-[160px] py-1 bg-white rounded-xl shadow-lg border border-slate-200">
+                                <button type="button" onClick={() => { handleView(request); setOpenActionsId(null); }} className="w-full px-3 py-2 text-right text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                                  <FiEye className="w-4 h-4" /> عرض
+                                </button>
+                                <button type="button" onClick={() => { handleEdit(request); setOpenActionsId(null); }} className="w-full px-3 py-2 text-right text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                                  <FiEdit className="w-4 h-4" /> تعديل
+                                </button>
+                                <button type="button" onClick={() => { handleReply(request); setOpenActionsId(null); }} className="w-full px-3 py-2 text-right text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                                  <FiMessageCircle className="w-4 h-4" /> رد
+                                </button>
+                                <hr className="my-1 border-slate-100" />
+                                <button type="button" onClick={() => { handleDelete(request); setOpenActionsId(null); }} className="w-full px-3 py-2 text-right text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                  <FiTrash2 className="w-4 h-4" /> حذف
+                                </button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-1.5 text-sm">
+                      <p className="font-medium text-slate-800">{request.clientName}</p>
+                      <p className="text-slate-500 text-xs">{request.clientEmail}</p>
+                      {request.clientPhone && <p className="text-slate-500 text-xs">{request.clientPhone}</p>}
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-slate-200 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                      <span className="text-slate-500">الخدمة</span>
+                      <span className="text-slate-800">{getServiceName(request.serviceId)}</span>
+                      <span className="text-slate-500">المستشار المطلوب</span>
+                      <span className="text-slate-800">{prefName}</span>
+                      <span className="text-slate-500">الردود</span>
+                      <span className="text-slate-800 flex items-center gap-1">
+                        <FiMessageCircle className="w-3.5 h-3.5" />
+                        {(request.replies?.length ?? 0) > 0 ? `${request.replies.length} ردود` : "لا ردود"}
+                        <button type="button" onClick={() => handleView(request)} className="text-[#09142b] font-medium hover:underline">عرض</button>
+                      </span>
+                      <span className="text-slate-500">الدفع</span>
+                      <span className="text-slate-800">{payAmount} {payStatus !== "—" && ` · ${payStatus}`}</span>
+                      <span className="text-slate-500">التاريخ</span>
+                      <span className="text-slate-800">
+                        {request.createdAt || request.created_at
+                          ? new Date(request.createdAt || request.created_at).toLocaleDateString("ar-DZ", { year: "numeric", month: "short", day: "numeric" })
+                          : "—"}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleView(request)}
+                      className="mt-3 w-full py-2 rounded-xl bg-[#09142b] text-white text-sm font-medium hover:bg-[#0b1a36] transition-colors"
+                    >
+                      عرض التفاصيل
+                    </button>
+                  </div>
+                );
+              })}
+              {/* Simple pagination for card view */}
+              {totalRequests > itemsPerPage && (
+                <div className="flex items-center justify-center gap-2 pt-4 border-t border-slate-200">
+                  <button
+                    type="button"
+                    disabled={currentPage <= 1}
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50"
+                  >
+                    السابق
+                  </button>
+                  <span className="text-sm text-slate-600">
+                    {currentPage} / {Math.ceil(totalRequests / itemsPerPage)}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={currentPage >= Math.ceil(totalRequests / itemsPerPage)}
+                    onClick={() => setCurrentPage((p) => Math.min(Math.ceil(totalRequests / itemsPerPage), p + 1))}
+                    className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50"
+                  >
+                    التالي
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Table: visible on large screens only */}
+            <div className="hidden lg:block overflow-x-visible">
+              <DataTable
+                data={requests}
+                columns={columns}
+                searchTerm={searchTerm}
+                noHorizontalScroll
+                pagination={{
+                  current: currentPage,
+                  limit: itemsPerPage,
+                  total: totalRequests,
+                  offset: (currentPage - 1) * itemsPerPage,
+                  onPageChange: (offset) =>
+                    setCurrentPage(Math.floor(offset / itemsPerPage) + 1),
+                  onItemsPerPageChange: setItemsPerPage,
+                }}
+              />
+            </div>
+          </>
+        )}
       </div>
 
       {/* Delete Confirmation Modal */}
@@ -962,11 +919,11 @@ const ServiceRequestsManagement = () => {
 
       {/* View Request Modal */}
       {showViewModal && selectedRequest && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
+            <div className="p-6 sm:p-8">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-[#09142b]">
                   تفاصيل طلب الخدمة
                 </h2>
                 <button
@@ -974,9 +931,9 @@ const ServiceRequestsManagement = () => {
                     setShowViewModal(false);
                     setSelectedRequest(null);
                   }}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
                 >
-                  <FiX className="w-6 h-6" />
+                  <FiX className="w-5 h-5" />
                 </button>
               </div>
 
@@ -1190,34 +1147,6 @@ const ServiceRequestsManagement = () => {
                   </div>
                 )}
 
-                {/* Consultant Assignment */}
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <FiUser className="ml-2" />
-                    تكليف المستشار
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        المستشار المكلف
-                      </label>
-                      <p className="text-gray-900">
-                        {selectedRequest.assignedConsultant?.fullName ||
-                          "لم يتم التكليف"}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        البريد الإلكتروني
-                      </label>
-                      <p className="text-gray-900">
-                        {selectedRequest.assignedConsultant?.email ||
-                          "غير محدد"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Service Description */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1243,6 +1172,60 @@ const ServiceRequestsManagement = () => {
                     </div>
                   </div>
                 )}
+
+                {/* الردود */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center justify-between">
+                    <span className="flex items-center">
+                      <FiMessageCircle className="ml-2" />
+                      الردود
+                      {(selectedRequest.replies?.length ?? 0) > 0 && (
+                        <span className="mr-2 text-sm font-normal text-gray-500">
+                          ({selectedRequest.replies.length})
+                        </span>
+                      )}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowViewModal(false);
+                        setShowReplyModal(true);
+                      }}
+                      className="text-sm px-3 py-1.5 rounded-lg bg-[#09142b] text-white hover:bg-[#0b1a36] transition-colors"
+                    >
+                      إضافة رد
+                    </button>
+                  </h3>
+                  {selectedRequest.replies && selectedRequest.replies.length > 0 ? (
+                    <div className="space-y-3 max-h-60 overflow-y-auto">
+                      {selectedRequest.replies.map((reply) => (
+                        <div
+                          key={reply.id}
+                          className="bg-slate-50 border border-slate-200 rounded-xl p-3"
+                        >
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <span className="font-medium text-gray-900">
+                              {reply.user?.fullName ?? "—"}
+                            </span>
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${
+                              reply.replyType === "admin" ? "bg-amber-100 text-amber-800" :
+                              reply.replyType === "consultant" ? "bg-blue-100 text-blue-800" :
+                              "bg-slate-200 text-slate-700"
+                            }`}>
+                              {reply.replyType === "admin" ? "إدارة" : reply.replyType === "consultant" ? "مستشار" : "دعم"}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {reply.created_at ? new Date(reply.created_at).toLocaleDateString("ar-DZ", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : ""}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-800 whitespace-pre-wrap">{reply.message}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500 py-2">لا توجد ردود بعد.</p>
+                  )}
+                </div>
 
                 {/* Request Details */}
                 <div>
@@ -1297,13 +1280,13 @@ const ServiceRequestsManagement = () => {
                 </div>
               </div>
 
-              <div className="flex justify-end space-x-3 space-x-reverse mt-8">
+              <div className="flex justify-end mt-8">
                 <button
                   onClick={() => {
                     setShowViewModal(false);
                     setSelectedRequest(null);
                   }}
-                  className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="px-5 py-2.5 bg-[#09142b] text-white rounded-xl font-medium hover:bg-[#0b1a36] transition-colors"
                 >
                   إغلاق
                 </button>
@@ -1315,8 +1298,8 @@ const ServiceRequestsManagement = () => {
 
       {/* Edit Request Modal */}
       {showEditModal && selectedRequest && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-gray-900">
@@ -1456,84 +1439,10 @@ const ServiceRequestsManagement = () => {
         </div>
       )}
 
-      {/* Assign Consultant Modal */}
-      {showAssignModal && selectedRequest && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900">
-                  تكليف مستشار
-                </h2>
-                <button
-                  onClick={() => {
-                    setShowAssignModal(false);
-                    setSelectedRequest(null);
-                    setSelectedConsultant("");
-                  }}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <FiX className="w-6 h-6" />
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    اختر المستشار
-                  </label>
-                  <select
-                    value={selectedConsultant}
-                    onChange={(e) => setSelectedConsultant(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">اختر مستشار</option>
-                    {consultants.map((consultant) => (
-                      <option key={consultant.id} value={consultant.id}>
-                        {consultant.name} - {consultant.title}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-3 space-x-reverse mt-6">
-                <button
-                  onClick={() => {
-                    setShowAssignModal(false);
-                    setSelectedRequest(null);
-                    setSelectedConsultant("");
-                  }}
-                  className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  إلغاء
-                </button>
-                <button
-                  onClick={() => {
-                    if (selectedConsultant) {
-                      assignMutation.mutate({
-                        id: selectedRequest.id,
-                        consultantId: selectedConsultant,
-                      });
-                    }
-                  }}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                  disabled={!selectedConsultant || assignMutation.isPending}
-                >
-                  {assignMutation.isPending
-                    ? "جاري التكليف..."
-                    : "تكليف المستشار"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Reply Modal */}
       {showReplyModal && selectedRequest && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-xl">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-gray-900">إضافة رد</h2>
@@ -1589,158 +1498,6 @@ const ServiceRequestsManagement = () => {
                   disabled={!replyMessage.trim() || replyMutation.isPending}
                 >
                   {replyMutation.isPending ? "جاري الإرسال..." : "إرسال الرد"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Payment Info Modal */}
-      {showPaymentModal && selectedRequest && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900">
-                  {selectedRequest.paymentRequired
-                    ? "تعديل معلومات الدفع"
-                    : "إضافة متطلبات الدفع"}
-                </h2>
-                <button
-                  onClick={() => {
-                    setShowPaymentModal(false);
-                    setSelectedRequest(null);
-                    setEditFormData({});
-                  }}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <FiX className="w-6 h-6" />
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="paymentRequired"
-                    checked={editFormData.paymentRequired || false}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        paymentRequired: e.target.checked,
-                      })
-                    }
-                    className="ml-2"
-                  />
-                  <label
-                    htmlFor="paymentRequired"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    {selectedRequest.paymentRequired
-                      ? "يتطلب دفع (يمكن إلغاء هذا الخيار)"
-                      : "يتطلب دفع (إضافة متطلبات الدفع)"}
-                  </label>
-                </div>
-
-                {!selectedRequest.paymentRequired &&
-                  !editFormData.paymentRequired && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                      <p className="text-sm text-blue-800">
-                        💡 هذا الطلب لا يتطلب دفع حالياً. يمكنك إضافة متطلبات
-                        الدفع عن طريق تفعيل الخيار أعلاه.
-                      </p>
-                    </div>
-                  )}
-
-                {editFormData.paymentRequired && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        المبلغ
-                      </label>
-                      <input
-                        type="number"
-                        value={editFormData.paymentAmount || ""}
-                        onChange={(e) =>
-                          setEditFormData({
-                            ...editFormData,
-                            paymentAmount: parseFloat(e.target.value),
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="0.00"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          العملة
-                        </label>
-                        <select
-                          value={editFormData.paymentCurrency || "DA"}
-                          onChange={(e) =>
-                            setEditFormData({
-                              ...editFormData,
-                              paymentCurrency: e.target.value,
-                            })
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                          <option value="DA">دينار جزائري</option>
-                          <option value="USD">دولار أمريكي</option>
-                          <option value="EUR">يورو</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          تاريخ الاستحقاق
-                        </label>
-                        <input
-                          type="date"
-                          value={editFormData.paymentDueDate || ""}
-                          onChange={(e) =>
-                            setEditFormData({
-                              ...editFormData,
-                              paymentDueDate: e.target.value,
-                            })
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-
-              <div className="flex justify-end space-x-3 space-x-reverse mt-6">
-                <button
-                  onClick={() => {
-                    setShowPaymentModal(false);
-                    setSelectedRequest(null);
-                    setEditFormData({});
-                  }}
-                  className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  إلغاء
-                </button>
-                <button
-                  onClick={() => {
-                    paymentMutation.mutate({
-                      id: selectedRequest.id,
-                      paymentData: editFormData,
-                    });
-                  }}
-                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
-                  disabled={paymentMutation.isPending}
-                >
-                  {paymentMutation.isPending
-                    ? "جاري الحفظ..."
-                    : selectedRequest.paymentRequired
-                    ? "حفظ التغييرات"
-                    : "إضافة متطلبات الدفع"}
                 </button>
               </div>
             </div>

@@ -18,7 +18,7 @@ import { useAuth } from "../contexts/useAuth";
 
 const RequestService = () => {
   const { serviceId: urlServiceId } = useParams();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   const [formData, setFormData] = useState({
     serviceId: "",
@@ -74,6 +74,18 @@ const RequestService = () => {
     }
   }, [urlServiceId, servicesList]);
 
+  // Pre-fill name, email, phone from logged-in user (no need to re-enter)
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setFormData((prev) => ({
+        ...prev,
+        clientName: user.fullName || prev.clientName,
+        clientEmail: user.email || prev.clientEmail,
+        clientPhone: user.phoneNumber || prev.clientPhone,
+      }));
+    }
+  }, [isAuthenticated, user]);
+
   // Get selected service details
   const selectedService = servicesList.find(
     (service) => service.id === formData.serviceId
@@ -104,11 +116,9 @@ const RequestService = () => {
         "clientPhone",
         "serviceDescription",
       ];
-
       const missingFields = requiredFields.filter(
-        (field) => !formData[field] || formData[field].trim() === ""
+        (field) => !formData[field] || String(formData[field]).trim() === ""
       );
-
       if (missingFields.length > 0) {
         toast.error("يرجى ملء جميع الحقول المطلوبة");
         setIsSubmitting(false);
@@ -117,7 +127,7 @@ const RequestService = () => {
 
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.clientEmail)) {
+      if (!emailRegex.test(formData.clientEmail.trim())) {
         toast.error("يرجى إدخال بريد إلكتروني صحيح");
         setIsSubmitting(false);
         return;
@@ -125,7 +135,7 @@ const RequestService = () => {
 
       // Validate phone format (basic validation)
       const phoneRegex = /^[\+]?[0-9\s\-\(\)]{8,}$/;
-      if (!phoneRegex.test(formData.clientPhone)) {
+      if (!phoneRegex.test(formData.clientPhone.trim())) {
         toast.error("يرجى إدخال رقم هاتف صحيح");
         setIsSubmitting(false);
         return;
@@ -147,6 +157,7 @@ const RequestService = () => {
       }
 
       // Prepare data for backend (convert serviceId to numeric)
+      // Use form values (pre-filled from account when logged in, client can change them)
       const requestData = {
         ...formData,
         serviceId: databaseServiceId,
@@ -158,10 +169,25 @@ const RequestService = () => {
       );
 
       if (response.success) {
-        toast.success(
-          "تم إرسال طلب الخدمة بنجاح! يمكنك مراجعة طلباتك في صفحة 'طلباتك'"
-        );
-
+        const checkoutUrl = response.data?.checkoutUrl;
+        if (checkoutUrl) {
+          window.dispatchEvent(new CustomEvent("refreshNotifications"));
+          window.location.href = checkoutUrl;
+          return;
+        }
+        const isPaidPlan =
+          formData.serviceId === "legal-consultation" &&
+          formData.selectedPlan &&
+          formData.selectedPlan !== "free-special-needs";
+        if (isPaidPlan) {
+          toast.success(
+            "تم حفظ طلبك بنجاح. يمكنك الدفع لاحقاً من صفحة طلباتك."
+          );
+        } else {
+          toast.success(
+            "تم إرسال طلب الخدمة بنجاح! يمكنك مراجعة طلباتك في صفحة 'طلباتك'"
+          );
+        }
         window.dispatchEvent(new CustomEvent("refreshNotifications"));
 
         // Reset form
@@ -369,12 +395,17 @@ const RequestService = () => {
             </section>
           )}
 
-          {/* Your details */}
+          {/* Your details — pre-filled when logged in, always editable */}
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-bold text-[#09142b] mb-4 flex items-center gap-2">
               <FiUser className="h-5 w-5 text-[#c8a45e]" />
               بياناتك
             </h2>
+            {isAuthenticated && user && (
+              <p className="text-sm text-slate-600 mb-4">
+                تم تعبئة البيانات من حسابك. يمكنك تعديلها إن رغبت.
+              </p>
+            )}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className={labelClass}>
@@ -516,7 +547,7 @@ const RequestService = () => {
             </div>
           </section>
 
-          {/* Submit */}
+          {/* Submit / Go to payment */}
           <div className="flex flex-col gap-4">
             <button
               type="submit"
@@ -526,17 +557,23 @@ const RequestService = () => {
               {isSubmitting ? (
                 <>
                   <FiLoader className="h-5 w-5 animate-spin" />
-                  جاري الإرسال...
+                  {isLegalConsultation && formData.selectedPlan && formData.selectedPlan !== "free-special-needs"
+                    ? "جاري التحويل لصفحة الدفع..."
+                    : "جاري الإرسال..."}
                 </>
               ) : (
                 <>
                   <FiSend className="h-5 w-5" />
-                  إرسال طلب الخدمة
+                  {isLegalConsultation && formData.selectedPlan && formData.selectedPlan !== "free-special-needs"
+                    ? "متابعة للدفع"
+                    : "إرسال طلب الخدمة"}
                 </>
               )}
             </button>
             <p className="text-center text-slate-500 text-sm">
-              {isAuthenticated
+              {isLegalConsultation && formData.selectedPlan && formData.selectedPlan !== "free-special-needs"
+                ? "سيتم تحويلك لصفحة الدفع الآمنة (Chargily Pay) لإتمام الطلب."
+                : isAuthenticated
                 ? "سنراجع طلبك ونتواصل معك خلال 24 ساعة. يمكنك تتبع الطلب من صفحة طلباتك."
                 : "سجّل الدخول لتمكين إرسال الطلب وتتبّع طلباتك."}
             </p>

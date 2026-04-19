@@ -14,246 +14,225 @@ import {
   FiCheck,
   FiPhone,
   FiCalendar,
+  FiArrowLeft,
 } from "react-icons/fi";
 import { FaGavel } from "react-icons/fa";
+
+const consultationBranchesData = [
+  {
+    id: "civil",
+    icon: FaGavel,
+    titleKey: "civilConsultationTitle",
+    services: [
+      "contractDisputes",
+      "civilLiabilityCases",
+      "rentalHousingIssues",
+      "damageCompensation",
+    ],
+  },
+  {
+    id: "commercial",
+    icon: FiUsers,
+    titleKey: "commercialLawConsultationTitle",
+    services: [
+      "companyFormation",
+      "partnershipSalesContracts",
+      "commercialDisputes",
+      "bankruptcyJudicialSettlement",
+    ],
+  },
+  {
+    id: "realEstate",
+    icon: FiHome,
+    titleKey: "realEstateConsultationTitle",
+    services: [
+      "realEstateBuySell",
+      "propertyDisputes",
+      "documentationRegistration",
+      "propertyRental",
+    ],
+  },
+  {
+    id: "labor",
+    icon: FiBriefcase,
+    titleKey: "laborLawConsultationTitle",
+    services: [
+      "unfairDismissal",
+      "workerEmployerRights",
+      "employmentContracts",
+      "socialSecurityDisputes",
+    ],
+  },
+  {
+    id: "criminal",
+    icon: FiShield,
+    titleKey: "criminalConsultationTitle",
+    services: [
+      "misdemeanorCrimeCases",
+      "investigationDefense",
+      "criminalCourtProcedures",
+    ],
+  },
+  {
+    id: "family",
+    icon: FiHeart,
+    titleKey: "familyConsultationTitle",
+    services: [
+      "divorceKhulaAlimony",
+      "custodyChildVisitation",
+      "inheritanceWills",
+    ],
+  },
+  {
+    id: "administrative",
+    icon: FiFileText,
+    titleKey: "administrativeConsultationTitle",
+    services: [
+      "administrativeAppeals",
+      "administrativeDisputes",
+      "publicEmployment",
+    ],
+  },
+  {
+    id: "intellectualProperty",
+    icon: FiGlobe,
+    titleKey: "intellectualPropertyConsultationTitle",
+    services: ["trademarkProtection", "patentProtection", "digitalContent"],
+  },
+  {
+    id: "publicProcurement",
+    icon: FiAward,
+    titleKey: "publicProcurementConsultationTitle",
+    services: [
+      "tenderPreparation",
+      "procurementAppeals",
+      "governmentContracting",
+    ],
+  },
+  {
+    id: "investment",
+    icon: FiTrendingUp,
+    titleKey: "investmentConsultationTitle",
+    services: [
+      "foreignInvestmentLaws",
+      "taxFinancialLegislation",
+      "newInvestorSupport",
+    ],
+  },
+];
 
 const ConsultationBranchesSection = () => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
 
-  const consultationBranches = [
-    {
-      id: "civil",
-      icon: FaGavel,
-      titleKey: "civilConsultationTitle",
-      services: [
-        "contractDisputes",
-        "civilLiabilityCases",
-        "rentalHousingIssues",
-        "damageCompensation",
-      ],
-      color: "bg-white border-[#09142b]",
-      iconColor: "text-[#c8a45e]",
-    },
-    {
-      id: "commercial",
-      icon: FiUsers,
-      titleKey: "commercialLawConsultationTitle",
-      services: [
-        "companyFormation",
-        "partnershipSalesContracts",
-        "commercialDisputes",
-        "bankruptcyJudicialSettlement",
-      ],
-      color: "bg-white border-[#09142b]",
-      iconColor: "text-[#c8a45e]",
-    },
-    {
-      id: "realEstate",
-      icon: FiHome,
-      titleKey: "realEstateConsultationTitle",
-      services: [
-        "realEstateBuySell",
-        "propertyDisputes",
-        "documentationRegistration",
-        "propertyRental",
-      ],
-      color: "bg-white border-[#09142b]",
-      iconColor: "text-[#c8a45e]",
-    },
-    {
-      id: "labor",
-      icon: FiBriefcase,
-      titleKey: "laborLawConsultationTitle",
-      services: [
-        "unfairDismissal",
-        "workerEmployerRights",
-        "employmentContracts",
-        "socialSecurityDisputes",
-      ],
-      color: "bg-white border-[#09142b]",
-      iconColor: "text-[#c8a45e]",
-    },
-    {
-      id: "criminal",
-      icon: FiShield,
-      titleKey: "criminalConsultationTitle",
-      services: [
-        "misdemeanorCrimeCases",
-        "investigationDefense",
-        "criminalCourtProcedures",
-      ],
-      color: "bg-white border-[#09142b]",
-      iconColor: "text-[#c8a45e]",
-    },
-    {
-      id: "family",
-      icon: FiHeart,
-      titleKey: "familyConsultationTitle",
-      services: [
-        "divorceKhulaAlimony",
-        "custodyChildVisitation",
-        "inheritanceWills",
-      ],
-      color: "bg-white border-[#09142b]",
-      iconColor: "text-[#c8a45e]",
-    },
-    {
-      id: "administrative",
-      icon: FiFileText,
-      titleKey: "administrativeConsultationTitle",
-      services: [
-        "administrativeAppeals",
-        "administrativeDisputes",
-        "publicEmployment",
-      ],
-      color: "bg-white border-[#09142b]",
-      iconColor: "text-[#c8a45e]",
-    },
-    {
-      id: "intellectualProperty",
-      icon: FiGlobe,
-      titleKey: "intellectualPropertyConsultationTitle",
-      services: ["trademarkProtection", "patentProtection", "digitalContent"],
-      color: "bg-white border-[#09142b]",
-      iconColor: "text-[#c8a45e]",
-    },
-    {
-      id: "publicProcurement",
-      icon: FiAward,
-      titleKey: "publicProcurementConsultationTitle",
-      services: [
-        "tenderPreparation",
-        "procurementAppeals",
-        "governmentContracting",
-      ],
-      color: "bg-white border-[#09142b]",
-      iconColor: "text-[#c8a45e]",
-    },
-    {
-      id: "investment",
-      icon: FiTrendingUp,
-      titleKey: "investmentConsultationTitle",
-      services: [
-        "foreignInvestmentLaws",
-        "taxFinancialLegislation",
-        "newInvestorSupport",
-      ],
-      color: "bg-white border-[#09142b]",
-      iconColor: "text-[#c8a45e]",
-    },
-  ];
-
   return (
     <section
       id="consultation-branches"
-      className="w-full bg-[#faf6f0] py-16 px-4 md:px-8"
+      className="relative w-full overflow-hidden py-14 px-4 md:py-18 md:px-8"
+      style={{
+        background: "linear-gradient(165deg, #f5f0e8 0%, #faf6f0 40%, #f2ebe0 100%)",
+      }}
     >
-      <div className="max-w-7xl mx-auto">
+      {/* Background effects */}
+      <div className="pointer-events-none absolute inset-0 z-0 min-h-full" aria-hidden>
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(200, 164, 94, 0.12) 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 100% 80%, rgba(9, 20, 43, 0.06) 0%, transparent 50%)",
+          }}
+        />
+        <div className="absolute -top-20 right-0 h-64 w-64 rounded-full bg-[#c8a45e] opacity-10 blur-3xl" />
+        <div className="absolute bottom-0 left-0 h-72 w-72 rounded-full bg-[#09142b] opacity-6 blur-3xl" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-6xl">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2
-            className={`font-extrabold text-[#09142b] mb-6 ${
-              isRTL ? "text-2xl md:text-4xl" : "text-3xl md:text-4xl"
-            }`}
-          >
-            ⚖ {t("consultationBranchesTitle")}
+        <div className="mb-10 text-center sm:mb-12 md:mb-14">
+          <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#09142b] text-[#c8a45e] shadow-md">
+            <FaGavel className="h-6 w-6" aria-hidden />
+          </div>
+          <h2 className="mb-3 max-w-full break-words font-extrabold text-[#09142b] text-xl leading-tight sm:mb-4 sm:text-2xl md:text-3xl lg:text-4xl">
+            {t("consultationBranchesTitle")}
           </h2>
-          <p
-            className={`text-[#6b7280] max-w-3xl mx-auto leading-relaxed ${
-              isRTL ? "text-sm md:text-lg" : "text-lg"
-            }`}
-          >
+          <p className="mx-auto max-w-2xl break-words px-1 text-sm leading-relaxed text-slate-600 sm:text-base md:text-lg">
             {t("consultationBranchesDesc")}
           </p>
         </div>
 
-        {/* Consultation Branches Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {consultationBranches.map((branch) => (
-            <div
-              key={branch.id}
-              className={`${branch.color} border-2 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group cursor-pointer`}
-            >
-              <div
-                className={`flex items-start ${
-                  isRTL ? "space-x-reverse space-x-6" : "space-x-6"
-                }`}
+        {/* Branches Grid - uniform cards */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6 xl:gap-8">
+          {consultationBranchesData.map((branch) => {
+            const Icon = branch.icon;
+            return (
+              <article
+                key={branch.id}
+                className="group flex min-h-[200px] flex-col overflow-hidden rounded-xl border border-slate-200/90 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[#c8a45e]/30 hover:shadow-lg focus-within:shadow-lg focus:outline-none"
+                tabIndex={0}
               >
-                <div
-                  className={`${branch.iconColor} p-3 rounded-xl ml-[10px] bg-[#09142b] shadow-sm group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}
-                >
-                  <branch.icon size={24} />
-                </div>
-                <div className="flex-1">
-                  <h3
-                    className={`font-bold text-[#09142b] mb-4 group-hover:text-[#c8a45e] transition-colors duration-300 ${
-                      isRTL ? "text-base md:text-lg" : "text-lg"
-                    }`}
-                  >
-                    {t(branch.titleKey)}
-                  </h3>
-                  <ul className="space-y-2">
-                    {branch.services.map((service, serviceIndex) => (
+                <div className="flex flex-1 flex-col p-4 sm:p-5">
+                  <div className="mb-3 flex items-start gap-3 sm:gap-4">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#09142b] text-[#c8a45e] transition-transform duration-200 group-hover:scale-105 sm:h-11 sm:w-11">
+                      <Icon className="h-5 w-5 sm:h-5 sm:w-5" aria-hidden />
+                    </span>
+                    <h3
+                      className="min-h-[2.5rem] line-clamp-2 text-base font-bold leading-snug text-[#09142b] transition-colors group-hover:text-[#c8a45e] sm:text-lg"
+                      dir="auto"
+                      title={t(branch.titleKey)}
+                    >
+                      {t(branch.titleKey)}
+                    </h3>
+                  </div>
+                  <ul className="space-y-2" dir={isRTL ? "rtl" : "ltr"}>
+                    {branch.services.slice(0, 4).map((serviceKey, idx) => (
                       <li
-                        key={serviceIndex}
-                        className={`flex items-center text-[#6b7280] hover:text-[#09142b] transition-colors duration-200 ${
-                          isRTL ? "text-xs md:text-sm" : "text-sm"
-                        }`}
+                        key={idx}
+                        className="flex items-center gap-2 text-slate-600 text-xs sm:text-sm"
                       >
                         <FiCheck
-                          className={`text-[#09142b ] flex-shrink-0 ${
-                            isRTL ? "ml-2 mr-2" : "mr-2 ml-2"
-                          }`}
-                          size={14}
+                          className="h-3.5 w-3.5 shrink-0 text-[#c8a45e]"
+                          aria-hidden
                         />
-                        <span>{t(service)}</span>
+                        <span className="line-clamp-1">{t(serviceKey)}</span>
                       </li>
                     ))}
+                    {branch.services.length > 4 && (
+                      <li className="text-[#c8a45e] text-xs font-medium">
+                        {isRTL ? "...والمزيد" : "...and more"}
+                      </li>
+                    )}
                   </ul>
                 </div>
-              </div>
-            </div>
-          ))}
+              </article>
+            );
+          })}
         </div>
 
-        {/* CTA Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 text-center">
-          <h4
-            className={`font-bold text-[#09142b] mb-4 ${
-              isRTL ? "text-lg md:text-xl" : "text-xl"
-            }`}
-          >
-            {t("getLegalConsultationNow")}
-          </h4>
-          <p
-            className={`text-[#6b7280] mb-6 ${
-              isRTL ? "text-sm md:text-base" : "text-base"
-            }`}
-          >
-            {t("getLegalConsultationDesc")}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/contact"
-              className="inline-flex items-center justify-center px-8 py-3 bg-[#c8a45e] text-white font-semibold rounded-lg hover:bg-[#b48b5a] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#c8a45e] focus:ring-offset-2"
-            >
-              <FiPhone
-                className={`${isRTL ? "ml-3 mr-3" : "mr-3 ml-3"}`}
-                size={18}
-              />
-              {t("bookConsultationNow")}
-            </Link>
-            <Link
-              to="/auth"
-              className="inline-flex items-center justify-center px-8 py-3 bg-white text-[#c8a45e] font-semibold rounded-lg border-2 border-[#c8a45e] hover:bg-[#faf6f0] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#c8a45e] focus:ring-offset-2"
-            >
-              <FiCalendar
-                className={`${isRTL ? "ml-3 mr-3" : "mr-3 ml-3"}`}
-                size={18}
-              />
-              {t("signIn")}
-            </Link>
+        {/* CTA Block */}
+        <div className="mt-12 rounded-2xl border border-slate-200/80 bg-white/95 p-6 shadow-md backdrop-blur-sm sm:mt-14 sm:p-8 md:p-10">
+          <div className="text-center">
+            <h3 className="mb-2 text-lg font-bold text-[#09142b] sm:text-xl" dir="auto">
+              {t("getLegalConsultationNow")}
+            </h3>
+            <p className="mx-auto mb-6 max-w-xl text-sm text-slate-600 sm:text-base" dir="auto">
+              {t("getLegalConsultationDesc")}
+            </p>
+            <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+              <Link
+                to="/request-service/legal-consultation"
+                className="inline-flex min-h-[44px] min-w-[180px] items-center justify-center gap-2 rounded-xl bg-[#c8a45e] px-6 py-3 font-semibold text-white shadow-sm transition-all hover:bg-[#b48b5a] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#c8a45e] focus:ring-offset-2"
+              >
+                <FiArrowLeft className={`h-4 w-4 shrink-0 ${isRTL ? "rotate-180" : ""}`} aria-hidden />
+                {t("bookConsultationNow")}
+              </Link>
+              <Link
+                to="/contact"
+                className="inline-flex min-h-[44px] min-w-[180px] items-center justify-center gap-2 rounded-xl border-2 border-[#09142b] bg-transparent px-6 py-3 font-semibold text-[#09142b] transition-all hover:bg-[#09142b] hover:text-white focus:outline-none focus:ring-2 focus:ring-[#09142b] focus:ring-offset-2"
+              >
+                <FiPhone className="h-4 w-4 shrink-0" aria-hidden />
+                {t("contactUs")}
+              </Link>
+            </div>
           </div>
         </div>
       </div>

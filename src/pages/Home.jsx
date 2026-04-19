@@ -6,6 +6,11 @@ import TestimonialsSection from "./components/TestimonialsSection";
 import ConsultationBranchesSection from "./components/ConsultationBranchesSection";
 import FAQSection from "./components/FAQSection";
 import TrainingCourseAnnouncement from "./components/TrainingCourseAnnouncement";
+import VoiceCourseAnnouncement from "./components/VoiceCourseAnnouncement";
+import CoursesHomeSection from "./components/CoursesHomeSection";
+import EmpowerProgramAnnouncement from "./components/EmpowerProgramAnnouncement";
+import HopeForumSection from "./components/HopeForumSection";
+import HowItWorksSection from "./components/HowItWorksSection";
 import SEO from "../components/SEO";
 import EmailVerificationBanner from "../components/EmailVerificationBanner";
 import { useTranslation } from "react-i18next";
@@ -219,6 +224,11 @@ const Home = () => {
         </div>
       )}
       <HeroSection />
+      <EmpowerProgramAnnouncement />
+      <CoursesHomeSection />
+      <HopeForumSection />
+      {/* <VoiceCourseAnnouncement /> */}
+      <HowItWorksSection />
       {/* <TrainingCourseAnnouncement /> */}
       {/* <NationalConferenceAnnouncement /> */}
       <ServicesSection />

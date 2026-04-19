@@ -101,6 +101,11 @@ export const services = [
       fr: "Présentiel ou à distance",
       en: "In person or remote",
     },
+    trustLine: {
+      ar: "استشارة احترافية • سرية تامة",
+      fr: "Conseil professionnel • Confidentialité totale",
+      en: "Professional advice • Full confidentiality",
+    },
     icon: FiPhone,
     image: lawconsulting
   },
@@ -166,6 +171,11 @@ export const services = [
       ar: "عن بُعد أو حضوريًا",
       fr: "À distance ou sur place",
       en: "Remote or in person",
+    },
+    trustLine: {
+      ar: "دقة قانونية • صياغة احترافية",
+      fr: "Précision juridique • Rédaction professionnelle",
+      en: "Legal accuracy • Professional drafting",
     },
     icon: FiFileText,
     image: ""
@@ -255,6 +265,11 @@ export const services = [
       ar: "حضورياً أو عن بُعد (المنصة، WhatsApp، Email)",
       fr: "Présentiel ou à distance (plateforme, WhatsApp, Email)",
       en: "In person or remotely (platform, WhatsApp, Email)",
+    },
+    trustLine: {
+      ar: "نماذج موثوقة • وفق القانون الجزائري",
+      fr: "Modèles fiables • Conformes au droit algérien",
+      en: "Reliable templates • Under Algerian law",
     },
     icon: FiEdit,
   },
@@ -374,6 +389,11 @@ export const services = [
       ar: "حضوريًا أو عن بُعد",
       fr: "Présentiel ou à distance",
       en: "In person or remote",
+    },
+    trustLine: {
+      ar: "حلول ودية • سرية وحياد",
+      fr: "Solutions amiables • Confidentialité et neutralité",
+      en: "Amicable solutions • Confidential & neutral",
     },
     icon: FaHandshake,
   },
@@ -518,6 +538,11 @@ export const services = [
       fr: "À distance ou sur place",
       en: "Remote or in person",
     },
+    trustLine: {
+      ar: "محتوى قانوني • صياغة متخصصة",
+      fr: "Contenu juridique • Rédaction spécialisée",
+      en: "Legal content • Specialized drafting",
+    },
     icon: FiEdit,
   },
 
@@ -603,6 +628,11 @@ export const services = [
       fr: "À distance ou sur place",
       en: "Remote or in person",
     },
+    trustLine: {
+      ar: "مراجعة شاملة • تقارير واضحة",
+      fr: "Revue complète • Rapports clairs",
+      en: "Comprehensive audit • Clear reports",
+    },
     icon: FiShield,
   },
   {
@@ -660,6 +690,11 @@ export const services = [
       ar: "عن بُعد أو حضوريًا",
       fr: "À distance ou sur place",
       en: "Remote or in person",
+    },
+    trustLine: {
+      ar: "دعم المشاريع الناشئة • حزم مرنة",
+      fr: "Soutien aux jeunes projets • Forfaits flexibles",
+      en: "Startup support • Flexible packages",
     },
     icon: FiHome,
   },
@@ -731,6 +766,11 @@ export const services = [
       ar: "حضوريًا أو عن بُعد",
       fr: "Présentiel ou à distance",
       en: "In person or remote",
+    },
+    trustLine: {
+      ar: "تدريب عملي • خبراء معتمدون",
+      fr: "Formation pratique • Experts certifiés",
+      en: "Practical training • Certified experts",
     },
     icon: FiBook,
   },
@@ -805,6 +845,11 @@ export const services = [
       ar: "حضوريًا أو عن بُعد",
       fr: "Présentiel ou à distance",
       en: "In person or remote",
+    },
+    trustLine: {
+      ar: "دعم متكامل • مرافقة مستمرة",
+      fr: "Accompagnement intégré • Suivi continu",
+      en: "Full support • Ongoing accompaniment",
     },
     icon: FiTrendingUp,
   },
@@ -889,6 +934,11 @@ export const services = [
       fr: "Présentiel ou à distance",
       en: "In person or remote",
     },
+    trustLine: {
+      ar: "أسعار مناسبة • دعم الطلاب",
+      fr: "Tarifs adaptés • Soutien étudiant",
+      en: "Student rates • Dedicated support",
+    },
     icon: FiUsers,
   },
 
@@ -948,6 +998,11 @@ export const services = [
       ar: "حضوريًا أو عن بُعد",
       fr: "Présentiel ou à distance",
       en: "In person or remote",
+    },
+    trustLine: {
+      ar: "تميز أكاديمي • قيادة مهنية",
+      fr: "Excellence académique • Leadership professionnel",
+      en: "Academic excellence • Professional leadership",
     },
     icon: FiAward,
   },

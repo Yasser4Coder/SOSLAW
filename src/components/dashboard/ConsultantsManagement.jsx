@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   FiSearch,
@@ -7,13 +7,14 @@ import {
   FiEye,
   FiUserPlus,
   FiUser,
-  FiBriefcase,
   FiStar,
-  FiFilter,
+  FiX,
   FiLoader,
+  FiAlertCircle,
+  FiChevronDown,
 } from "react-icons/fi";
 import DataTable from "./DataTable";
-import CustomAlert from "./CustomAlert";
+import ConfirmationModal from "./ConfirmationModal";
 import consultantService from "../../services/consultantService";
 import toast from "react-hot-toast";
 import Avatar from "../common/Avatar";
@@ -21,18 +22,19 @@ import Avatar from "../common/Avatar";
 const ConsultantsManagement = () => {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [isSearching, setIsSearching] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [alert, setAlert] = useState({
-    show: false,
-    type: "info",
-    title: "",
-    message: "",
-  });
   const [selectedConsultant, setSelectedConsultant] = useState(null);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [consultantToDelete, setConsultantToDelete] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [openActionsId, setOpenActionsId] = useState(null);
+  const searchInputRef = useRef(null);
 
   // Form data for multi-language support
   const [formData, setFormData] = useState({
@@ -57,45 +59,45 @@ const ConsultantsManagement = () => {
   const [isImageLoading, setIsImageLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Keyboard shortcut for search (Ctrl+F or Cmd+F)
-  React.useEffect(() => {
+  useEffect(() => {
+    setIsSearching(true);
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      setIsSearching(false);
+    }, 500);
+    return () => {
+      clearTimeout(timer);
+      setIsSearching(false);
+    };
+  }, [searchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedFilter, debouncedSearchTerm]);
+
+  useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "f") {
         e.preventDefault();
-        const searchInput = document.querySelector(
-          'input[placeholder*="البحث في المستشارين"]'
-        );
-        if (searchInput) {
-          searchInput.focus();
-        }
+        searchInputRef.current?.focus();
       }
     };
-
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Reset to page 1 when filter or search changes (so results from any page appear)
-  React.useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedFilter]);
-
-  React.useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
-
-  // Fetch consultants with React Query - server-side search across all consultants
   const {
     data: consultantsData,
     isLoading: isLoadingConsultants,
     error: consultantsError,
+    refetch: refetchConsultants,
   } = useQuery({
     queryKey: [
       "consultants",
       selectedFilter,
       currentPage,
       itemsPerPage,
-      searchTerm.trim() || null,
+      debouncedSearchTerm.trim() || null,
     ],
     queryFn: () => {
       const offset = (currentPage - 1) * itemsPerPage;
@@ -104,25 +106,28 @@ const ConsultantsManagement = () => {
         language: "ar",
         limit: itemsPerPage,
         offset: offset,
-        ...(searchTerm.trim() ? { search: searchTerm.trim() } : {}),
+        ...(debouncedSearchTerm.trim() ? { search: debouncedSearchTerm.trim() } : {}),
       });
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    retry: 2,
+    enabled: !isSearching,
   });
 
-  // Fetch consultant statistics
-  const { data: statsData, isLoading: isLoadingStats } = useQuery({
+  const { data: statsData } = useQuery({
     queryKey: ["consultantStats"],
     queryFn: consultantService.getConsultantStats,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
+    enabled: !debouncedSearchTerm || debouncedSearchTerm.trim().length === 0,
   });
 
   // Create consultant mutation
   const createConsultantMutation = useMutation({
     mutationFn: (data) =>
       consultantService.createConsultant(data.consultantData, data.imageFile),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["consultants"] });
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ["consultants"], exact: false });
       queryClient.invalidateQueries({ queryKey: ["consultantStats"] });
       toast.success("تم إضافة المستشار الجديد بنجاح");
       handleCloseForm();
@@ -140,8 +145,8 @@ const ConsultantsManagement = () => {
         data.consultantData,
         data.imageFile
       ),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["consultants"] });
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ["consultants"], exact: false });
       queryClient.invalidateQueries({ queryKey: ["consultantStats"] });
       toast.success("تم تحديث بيانات المستشار بنجاح");
       handleCloseForm();
@@ -154,9 +159,13 @@ const ConsultantsManagement = () => {
   // Delete consultant mutation
   const deleteConsultantMutation = useMutation({
     mutationFn: consultantService.deleteConsultant,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["consultants"] });
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ["consultants"], exact: false });
       queryClient.invalidateQueries({ queryKey: ["consultantStats"] });
+      setShowDeleteConfirm(false);
+      setConsultantToDelete(null);
+      await new Promise((r) => setTimeout(r, 300));
+      await refetchConsultants();
       toast.success("تم حذف المستشار بنجاح");
     },
     onError: (error) => {
@@ -167,9 +176,10 @@ const ConsultantsManagement = () => {
   // Toggle status mutation
   const toggleStatusMutation = useMutation({
     mutationFn: consultantService.toggleConsultantStatus,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["consultants"] });
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ["consultants"], exact: false });
       queryClient.invalidateQueries({ queryKey: ["consultantStats"] });
+      await refetchConsultants();
       toast.success("تم تغيير حالة المستشار بنجاح");
     },
     onError: (error) => {
@@ -181,6 +191,11 @@ const ConsultantsManagement = () => {
   const consultants = consultantsData?.data?.consultants || [];
   const totalConsultants = consultantsData?.data?.total || 0;
 
+  const stats = statsData?.data || {};
+  const totalCount = stats.totalConsultants ?? 0;
+  const activeCount = stats.activeConsultants ?? 0;
+  const inactiveCount = totalCount - activeCount;
+
   // Table columns
   const columns = [
     {
@@ -188,19 +203,18 @@ const ConsultantsManagement = () => {
       label: "الاسم",
       sortable: true,
       render: (value, consultant) => (
-        <div className="flex items-center">
+        <div className="flex items-center gap-3">
           <Avatar
             src={consultant.imageUrl}
             alt={consultant.name}
             name={consultant.name}
             size="md"
-            className="ml-3"
+            className="shrink-0"
             fallbackBg="gradient"
           />
-
-          <div>
-            <div className="font-medium text-gray-900">{consultant.name}</div>
-            <div className="text-sm text-gray-500">{consultant.title}</div>
+          <div className="min-w-0">
+            <div className="font-medium text-slate-800 truncate">{consultant.name}</div>
+            <div className="text-sm text-slate-500 truncate">{consultant.title}</div>
           </div>
         </div>
       ),
@@ -209,22 +223,22 @@ const ConsultantsManagement = () => {
       key: "specialization",
       label: "التخصص",
       sortable: true,
-      render: (value, consultant) => consultant.specialization,
+      render: (value) => <span className="text-slate-800">{value || "—"}</span>,
     },
     {
       key: "experience",
       label: "الخبرة",
       sortable: true,
-      render: (value, consultant) => consultant.experience,
+      render: (value) => <span className="text-slate-800">{value || "—"}</span>,
     },
     {
       key: "rating",
       label: "التقييم",
       sortable: true,
       render: (value, consultant) => (
-        <div className="flex items-center">
-          <FiStar className="text-yellow-400 ml-1" size={14} />
-          <span className="text-sm font-medium">{consultant.rating}</span>
+        <div className="flex items-center gap-1">
+          <FiStar className="text-amber-500 shrink-0" size={14} />
+          <span className="text-sm font-medium text-slate-800">{consultant.rating ?? "—"}</span>
         </div>
       ),
     },
@@ -232,20 +246,22 @@ const ConsultantsManagement = () => {
       key: "consultations",
       label: "الاستشارات",
       sortable: true,
-      render: (value, consultant) => consultant.consultations,
+      render: (value) => <span className="text-slate-800">{value ?? "—"}</span>,
     },
     {
       key: "status",
       label: "الحالة",
       sortable: true,
+      headerClassName: "min-w-[9rem] w-[9rem]",
+      cellClassName: "min-w-[9rem] w-[9rem]",
       render: (value, consultant) => (
         <span
-          className={`px-2 py-1 text-xs font-medium rounded-full cursor-pointer ${
+          className={`inline-flex px-2 py-1 rounded-lg text-xs font-medium border cursor-pointer ${
             consultant.status === "active"
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
+              ? "text-green-700 bg-green-50 border-green-200"
+              : "text-red-700 bg-red-50 border-red-200"
           }`}
-          onClick={() => handleToggleStatus(consultant.id)}
+          onClick={(e) => { e.stopPropagation(); handleToggleStatus(consultant.id); }}
           title="انقر لتغيير الحالة"
         >
           {consultant.status === "active" ? "نشط" : "غير نشط"}
@@ -254,36 +270,64 @@ const ConsultantsManagement = () => {
     },
     {
       key: "actions",
-      label: "الإجراءات",
+      label: "",
       sortable: false,
-      render: (_, consultant) => (
-        <div className="flex items-center space-x-2 space-x-reverse">
-          <button
-            onClick={() => handleViewConsultant(consultant)}
-            disabled={isSubmitting}
-            className="p-1 text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
-            title="عرض"
-          >
-            <FiEye size={16} />
-          </button>
-          <button
-            onClick={() => handleEditConsultant(consultant)}
-            disabled={isSubmitting}
-            className="p-1 text-green-600 hover:text-green-800 disabled:opacity-50 disabled:cursor-not-allowed"
-            title="تعديل"
-          >
-            <FiEdit size={16} />
-          </button>
-          <button
-            onClick={() => handleDeleteConsultant(consultant.id)}
-            disabled={isSubmitting}
-            className="p-1 text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
-            title="حذف"
-          >
-            <FiTrash2 size={16} />
-          </button>
-        </div>
-      ),
+      render: (_, consultant) => {
+        const isOpen = openActionsId === consultant.id;
+        return (
+          <div className="relative flex justify-center">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpenActionsId(isOpen ? null : consultant.id);
+              }}
+              className="p-2 rounded-lg text-slate-500 hover:text-[#09142b] hover:bg-slate-100 transition-colors"
+              title="الإجراءات"
+            >
+              <FiChevronDown className={`w-5 h-5 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+            </button>
+            {isOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setOpenActionsId(null)}
+                  aria-hidden="true"
+                />
+                <div className="absolute left-0 top-full mt-1 z-20 min-w-[180px] py-1 bg-white rounded-xl shadow-lg border border-slate-200">
+                  <button
+                    onClick={() => {
+                      handleViewConsultant(consultant);
+                      setOpenActionsId(null);
+                    }}
+                    className="w-full px-4 py-2 text-right text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                  >
+                    <FiEye className="w-4 h-4" /> عرض
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleEditConsultant(consultant);
+                      setOpenActionsId(null);
+                    }}
+                    className="w-full px-4 py-2 text-right text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                  >
+                    <FiEdit className="w-4 h-4" /> تعديل
+                  </button>
+                  <hr className="my-1 border-slate-100" />
+                  <button
+                    onClick={() => {
+                      handleDeleteConsultant(consultant.id);
+                      setOpenActionsId(null);
+                    }}
+                    className="w-full px-4 py-2 text-right text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                  >
+                    <FiTrash2 className="w-4 h-4" /> حذف
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        );
+      },
     },
   ];
 
@@ -421,11 +465,15 @@ const ConsultantsManagement = () => {
   };
 
   // Handle delete consultant
-  const handleDeleteConsultant = async (consultantId) => {
+  const handleDeleteConsultant = (consultantId) => {
     if (isSubmitting) return;
+    setConsultantToDelete(consultantId);
+    setShowDeleteConfirm(true);
+  };
 
-    if (window.confirm("هل أنت متأكد من حذف هذا المستشار؟")) {
-      await deleteConsultantMutation.mutateAsync(consultantId);
+  const handleDeleteConfirm = () => {
+    if (consultantToDelete) {
+      deleteConsultantMutation.mutate(consultantToDelete);
     }
   };
 
@@ -439,11 +487,7 @@ const ConsultantsManagement = () => {
   const handleViewConsultant = (consultant) => {
     if (isSubmitting) return;
     setSelectedConsultant(consultant);
-    showAlert(
-      "info",
-      "عرض المستشار",
-      `عرض تفاصيل المستشار: ${consultant.name}`
-    );
+    setShowViewModal(true);
   };
 
   // Handle close form
@@ -474,193 +518,466 @@ const ConsultantsManagement = () => {
     setIsSubmitting(false);
   };
 
-  // Show alert
-  const showAlert = (type, title, message) => {
-    setAlert({ show: true, type, title, message });
-  };
-
-  // Close alert
-  const closeAlert = () => {
-    setAlert({ show: false, type: "info", title: "", message: "" });
-  };
-
   // Loading state
   if (isLoadingConsultants) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <FiLoader className="animate-spin text-4xl text-blue-600" />
-        <span className="mr-3 text-lg text-gray-600">
-          جاري تحميل المستشارين...
-        </span>
+      <div className="space-y-6 animate-pulse" dir="rtl">
+        <div className="h-10 w-64 bg-slate-200 rounded-xl" />
+        <div className="flex flex-wrap gap-2">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-11 w-28 bg-slate-100 rounded-xl" />
+          ))}
+        </div>
+        <div className="h-14 bg-white rounded-xl border border-slate-200" />
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <div className="h-12 bg-slate-50 border-b border-slate-200" />
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-16 border-b border-slate-100" />
+          ))}
+        </div>
       </div>
     );
   }
 
   // Error state
   if (consultantsError) {
+    if (consultantsError.response?.status === 401) {
+      return (
+        <div
+          className="flex flex-col items-center justify-center min-h-[320px] bg-white rounded-2xl border border-slate-200 p-8 text-center"
+          dir="rtl"
+        >
+          <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mb-4">
+            <FiAlertCircle className="w-8 h-8 text-amber-600" />
+          </div>
+          <h3 className="text-lg font-semibold text-[#09142b] mb-1">مطلوب تسجيل الدخول</h3>
+          <p className="text-slate-600 text-sm mb-6">يجب تسجيل الدخول لعرض المستشارين</p>
+          <a
+            href="/auth"
+            className="px-5 py-2.5 bg-[#09142b] text-white rounded-xl font-medium hover:bg-[#0b1a36] transition-colors"
+          >
+            تسجيل الدخول
+          </a>
+        </div>
+      );
+    }
     return (
-      <div className="text-center py-8">
-        <div className="text-red-600 text-lg mb-2">خطأ في تحميل البيانات</div>
-        <div className="text-gray-600">{consultantsError.message}</div>
+      <div
+        className="flex flex-col items-center justify-center min-h-[320px] bg-white rounded-2xl border border-slate-200 p-8 text-center"
+        dir="rtl"
+      >
+        <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
+          <FiAlertCircle className="w-8 h-8 text-red-600" />
+        </div>
+        <h3 className="text-lg font-semibold text-[#09142b] mb-1">حدث خطأ أثناء تحميل البيانات</h3>
+        <p className="text-slate-600 text-sm">
+          {consultantsError.message || "خطأ في الاتصال بالخادم"}
+        </p>
       </div>
     );
   }
 
+  const statusTabs = [
+    { value: "all", label: "الكل", count: totalCount, icon: FiUser },
+    { value: "active", label: "نشط", count: activeCount, icon: FiEye },
+    { value: "inactive", label: "غير نشط", count: inactiveCount, icon: FiEdit },
+  ];
+
+  const handleSearchClear = () => {
+    setSearchTerm("");
+    setDebouncedSearchTerm("");
+  };
+
+  const handleImmediateSearch = () => {
+    setDebouncedSearchTerm(searchTerm);
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div className="space-y-6" dir="rtl">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">
-              إدارة المستشارين
-            </h2>
-            <p className="text-sm text-gray-600">
-              إجمالي المستشارين: {totalConsultants}
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#09142b] tracking-tight">
+            إدارة المستشارين
+          </h1>
+          <p className="text-slate-600 mt-1">
+            عرض وإدارة المستشارين وإضافة أو تعديل البيانات
+          </p>
+        </div>
+        <button
+          onClick={() => setShowAddForm(true)}
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#09142b] text-white rounded-xl font-medium hover:bg-[#0b1a36] transition-colors shadow-sm"
+        >
+          <FiUserPlus className="w-5 h-5" />
+          إضافة مستشار جديد
+        </button>
+      </div>
+
+      {/* Status tabs */}
+      <div className="flex flex-wrap gap-2">
+        {statusTabs.map((tab) => {
+          const isActive = selectedFilter === tab.value;
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.value}
+              onClick={() => setSelectedFilter(tab.value)}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                isActive
+                  ? "bg-[#09142b] text-white shadow-md"
+                  : "bg-white text-slate-600 border border-slate-200 hover:border-[#c8a45e] hover:text-[#09142b]"
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              <span>{tab.label}</span>
+              <span className={`tabular-nums ${isActive ? "text-white/90" : "text-slate-400"}`}>
+                {tab.count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Toolbar */}
+      <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+        <div className="relative flex-1 max-w-md">
+          <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <input
+            ref={searchInputRef}
+            type="text"
+            placeholder="بحث في المستشارين... (Ctrl+F)"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleImmediateSearch();
+              }
+              if (e.key === "Escape") handleSearchClear();
+            }}
+            className={`w-full pl-4 pr-10 py-2.5 rounded-xl border bg-white transition-colors placeholder:text-slate-400 ${
+              isSearching
+                ? "border-[#c8a45e] bg-amber-50/30"
+                : "border-slate-200 focus:border-[#09142b] focus:ring-2 focus:ring-[#09142b]/10"
+            }`}
+            autoComplete="off"
+          />
+          {searchTerm && !isSearching && (
+            <button
+              type="button"
+              onClick={handleSearchClear}
+              className="absolute left-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded"
+            >
+              <FiX className="w-4 h-4" />
+            </button>
+          )}
+          {debouncedSearchTerm && totalConsultants > 0 && (
+            <p className="absolute -bottom-5 right-0 text-xs text-slate-500">
+              {totalConsultants} نتيجة
             </p>
-          </div>
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors"
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <select
+            value={itemsPerPage}
+            onChange={(e) => {
+              setItemsPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+            className="py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm focus:border-[#09142b]"
           >
-            <FiUserPlus className="ml-2" size={16} />
-            إضافة مستشار جديد
-          </button>
+            <option value={5}>5 لكل صفحة</option>
+            <option value={10}>10 لكل صفحة</option>
+            <option value={25}>25 لكل صفحة</option>
+            <option value={50}>50 لكل صفحة</option>
+          </select>
         </div>
       </div>
 
-      {/* Statistics */}
-      {!isLoadingStats && statsData && (
-        <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">
-                {statsData.data.totalConsultants}
-              </div>
-              <div className="text-sm text-gray-600">إجمالي المستشارين</div>
+      {/* Table / Card container */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        {consultants.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 px-4">
+            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+              <FiUserPlus className="w-8 h-8 text-slate-400" />
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
-                {statsData.data.activeConsultants}
-              </div>
-              <div className="text-sm text-gray-600">المستشارين النشطين</div>
+            <h3 className="text-lg font-semibold text-[#09142b] mb-1">لا يوجد مستشارون</h3>
+            <p className="text-slate-500 text-sm text-center max-w-sm">
+              {debouncedSearchTerm || selectedFilter !== "all"
+                ? "لا توجد نتائج تطابق البحث أو الفلاتر. جرّب تغيير المعايير."
+                : "لم يتم إضافة أي مستشارين بعد. استخدم زر \"إضافة مستشار جديد\" للبدء."}
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Card list: mobile */}
+            <div className="lg:hidden p-4 space-y-4">
+              {consultants.map((consultant) => {
+                const isOpen = openActionsId === consultant.id;
+                const statusClass =
+                  consultant.status === "active"
+                    ? "text-green-700 bg-green-50 border-green-200"
+                    : "text-red-700 bg-red-50 border-red-200";
+                return (
+                  <div
+                    key={consultant.id}
+                    className="border border-slate-200 rounded-xl p-4 bg-slate-50/50"
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <Avatar
+                          src={consultant.imageUrl}
+                          alt={consultant.name}
+                          name={consultant.name}
+                          size="md"
+                          className="shrink-0"
+                          fallbackBg="gradient"
+                        />
+                        <div className="min-w-0">
+                          <p className="font-medium text-slate-800 truncate">{consultant.name}</p>
+                          <p className="text-sm text-slate-500 truncate">{consultant.title}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span
+                          className={`inline-flex px-2 py-1 rounded-lg text-xs font-medium border cursor-pointer ${statusClass}`}
+                          onClick={() => handleToggleStatus(consultant.id)}
+                        >
+                          {consultant.status === "active" ? "نشط" : "غير نشط"}
+                        </span>
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenActionsId(isOpen ? null : consultant.id);
+                            }}
+                            className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-200"
+                          >
+                            <FiChevronDown className={`w-4 h-4 ${isOpen ? "rotate-180" : ""}`} />
+                          </button>
+                          {isOpen && (
+                            <>
+                              <div
+                                className="fixed inset-0 z-10"
+                                onClick={() => setOpenActionsId(null)}
+                                aria-hidden="true"
+                              />
+                              <div className="absolute left-0 top-full mt-1 z-20 min-w-[160px] py-1 bg-white rounded-xl shadow-lg border border-slate-200">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    handleViewConsultant(consultant);
+                                    setOpenActionsId(null);
+                                  }}
+                                  className="w-full px-3 py-2 text-right text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                >
+                                  <FiEye className="w-4 h-4" /> عرض
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    handleEditConsultant(consultant);
+                                    setOpenActionsId(null);
+                                  }}
+                                  className="w-full px-3 py-2 text-right text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                >
+                                  <FiEdit className="w-4 h-4" /> تعديل
+                                </button>
+                                <hr className="my-1 border-slate-100" />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    handleDeleteConsultant(consultant.id);
+                                    setOpenActionsId(null);
+                                  }}
+                                  className="w-full px-3 py-2 text-right text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                >
+                                  <FiTrash2 className="w-4 h-4" /> حذف
+                                </button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-slate-200 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                      <span className="text-slate-500">التخصص</span>
+                      <span className="text-slate-800 truncate">{consultant.specialization || "—"}</span>
+                      <span className="text-slate-500">الخبرة</span>
+                      <span className="text-slate-800">{consultant.experience || "—"}</span>
+                      <span className="text-slate-500">التقييم</span>
+                      <span className="text-slate-800 flex items-center gap-1">
+                        <FiStar className="w-3.5 h-3.5 text-amber-500" />
+                        {consultant.rating ?? "—"}
+                      </span>
+                      <span className="text-slate-500">الاستشارات</span>
+                      <span className="text-slate-800">{consultant.consultations ?? "—"}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleViewConsultant(consultant)}
+                      className="mt-3 w-full py-2 rounded-xl bg-[#09142b] text-white text-sm font-medium hover:bg-[#0b1a36] transition-colors"
+                    >
+                      عرض التفاصيل
+                    </button>
+                  </div>
+                );
+              })}
+              {totalConsultants > itemsPerPage && (
+                <div className="flex items-center justify-center gap-2 pt-4 border-t border-slate-200">
+                  <button
+                    type="button"
+                    disabled={currentPage <= 1}
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50"
+                  >
+                    السابق
+                  </button>
+                  <span className="text-sm text-slate-600">
+                    {currentPage} / {Math.ceil(totalConsultants / itemsPerPage)}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={currentPage >= Math.ceil(totalConsultants / itemsPerPage)}
+                    onClick={() =>
+                      setCurrentPage((p) =>
+                        Math.min(Math.ceil(totalConsultants / itemsPerPage), p + 1)
+                      )
+                    }
+                    className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50"
+                  >
+                    التالي
+                  </button>
+                </div>
+              )}
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-600">
-                {statsData.data.averageRating}
-              </div>
-              <div className="text-sm text-gray-600">متوسط التقييم</div>
+
+            {/* Table: desktop */}
+            <div className="hidden lg:block overflow-x-visible">
+              <DataTable
+                data={consultants}
+                columns={columns}
+                searchTerm={searchTerm}
+                noHorizontalScroll
+                pagination={{
+                  current: currentPage,
+                  limit: itemsPerPage,
+                  total: totalConsultants,
+                  offset: (currentPage - 1) * itemsPerPage,
+                  onPageChange: (offset) =>
+                    setCurrentPage(Math.floor(offset / itemsPerPage) + 1),
+                  onItemsPerPageChange: setItemsPerPage,
+                }}
+              />
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">
-                {statsData.data.activePercentage}%
+          </>
+        )}
+      </div>
+
+      {/* Delete Confirmation */}
+      <ConfirmationModal
+        isOpen={showDeleteConfirm}
+        onClose={() => {
+          setShowDeleteConfirm(false);
+          setConsultantToDelete(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="تأكيد الحذف"
+        message="هل أنت متأكد من حذف هذا المستشار؟ لا يمكن التراجع عن هذا الإجراء."
+        confirmText="حذف"
+        cancelText="إلغاء"
+        type="danger"
+        isLoading={deleteConsultantMutation.isPending}
+      />
+
+      {/* View Consultant Modal */}
+      {showViewModal && selectedConsultant && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full shadow-xl">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-[#09142b]">تفاصيل المستشار</h2>
+                <button
+                  onClick={() => {
+                    setShowViewModal(false);
+                    setSelectedConsultant(null);
+                  }}
+                  className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                >
+                  <FiX className="w-5 h-5" />
+                </button>
               </div>
-              <div className="text-sm text-gray-600">نسبة النشاط</div>
+              <div className="flex flex-col items-center text-center">
+                <Avatar
+                  src={selectedConsultant.imageUrl}
+                  alt={selectedConsultant.name}
+                  name={selectedConsultant.name}
+                  size="xl"
+                  className="mb-4"
+                  fallbackBg="gradient"
+                />
+                <h3 className="text-lg font-semibold text-slate-800">{selectedConsultant.name}</h3>
+                <p className="text-slate-600 text-sm mt-1">{selectedConsultant.title}</p>
+                <p className="text-slate-700 text-sm mt-2">{selectedConsultant.specialization}</p>
+                <p className="text-slate-500 text-sm mt-1">{selectedConsultant.experience}</p>
+                <div className="flex items-center gap-4 mt-4 text-sm">
+                  <span className="flex items-center gap-1">
+                    <FiStar className="text-amber-500" size={16} />
+                    {selectedConsultant.rating ?? "—"}
+                  </span>
+                  <span className="text-slate-600">الاستشارات: {selectedConsultant.consultations ?? "—"}</span>
+                </div>
+                <span
+                  className={`inline-flex mt-3 px-3 py-1 rounded-lg text-xs font-medium ${
+                    selectedConsultant.status === "active"
+                      ? "text-green-700 bg-green-50 border border-green-200"
+                      : "text-red-700 bg-red-50 border border-red-200"
+                  }`}
+                >
+                  {selectedConsultant.status === "active" ? "نشط" : "غير نشط"}
+                </span>
+              </div>
+              <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-slate-200">
+                <button
+                  onClick={() => {
+                    setShowViewModal(false);
+                    handleEditConsultant(selectedConsultant);
+                  }}
+                  className="px-5 py-2.5 bg-[#09142b] text-white rounded-xl font-medium hover:bg-[#0b1a36] transition-colors flex items-center gap-2"
+                >
+                  <FiEdit size={16} />
+                  تعديل
+                </button>
+                <button
+                  onClick={() => {
+                    setShowViewModal(false);
+                    setSelectedConsultant(null);
+                  }}
+                  className="px-5 py-2.5 bg-slate-100 text-slate-700 rounded-xl font-medium hover:bg-slate-200 transition-colors"
+                >
+                  إغلاق
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Search and Filters */}
-      <div className="px-6 py-4 border-b border-gray-200">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <FiSearch
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={20}
-              />
-              <input
-                type="text"
-                placeholder="البحث في المستشارين... (Ctrl+F)"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                autoComplete="off"
-                title="البحث في المستشارين - استخدم Ctrl+F للوصول السريع"
-              />
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm("")}
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  type="button"
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              )}
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <select
-              value={selectedFilter}
-              onChange={(e) => setSelectedFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">جميع الحالات</option>
-              <option value="active">نشط</option>
-              <option value="inactive">غير نشط</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Data Table */}
-      <div className="px-6 py-4">
-        <DataTable
-          data={consultants}
-          columns={columns}
-          pagination={{
-            total: totalConsultants,
-            limit: itemsPerPage,
-            offset: (currentPage - 1) * itemsPerPage,
-            onPageChange: (offset) => {
-              const newPage = Math.floor(offset / itemsPerPage) + 1;
-              setCurrentPage(newPage);
-            }
-          }}
-          searchTerm={searchTerm}
-          isLoading={isLoadingConsultants}
-        />
-      </div>
-
       {/* Add/Edit Form Modal */}
       {showAddForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="px-6 py-4 border-b border-gray-200">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
+            <div className="px-6 py-4 border-b border-slate-200">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-[#09142b]">
                   {isEditing ? "تعديل المستشار" : "إضافة مستشار جديد"}
                 </h3>
                 <button
                   onClick={handleCloseForm}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
                 >
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
+                  <FiX className="w-5 h-5" />
                 </button>
               </div>
             </div>
@@ -923,23 +1240,23 @@ const ConsultantsManagement = () => {
               </div>
 
               {/* Form actions */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
                 <button
                   type="button"
                   onClick={handleCloseForm}
                   disabled={isSubmitting}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50"
+                  className="px-4 py-2.5 text-slate-600 bg-slate-100 rounded-xl font-medium hover:bg-slate-200 transition-colors disabled:opacity-50"
                 >
                   إلغاء
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center"
+                  className="px-5 py-2.5 bg-[#09142b] hover:bg-[#0b1a36] text-white rounded-xl font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
                 >
                   {isSubmitting ? (
                     <>
-                      <FiLoader className="animate-spin ml-2" size={16} />
+                      <FiLoader className="animate-spin w-4 h-4" />
                       جاري الإرسال...
                     </>
                   ) : isEditing ? (
@@ -952,16 +1269,6 @@ const ConsultantsManagement = () => {
             </form>
           </div>
         </div>
-      )}
-
-      {/* Alert */}
-      {alert.show && (
-        <CustomAlert
-          type={alert.type}
-          title={alert.title}
-          message={alert.message}
-          onClose={closeAlert}
-        />
       )}
     </div>
   );

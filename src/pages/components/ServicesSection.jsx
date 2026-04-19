@@ -40,22 +40,15 @@ const ServicesSection = () => {
   return (
     <section id="services" className="w-full bg-white py-16 px-4 md:px-8">
       <div className="max-w-6xl mx-auto">
-        {/* Section Header */}
-        <div className="text-center mb-16">
-          
+        {/* Section Header - consistent on all screens */}
+        <div className="mb-10 text-center sm:mb-12 md:mb-16">
           <h2
-            className={`font-bold text-[#09142b] mb-4 ${
-              currentLanguage === "ar"
-                ? "text-2xl md:text-4xl"
-                : "text-3xl md:text-4xl"
-            }`}
+            className="mb-3 max-w-full break-words font-bold text-[#09142b] text-xl leading-tight sm:mb-4 sm:text-2xl md:text-3xl lg:text-4xl"
           >
             {t("servicesTitle", "Our Legal Services")}
           </h2>
           <p
-            className={`text-[#6b7280] max-w-3xl mx-auto ${
-              currentLanguage === "ar" ? "text-sm md:text-lg" : "text-lg"
-            }`}
+            className="mx-auto max-w-3xl break-words px-1 text-sm leading-relaxed text-[#6b7280] sm:text-base md:text-lg"
           >
             {t(
               "servicesDesc",
@@ -64,8 +57,8 @@ const ServicesSection = () => {
           </p>
         </div>
 
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        {/* Services Grid - equal height cards, responsive gap */}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-8 max-w-6xl mx-auto">
           {services.map((service) => {
             const IconComponent = iconMap[service.id] || FiBriefcase;
             return (
@@ -78,6 +71,11 @@ const ServicesSection = () => {
                 }
                 route={`/services/${service.id}`}
                 serviceId={service.id}
+                trustLine={
+                  service.trustLine
+                    ? service.trustLine[currentLanguage] || service.trustLine.ar
+                    : undefined
+                }
               />
             );
           })}

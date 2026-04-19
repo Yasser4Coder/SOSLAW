@@ -7,7 +7,7 @@ import {
   FiChevronRight,
 } from "react-icons/fi";
 
-const DataTable = ({ data, columns, searchTerm = "", pagination = null }) => {
+const DataTable = ({ data, columns, searchTerm = "", pagination = null, noHorizontalScroll = false }) => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language || "en";
   const isRTL = lang === "ar";
@@ -135,8 +135,8 @@ const DataTable = ({ data, columns, searchTerm = "", pagination = null }) => {
   };
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
+    <div className={noHorizontalScroll ? "overflow-x-visible" : "overflow-x-auto"}>
+      <table className={`min-w-full divide-y divide-gray-200 ${noHorizontalScroll ? "table-fixed w-full" : ""}`}>
         <thead className="bg-gray-50">
           <tr>
             {columns.map((column) => (
@@ -144,7 +144,7 @@ const DataTable = ({ data, columns, searchTerm = "", pagination = null }) => {
                 key={column.key}
                 className={`px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider ${
                   column.sortable ? "cursor-pointer hover:bg-gray-100" : ""
-                }`}
+                } ${column.headerClassName || ""}`}
                 onClick={() => column.sortable && handleSort(column.key)}
               >
                 <div className="flex items-center justify-end">
@@ -166,7 +166,7 @@ const DataTable = ({ data, columns, searchTerm = "", pagination = null }) => {
                 {columns.map((column) => (
                   <td
                     key={column.key}
-                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                    className={`px-6 py-4 text-sm text-gray-900 ${noHorizontalScroll ? "break-words align-top" : "whitespace-nowrap"} ${column.cellClassName || ""}`}
                   >
                     {column.render
                       ? column.render(item[column.key], item)

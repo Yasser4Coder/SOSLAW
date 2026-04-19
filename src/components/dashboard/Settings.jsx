@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FiSave,
   FiGlobe,
@@ -8,12 +8,20 @@ import {
   FiUser,
   FiDatabase,
   FiPhone,
+  FiCreditCard,
 } from "react-icons/fi";
 import CustomAlert from "./CustomAlert";
 import ContactInfoManagement from "./ContactInfoManagement";
+import settingsService from "../../services/settingsService";
+import { useAuth } from "../../contexts/useAuth";
 
 const Settings = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("general");
+  const [ePaymentEnabled, setEPaymentEnabled] = useState(true);
+  const [ePaymentLoading, setEPaymentLoading] = useState(false);
+  const [ePaymentSaving, setEPaymentSaving] = useState(false);
+  const [ePaymentError, setEPaymentError] = useState(null);
   const [alert, setAlert] = useState({
     show: false,
     type: "info",
@@ -82,6 +90,42 @@ const Settings = () => {
     setAlert({ show: false, type: "info", title: "", message: "" });
   };
 
+  // Fetch e-payment setting when admin opens settings
+  useEffect(() => {
+    if (user?.role !== "admin") return;
+    let cancelled = false;
+    setEPaymentLoading(true);
+    setEPaymentError(null);
+    settingsService
+      .getEpaymentEnabled()
+      .then((enabled) => {
+        if (!cancelled) setEPaymentEnabled(!!enabled);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setEPaymentError(err.response?.data?.message || "فشل تحميل الإعداد");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setEPaymentLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [user?.role]);
+
+  const handleEpaymentToggle = async (nextValue) => {
+    if (user?.role !== "admin") return;
+    setEPaymentSaving(true);
+    setEPaymentError(null);
+    try {
+      await settingsService.updateEpaymentEnabled(nextValue);
+      setEPaymentEnabled(nextValue);
+    } catch (err) {
+      setEPaymentError(err.response?.data?.message || "فشل تحديث الإعداد");
+    } finally {
+      setEPaymentSaving(false);
+    }
+  };
+
   const tabs = [
     {
       id: "general",
@@ -104,6 +148,9 @@ const Settings = () => {
       label: "التكاملات",
       icon: FiDatabase,
     },
+    ...(user?.role === "admin"
+      ? [{ id: "epayment", label: "الدفع الإلكتروني", icon: FiCreditCard }]
+      : []),
   ];
 
   return (
@@ -465,6 +512,49 @@ const Settings = () => {
                     <option value="nexmo">Nexmo</option>
                   </select>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "epayment" && user?.role === "admin" && (
+            <div className="space-y-6">
+              <h3 className="text-lg font-medium text-gray-900">الدفع الإلكتروني (Chargily)</h3>
+              <p className="text-sm text-gray-500">
+                عند التفعيل: يتم تحويل العميل لصفحة الدفع الآمنة (Chargily Pay) عند طلب خدمة مدفوعة. عند الإيقاف: يتم إنشاء الطلب مباشرة ويتواصل الفريق مع العميل لاستلام الدفع لاحقاً.
+              </p>
+              {ePaymentError && (
+                <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+                  {ePaymentError}
+                </div>
+              )}
+              <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50/50 p-4">
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900">
+                    تفعيل الدفع الإلكتروني (Chargily)
+                  </h4>
+                  <p className="text-sm text-gray-500 mt-0.5">
+                    {ePaymentEnabled
+                      ? "مفعّل — العملاء يُحوَّلون لصفحة الدفع عند طلب خدمة مدفوعة."
+                      : "متوقف — الطلبات تُنشأ مباشرة والدفع عند التواصل معهم."}
+                  </p>
+                </div>
+                {ePaymentLoading ? (
+                  <span className="text-sm text-gray-500">جاري التحميل...</span>
+                ) : (
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={ePaymentEnabled}
+                      disabled={ePaymentSaving}
+                      onChange={(e) => handleEpaymentToggle(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 peer-disabled:opacity-50"></div>
+                    <span className="mr-2 text-sm text-gray-600">
+                      {ePaymentSaving ? "جاري الحفظ..." : ePaymentEnabled ? "مفعّل" : "متوقف"}
+                    </span>
+                  </label>
+                )}
               </div>
             </div>
           )}

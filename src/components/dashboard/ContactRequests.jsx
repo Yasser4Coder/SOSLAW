@@ -1,24 +1,23 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  FiEye,
-  FiMail,
   FiSearch,
-  FiFilter,
-  FiMessageSquare,
+  FiEye,
   FiTrash2,
-  FiCheck,
   FiX,
   FiClock,
   FiAlertCircle,
   FiCheckCircle,
   FiXCircle,
+  FiCheck,
   FiLoader,
   FiUser,
   FiCalendar,
   FiFileText,
-  FiMapPin,
   FiPhone,
+  FiMail,
+  FiMessageSquare,
+  FiChevronDown,
 } from "react-icons/fi";
 import contactRequestService from "../../services/contactRequestService";
 import DataTable from "./DataTable";
@@ -27,7 +26,9 @@ import toast from "react-hot-toast";
 
 const ContactRequests = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [isSearching, setIsSearching] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -35,11 +36,27 @@ const ContactRequests = () => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showReplyModal, setShowReplyModal] = useState(false);
   const [replyMessage, setReplyMessage] = useState("");
+  const [openActionsId, setOpenActionsId] = useState(null);
   const searchInputRef = useRef(null);
 
   const queryClient = useQueryClient();
 
-  // Keyboard shortcut for search
+  useEffect(() => {
+    setIsSearching(true);
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      setIsSearching(false);
+    }, 500);
+    return () => {
+      clearTimeout(timer);
+      setIsSearching(false);
+    };
+  }, [searchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedFilter, debouncedSearchTerm]);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "f") {
@@ -47,251 +64,111 @@ const ContactRequests = () => {
         searchInputRef.current?.focus();
       }
     };
-
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Reset to page 1 when filter or search changes (so results from any page appear)
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedFilter]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
-
-  // Fetch contact requests with React Query - server-side search across all requests
   const {
     data: requestsData,
     isLoading: isLoadingRequests,
     error: requestsError,
+    refetch: refetchRequests,
   } = useQuery({
     queryKey: [
       "contact-requests",
       selectedFilter,
       currentPage,
       itemsPerPage,
-      searchTerm.trim() || null,
+      debouncedSearchTerm.trim() || null,
     ],
     queryFn: async () => {
       const result = await contactRequestService.getAllContactRequests({
         status: selectedFilter === "all" ? undefined : selectedFilter,
         page: currentPage,
         limit: itemsPerPage,
-        ...(searchTerm.trim() ? { search: searchTerm.trim() } : {}),
+        ...(debouncedSearchTerm.trim()
+          ? { search: debouncedSearchTerm.trim() }
+          : {}),
       });
       return result;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    retry: 2,
+    enabled: !isSearching,
   });
 
-  // Fetch stats for dashboard cards (global counts)
   const { data: statsData } = useQuery({
     queryKey: ["contact-request-stats"],
     queryFn: contactRequestService.getContactRequestStats,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 2 * 60 * 1000,
+    enabled: !debouncedSearchTerm || debouncedSearchTerm.trim().length === 0,
   });
 
-  // Extract requests from API response (search is done on the server)
   const requests = requestsData?.data?.contactRequests || [];
   const totalRequests = requestsData?.data?.total || 0;
+  const apiStats = statsData?.data || {};
+  const stats = {
+    total: apiStats.total ?? 0,
+    new: apiStats.new ?? 0,
+    read: apiStats.read ?? 0,
+    replied: apiStats.replied ?? 0,
+    closed: apiStats.closed ?? 0,
+  };
 
-  // Table columns
-  const columns = [
-    {
-      key: "id",
-      label: "الرقم",
-      sortable: true,
-      render: (value) => `#${value}`,
-    },
-    {
-      key: "name",
-      label: "الاسم",
-      sortable: true,
-    },
-    {
-      key: "email",
-      label: "البريد الإلكتروني",
-      sortable: true,
-    },
-    {
-      key: "phone",
-      label: "رقم الهاتف",
-      sortable: true,
-      render: (value) => value || "غير محدد",
-    },
-    {
-      key: "subject",
-      label: "الموضوع",
-      sortable: true,
-      render: (value) => value || "غير محدد",
-    },
-    {
-      key: "priority",
-      label: "الأولوية",
-      sortable: true,
-      render: (value) => {
-        const priorityConfig = {
-          urgent: { text: "عاجل", color: "text-red-600 bg-red-50" },
-          high: { text: "عالية", color: "text-orange-600 bg-orange-50" },
-          normal: { text: "عادية", color: "text-blue-600 bg-blue-50" },
-          low: { text: "منخفضة", color: "text-green-600 bg-green-50" },
-        };
-        const config = priorityConfig[value] || priorityConfig.normal;
-        return (
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${config.color}`}
-          >
-            {config.text}
-          </span>
-        );
-      },
-    },
-    {
-      key: "status",
-      label: "الحالة",
-      sortable: true,
-      render: (value, request) => {
-        const statusConfig = {
-          new: {
-            text: "جديد",
-            icon: FiClock,
-            color: "text-blue-600 bg-blue-50",
-          },
-          read: {
-            text: "مقروء",
-            icon: FiCheckCircle,
-            color: "text-green-600 bg-green-50",
-          },
-          replied: {
-            text: "تم الرد",
-            icon: FiCheck,
-            color: "text-green-600 bg-green-50",
-          },
-          closed: {
-            text: "مغلق",
-            icon: FiXCircle,
-            color: "text-gray-600 bg-gray-50",
-          },
-        };
-        const config = statusConfig[value] || statusConfig.new;
-        const Icon = config.icon;
+  const handleSearchClear = () => {
+    setSearchTerm("");
+    setDebouncedSearchTerm("");
+  };
 
-        return (
-          <div className="flex items-center space-x-2 space-x-reverse">
-            <span
-              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.color}`}
-            >
-              <Icon className="ml-1 w-3 h-3" />
-              {config.text}
-            </span>
-            <select
-              value={value}
-              onChange={(e) => handleStatusChange(request.id, e.target.value)}
-              className="text-xs border border-gray-300 rounded px-1 py-1 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <option value="new">جديد</option>
-              <option value="read">مقروء</option>
-              <option value="replied">تم الرد</option>
-              <option value="closed">مغلق</option>
-            </select>
-          </div>
-        );
-      },
-    },
-    {
-      key: "created_at",
-      label: "تاريخ الإرسال",
-      sortable: true,
-      render: (value) => {
-        if (!value) return "غير محدد";
-        try {
-          const date = new Date(value);
-          const dayNames = [
-            "الأحد",
-            "الاثنين",
-            "الثلاثاء",
-            "الأربعاء",
-            "الخميس",
-            "الجمعة",
-            "السبت",
-          ];
-          const dayName = dayNames[date.getDay()];
-          const day = String(date.getDate()).padStart(2, "0");
-          const month = String(date.getMonth() + 1).padStart(2, "0");
-          const year = date.getFullYear();
-          return `${dayName} ${day}/${month}/${year}`;
-        } catch (error) {
-          return "غير محدد";
-        }
-      },
-    },
-    {
-      key: "actions",
-      label: "الإجراءات",
-      sortable: false,
-      render: (_, request) => (
-        <div className="flex items-center space-x-2 space-x-reverse">
-          <button
-            onClick={() => handleView(request)}
-            className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded"
-            title="عرض التفاصيل"
-          >
-            <FiEye className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => handleDelete(request)}
-            className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
-            title="حذف الطلب"
-          >
-            <FiTrash2 className="w-4 h-4" />
-          </button>
-        </div>
-      ),
-    },
-  ];
+  const handleImmediateSearch = () => {
+    setDebouncedSearchTerm(searchTerm);
+  };
 
-  // Status update mutation
   const statusUpdateMutation = useMutation({
     mutationFn: ({ id, status }) =>
       contactRequestService.updateContactRequestStatus(id, status),
-    onSuccess: () => {
-      queryClient.invalidateQueries(["contact-requests"]);
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ["contact-requests"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["contact-request-stats"] });
+      await new Promise((r) => setTimeout(r, 300));
+      await refetchRequests();
       toast.success("تم تحديث حالة الطلب بنجاح");
     },
-    onError: (error) => {
+    onError: () => {
       toast.error("حدث خطأ أثناء تحديث حالة الطلب");
     },
   });
 
-  // Reply mutation
   const replyMutation = useMutation({
     mutationFn: ({ id, replyMessage }) =>
       contactRequestService.replyToContactRequest(id, replyMessage),
-    onSuccess: () => {
-      queryClient.invalidateQueries(["contact-requests"]);
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ["contact-requests"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["contact-request-stats"] });
       setShowReplyModal(false);
       setReplyMessage("");
       setSelectedRequest(null);
+      await refetchRequests();
       toast.success("تم إرسال الرد بنجاح");
     },
-    onError: (error) => {
+    onError: () => {
       toast.error("حدث خطأ أثناء إرسال الرد");
     },
   });
 
-  // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: (id) => contactRequestService.deleteContactRequest(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries(["contact-requests"]);
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ["contact-requests"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["contact-request-stats"] });
       setShowDeleteModal(false);
       setSelectedRequest(null);
+      await new Promise((r) => setTimeout(r, 300));
+      await refetchRequests();
       toast.success("تم حذف الطلب بنجاح");
     },
-    onError: (error) => {
+    onError: () => {
       toast.error("حدث خطأ أثناء حذف الطلب");
     },
   });
@@ -307,6 +184,7 @@ const ContactRequests = () => {
 
   const handleReply = (request) => {
     setSelectedRequest(request);
+    setReplyMessage("");
     setShowReplyModal(true);
   };
 
@@ -316,9 +194,7 @@ const ContactRequests = () => {
   };
 
   const confirmDelete = () => {
-    if (selectedRequest) {
-      deleteMutation.mutate(selectedRequest.id);
-    }
+    if (selectedRequest) deleteMutation.mutate(selectedRequest.id);
   };
 
   const handleSendReply = () => {
@@ -326,7 +202,6 @@ const ContactRequests = () => {
       toast.error("يرجى كتابة رسالة الرد");
       return;
     }
-
     if (selectedRequest) {
       replyMutation.mutate({
         id: selectedRequest.id,
@@ -335,167 +210,516 @@ const ContactRequests = () => {
     }
   };
 
-  // Use API stats for cards; when searching, total reflects filtered count from list response
-  const apiStats = statsData?.data || {};
-  const stats = {
-    total: searchTerm.trim() ? totalRequests : (apiStats.total ?? totalRequests),
-    new: apiStats.new ?? 0,
-    read: apiStats.read ?? 0,
-    replied: apiStats.replied ?? 0,
-    closed: apiStats.closed ?? 0,
+  const statusTabs = [
+    { value: "all", label: "الكل", count: stats.total, icon: FiFileText },
+    { value: "new", label: "جديد", count: stats.new, icon: FiClock },
+    { value: "read", label: "مقروء", count: stats.read, icon: FiCheckCircle },
+    { value: "replied", label: "تم الرد", count: stats.replied, icon: FiCheck },
+    { value: "closed", label: "مغلق", count: stats.closed, icon: FiXCircle },
+  ];
+
+  const statusConfig = {
+    new: { text: "جديد", color: "text-blue-700 bg-blue-50 border-blue-200" },
+    read: { text: "مقروء", color: "text-green-700 bg-green-50 border-green-200" },
+    replied: { text: "تم الرد", color: "text-green-700 bg-green-50 border-green-200" },
+    closed: { text: "مغلق", color: "text-slate-700 bg-slate-50 border-slate-200" },
   };
+
+  const columns = [
+    {
+      key: "id",
+      label: "الرقم",
+      sortable: true,
+      render: (value) => `#${value}`,
+    },
+    {
+      key: "name",
+      label: "الاسم",
+      sortable: true,
+      render: (value, request) => (
+        <div className="min-w-0">
+          <div className="font-medium text-slate-800 truncate">{value}</div>
+          <div className="text-xs text-slate-500 truncate">{request.email}</div>
+          {request.phone && (
+            <div className="text-xs text-slate-500 truncate">{request.phone}</div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "subject",
+      label: "الموضوع",
+      sortable: true,
+      render: (value) => value ? <span className="text-slate-800">{value}</span> : <span className="text-slate-500">—</span>,
+    },
+    {
+      key: "priority",
+      label: "الأولوية",
+      sortable: true,
+      render: (value) => {
+        const priorityConfig = {
+          urgent: { text: "عاجل", color: "text-red-600 bg-red-50" },
+          high: { text: "عالية", color: "text-orange-600 bg-orange-50" },
+          normal: { text: "عادية", color: "text-blue-600 bg-blue-50" },
+          low: { text: "منخفضة", color: "text-green-600 bg-green-50" },
+        };
+        const config = priorityConfig[value] || priorityConfig.normal;
+        return (
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
+            {config.text}
+          </span>
+        );
+      },
+    },
+    {
+      key: "status",
+      label: "الحالة",
+      sortable: true,
+      headerClassName: "min-w-[10rem] w-[10rem]",
+      cellClassName: "min-w-[10rem] w-[10rem]",
+      render: (value, request) => {
+        const actualStatus = value || request.status;
+        const config = statusConfig[actualStatus] || statusConfig.new;
+        return (
+          <select
+            value={actualStatus}
+            onChange={(e) => handleStatusChange(request.id, e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+            title={config.text}
+            className={`w-full min-w-0 text-xs font-medium rounded-lg border px-3 py-1.5 pe-8 cursor-pointer focus:ring-2 focus:ring-[#09142b]/20 focus:border-[#09142b] outline-none ${config.color}`}
+          >
+            <option value="new">جديد</option>
+            <option value="read">مقروء</option>
+            <option value="replied">تم الرد</option>
+            <option value="closed">مغلق</option>
+          </select>
+        );
+      },
+    },
+    {
+      key: "created_at",
+      label: "تاريخ الإرسال",
+      sortable: true,
+      render: (value) => {
+        if (!value) return "غير محدد";
+        try {
+          return new Date(value).toLocaleDateString("ar-DZ", {
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+          });
+        } catch (error) {
+          return "غير محدد";
+        }
+      },
+    },
+    {
+      key: "actions",
+      label: "",
+      sortable: false,
+      render: (_, request) => {
+        const isOpen = openActionsId === request.id;
+        return (
+          <div className="relative flex justify-center">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpenActionsId(isOpen ? null : request.id);
+              }}
+              className="p-2 rounded-lg text-slate-500 hover:text-[#09142b] hover:bg-slate-100 transition-colors"
+              title="الإجراءات"
+            >
+              <FiChevronDown className={`w-5 h-5 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+            </button>
+            {isOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setOpenActionsId(null)}
+                  aria-hidden="true"
+                />
+                <div className="absolute left-0 top-full mt-1 z-20 min-w-[180px] py-1 bg-white rounded-xl shadow-lg border border-slate-200">
+                  <button
+                    onClick={() => {
+                      handleView(request);
+                      setOpenActionsId(null);
+                    }}
+                    className="w-full px-4 py-2 text-right text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                  >
+                    <FiEye className="w-4 h-4" /> عرض
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleReply(request);
+                      setOpenActionsId(null);
+                    }}
+                    className="w-full px-4 py-2 text-right text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                  >
+                    <FiMessageSquare className="w-4 h-4" /> رد
+                  </button>
+                  <hr className="my-1 border-slate-100" />
+                  <button
+                    onClick={() => {
+                      handleDelete(request);
+                      setOpenActionsId(null);
+                    }}
+                    className="w-full px-4 py-2 text-right text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                  >
+                    <FiTrash2 className="w-4 h-4" /> حذف
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        );
+      },
+    },
+  ];
 
   if (isLoadingRequests) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <FiLoader className="animate-spin text-4xl text-blue-600" />
+      <div className="space-y-6 animate-pulse" dir="rtl">
+        <div className="h-10 w-64 bg-slate-200 rounded-xl" />
+        <div className="flex flex-wrap gap-2">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-11 w-28 bg-slate-100 rounded-xl" />
+          ))}
+        </div>
+        <div className="h-14 bg-white rounded-xl border border-slate-200" />
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <div className="h-12 bg-slate-50 border-b border-slate-200" />
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-16 border-b border-slate-100" />
+          ))}
+        </div>
       </div>
     );
   }
 
   if (requestsError) {
+    if (requestsError.response?.status === 401) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-[320px] bg-white rounded-2xl border border-slate-200 p-8 text-center" dir="rtl">
+          <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mb-4">
+            <FiAlertCircle className="w-8 h-8 text-amber-600" />
+          </div>
+          <h3 className="text-lg font-semibold text-[#09142b] mb-1">مطلوب تسجيل الدخول</h3>
+          <p className="text-slate-600 text-sm mb-6">يجب تسجيل الدخول لعرض طلبات التواصل</p>
+          <a
+            href="/auth"
+            className="px-5 py-2.5 bg-[#09142b] text-white rounded-xl font-medium hover:bg-[#0b1a36] transition-colors"
+          >
+            تسجيل الدخول
+          </a>
+        </div>
+      );
+    }
     return (
-      <div className="text-center py-8">
-        <FiAlertCircle className="text-4xl text-red-500 mx-auto mb-4" />
-        <p className="text-red-600">حدث خطأ أثناء تحميل البيانات</p>
-        <p className="text-sm text-gray-500 mt-2">
-          {requestsError.message || "خطأ في الاتصال بالخادم"}
-        </p>
+      <div className="flex flex-col items-center justify-center min-h-[320px] bg-white rounded-2xl border border-slate-200 p-8 text-center" dir="rtl">
+        <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
+          <FiAlertCircle className="w-8 h-8 text-red-600" />
+        </div>
+        <h3 className="text-lg font-semibold text-[#09142b] mb-1">حدث خطأ أثناء تحميل البيانات</h3>
+        <p className="text-slate-600 text-sm">{requestsError.message || "خطأ في الاتصال بالخادم"}</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">طلبات التواصل</h1>
-          <p className="text-gray-600 mt-1">إدارة رسائل التواصل من العملاء</p>
-        </div>
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#09142b] tracking-tight">
+          طلبات التواصل
+        </h1>
+        <p className="text-slate-600 mt-1">
+          إدارة وعرض رسائل التواصل من العملاء
+        </p>
       </div>
 
-      {/* Statistics Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <FiFileText className="w-5 h-5 text-blue-600" />
-            </div>
-            <div className="mr-3">
-              <p className="text-sm text-gray-600">إجمالي الطلبات</p>
-              <p className="text-xl font-bold text-gray-900">{stats.total}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <FiClock className="w-5 h-5 text-blue-600" />
-            </div>
-            <div className="mr-3">
-              <p className="text-sm text-gray-600">جديد</p>
-              <p className="text-xl font-bold text-gray-900">{stats.new}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <FiCheckCircle className="w-5 h-5 text-green-600" />
-            </div>
-            <div className="mr-3">
-              <p className="text-sm text-gray-600">مقروء</p>
-              <p className="text-xl font-bold text-gray-900">{stats.read}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <FiCheck className="w-5 h-5 text-green-600" />
-            </div>
-            <div className="mr-3">
-              <p className="text-sm text-gray-600">تم الرد</p>
-              <p className="text-xl font-bold text-gray-900">{stats.replied}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <div className="flex items-center">
-            <div className="p-2 bg-gray-100 rounded-lg">
-              <FiXCircle className="w-5 h-5 text-gray-600" />
-            </div>
-            <div className="mr-3">
-              <p className="text-sm text-gray-600">مغلق</p>
-              <p className="text-xl font-bold text-gray-900">{stats.closed}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters and Search */}
-      <div className="bg-white p-6 rounded-lg shadow border">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4">
-          {/* Search */}
-          <div className="relative flex-1 max-w-md">
-            <FiSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              ref={searchInputRef}
-              type="text"
-              placeholder="البحث في طلبات التواصل... (Ctrl+F)"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              autoComplete="off"
-              title="البحث في طلبات التواصل - استخدم Ctrl+F للوصول السريع"
-            />
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm("")}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                type="button"
-              >
-                <FiX className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-
-          {/* Status Filter */}
-          <div className="flex items-center space-x-2 space-x-reverse">
-            <FiFilter className="text-gray-400" />
-            <select
-              value={selectedFilter}
-              onChange={(e) => setSelectedFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      {/* Status tabs */}
+      <div className="flex flex-wrap gap-2">
+        {statusTabs.map((tab) => {
+          const isActive = selectedFilter === tab.value;
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.value}
+              onClick={() => setSelectedFilter(tab.value)}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                isActive
+                  ? "bg-[#09142b] text-white shadow-md"
+                  : "bg-white text-slate-600 border border-slate-200 hover:border-[#c8a45e] hover:text-[#09142b]"
+              }`}
             >
-              <option value="all">جميع الحالات</option>
-              <option value="new">جديد</option>
-              <option value="read">مقروء</option>
-              <option value="replied">تم الرد</option>
-              <option value="closed">مغلق</option>
-            </select>
-          </div>
+              <Icon className="w-4 h-4" />
+              <span>{tab.label}</span>
+              <span className={`tabular-nums ${isActive ? "text-white/90" : "text-slate-400"}`}>
+                {tab.count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Toolbar */}
+      <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+        <div className="relative flex-1 max-w-md">
+          <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <input
+            ref={searchInputRef}
+            type="text"
+            placeholder="بحث بالاسم، البريد أو الهاتف..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleImmediateSearch();
+              }
+              if (e.key === "Escape") handleSearchClear();
+            }}
+            className={`w-full pl-4 pr-10 py-2.5 rounded-xl border bg-white transition-colors placeholder:text-slate-400 ${
+              isSearching
+                ? "border-[#c8a45e] bg-amber-50/30"
+                : "border-slate-200 focus:border-[#09142b] focus:ring-2 focus:ring-[#09142b]/10"
+            }`}
+            autoComplete="off"
+          />
+          {searchTerm && !isSearching && (
+            <button
+              type="button"
+              onClick={handleSearchClear}
+              className="absolute left-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded"
+            >
+              <FiX className="w-4 h-4" />
+            </button>
+          )}
+          {debouncedSearchTerm && totalRequests > 0 && (
+            <p className="absolute -bottom-5 right-0 text-xs text-slate-500">
+              {totalRequests} نتيجة
+            </p>
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <select
+            value={itemsPerPage}
+            onChange={(e) => {
+              setItemsPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+            className="py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm focus:border-[#09142b]"
+          >
+            <option value={5}>5 لكل صفحة</option>
+            <option value={10}>10 لكل صفحة</option>
+            <option value={25}>25 لكل صفحة</option>
+            <option value={50}>50 لكل صفحة</option>
+          </select>
         </div>
       </div>
 
-      {/* Data Table */}
-      <div className="bg-white rounded-lg shadow border">
-        <DataTable
-          data={requests}
-          columns={columns}
-          pagination={{
-            total: totalRequests,
-            limit: itemsPerPage,
-            offset: (currentPage - 1) * itemsPerPage,
-            onPageChange: (offset) => {
-              const newPage = Math.floor(offset / itemsPerPage) + 1;
-              setCurrentPage(newPage);
-            }
-          }}
-          searchTerm={searchTerm}
-          isLoading={isLoadingRequests}
-        />
+      {/* Table / Card container */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        {requests.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 px-4">
+            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+              <FiMessageSquare className="w-8 h-8 text-slate-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-[#09142b] mb-1">لا توجد طلبات</h3>
+            <p className="text-slate-500 text-sm text-center max-w-sm">
+              {debouncedSearchTerm || selectedFilter !== "all"
+                ? "لا توجد نتائج تطابق البحث أو الفلاتر. جرّب تغيير المعايير."
+                : "لم يتم إرسال أي طلبات تواصل حتى الآن."}
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Card list: mobile */}
+            <div className="lg:hidden p-4 space-y-4">
+              {requests.map((request) => {
+                const isOpen = openActionsId === request.id;
+                const cardStatusClass =
+                  statusConfig[request.status]?.color || statusConfig.new.color;
+                return (
+                  <div
+                    key={request.id}
+                    className="border border-slate-200 rounded-xl p-4 bg-slate-50/50"
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <span className="text-slate-500 font-medium">#{request.id}</span>
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={request.status}
+                          onChange={(e) =>
+                            handleStatusChange(request.id, e.target.value)
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          className={`text-xs font-medium rounded-lg border px-3 py-1.5 pe-8 cursor-pointer focus:ring-2 focus:ring-[#09142b]/20 outline-none w-full min-w-[10rem] ${cardStatusClass}`}
+                        >
+                          <option value="new">جديد</option>
+                          <option value="read">مقروء</option>
+                          <option value="replied">تم الرد</option>
+                          <option value="closed">مغلق</option>
+                        </select>
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenActionsId(isOpen ? null : request.id);
+                            }}
+                            className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-200"
+                          >
+                            <FiChevronDown
+                              className={`w-4 h-4 ${isOpen ? "rotate-180" : ""}`}
+                            />
+                          </button>
+                          {isOpen && (
+                            <>
+                              <div
+                                className="fixed inset-0 z-10"
+                                onClick={() => setOpenActionsId(null)}
+                                aria-hidden="true"
+                              />
+                              <div className="absolute left-0 top-full mt-1 z-20 min-w-[160px] py-1 bg-white rounded-xl shadow-lg border border-slate-200">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    handleView(request);
+                                    setOpenActionsId(null);
+                                  }}
+                                  className="w-full px-3 py-2 text-right text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                >
+                                  <FiEye className="w-4 h-4" /> عرض
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    handleReply(request);
+                                    setOpenActionsId(null);
+                                  }}
+                                  className="w-full px-3 py-2 text-right text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                >
+                                  <FiMessageSquare className="w-4 h-4" /> رد
+                                </button>
+                                <hr className="my-1 border-slate-100" />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    handleDelete(request);
+                                    setOpenActionsId(null);
+                                  }}
+                                  className="w-full px-3 py-2 text-right text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                >
+                                  <FiTrash2 className="w-4 h-4" /> حذف
+                                </button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-1.5 text-sm">
+                      <p className="font-medium text-slate-800">{request.name}</p>
+                      <p className="text-slate-500 text-xs">{request.email}</p>
+                      {request.phone && (
+                        <p className="text-slate-500 text-xs">{request.phone}</p>
+                      )}
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-slate-200 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                      <span className="text-slate-500">الموضوع</span>
+                      <span className="text-slate-800">
+                        {request.subject || "—"}
+                      </span>
+                      <span className="text-slate-500">الأولوية</span>
+                      <span className="text-slate-800">
+                        {request.priority === "urgent" && "عاجل"}
+                        {request.priority === "high" && "عالية"}
+                        {request.priority === "normal" && "عادية"}
+                        {request.priority === "low" && "منخفضة"}
+                        {!request.priority && "—"}
+                      </span>
+                      <span className="text-slate-500">التاريخ</span>
+                      <span className="text-slate-800">
+                        {request.created_at
+                          ? new Date(request.created_at).toLocaleDateString(
+                              "ar-DZ",
+                              {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              }
+                            )
+                          : "—"}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleView(request)}
+                      className="mt-3 w-full py-2 rounded-xl bg-[#09142b] text-white text-sm font-medium hover:bg-[#0b1a36] transition-colors"
+                    >
+                      عرض التفاصيل
+                    </button>
+                  </div>
+                );
+              })}
+              {totalRequests > itemsPerPage && (
+                <div className="flex items-center justify-center gap-2 pt-4 border-t border-slate-200">
+                  <button
+                    type="button"
+                    disabled={currentPage <= 1}
+                    onClick={() =>
+                      setCurrentPage((p) => Math.max(1, p - 1))
+                    }
+                    className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50"
+                  >
+                    السابق
+                  </button>
+                  <span className="text-sm text-slate-600">
+                    {currentPage} /{" "}
+                    {Math.ceil(totalRequests / itemsPerPage)}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={
+                      currentPage >= Math.ceil(totalRequests / itemsPerPage)
+                    }
+                    onClick={() =>
+                      setCurrentPage((p) =>
+                        Math.min(
+                          Math.ceil(totalRequests / itemsPerPage),
+                          p + 1
+                        )
+                      )
+                    }
+                    className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50"
+                  >
+                    التالي
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Table: desktop */}
+            <div className="hidden lg:block overflow-x-visible">
+              <DataTable
+                data={requests}
+                columns={columns}
+                searchTerm={searchTerm}
+                noHorizontalScroll
+                pagination={{
+                  current: currentPage,
+                  limit: itemsPerPage,
+                  total: totalRequests,
+                  offset: (currentPage - 1) * itemsPerPage,
+                  onPageChange: (offset) =>
+                    setCurrentPage(Math.floor(offset / itemsPerPage) + 1),
+                  onItemsPerPageChange: setItemsPerPage,
+                }}
+              />
+            </div>
+          </>
+        )}
       </div>
 
       {/* Delete Confirmation Modal */}
@@ -516,11 +740,11 @@ const ContactRequests = () => {
 
       {/* View Request Modal */}
       {showViewModal && selectedRequest && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
+            <div className="p-6 sm:p-8">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-[#09142b]">
                   تفاصيل طلب التواصل
                 </h2>
                 <button
@@ -528,14 +752,13 @@ const ContactRequests = () => {
                     setShowViewModal(false);
                     setSelectedRequest(null);
                   }}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
                 >
-                  <FiX className="w-6 h-6" />
+                  <FiX className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="space-y-6">
-                {/* Client Information */}
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                     <FiUser className="ml-2" />
@@ -575,12 +798,12 @@ const ContactRequests = () => {
                         {selectedRequest.priority === "high" && "عالية"}
                         {selectedRequest.priority === "normal" && "عادية"}
                         {selectedRequest.priority === "low" && "منخفضة"}
+                        {!selectedRequest.priority && "—"}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Message Information */}
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                     <FiFileText className="ml-2" />
@@ -610,51 +833,34 @@ const ContactRequests = () => {
                   </div>
                 </div>
 
-                {/* Reply Information */}
                 {selectedRequest.replyMessage && (
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                       <FiMessageSquare className="ml-2" />
                       الرد
                     </h3>
-                    <div className="bg-blue-50 p-4 rounded-lg">
+                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
                       <p className="text-gray-900 whitespace-pre-wrap">
                         {selectedRequest.replyMessage}
                       </p>
                     </div>
                     {selectedRequest.repliedAt && (
-                      <p className="text-sm text-gray-500 mt-2">
+                      <p className="text-sm text-slate-500 mt-2">
                         تم الرد في:{" "}
-                        {(() => {
-                          try {
-                            const date = new Date(selectedRequest.repliedAt);
-                            const dayNames = [
-                              "الأحد",
-                              "الاثنين",
-                              "الثلاثاء",
-                              "الأربعاء",
-                              "الخميس",
-                              "الجمعة",
-                              "السبت",
-                            ];
-                            const dayName = dayNames[date.getDay()];
-                            const day = String(date.getDate()).padStart(2, "0");
-                            const month = String(date.getMonth() + 1).padStart(
-                              2,
-                              "0"
-                            );
-                            const year = date.getFullYear();
-                            return `${dayName} ${day}/${month}/${year}`;
-                          } catch (error) {
-                            return "غير محدد";
-                          }
-                        })()}
+                        {new Date(
+                          selectedRequest.repliedAt
+                        ).toLocaleDateString("ar-DZ", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                       </p>
                     )}
                   </div>
                 )}
 
-                {/* Request Details */}
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                     <FiCalendar className="ml-2" />
@@ -666,38 +872,17 @@ const ContactRequests = () => {
                         تاريخ الإرسال
                       </label>
                       <p className="text-gray-900">
-                        {(() => {
-                          try {
-                            const date = new Date(selectedRequest.created_at);
-                            const dayNames = [
-                              "الأحد",
-                              "الاثنين",
-                              "الثلاثاء",
-                              "الأربعاء",
-                              "الخميس",
-                              "الجمعة",
-                              "السبت",
-                            ];
-                            const dayName = dayNames[date.getDay()];
-                            const day = String(date.getDate()).padStart(2, "0");
-                            const month = String(date.getMonth() + 1).padStart(
-                              2,
-                              "0"
-                            );
-                            const year = date.getFullYear();
-                            const hours = String(date.getHours()).padStart(
-                              2,
-                              "0"
-                            );
-                            const minutes = String(date.getMinutes()).padStart(
-                              2,
-                              "0"
-                            );
-                            return `${dayName} ${day}/${month}/${year} ${hours}:${minutes}`;
-                          } catch (error) {
-                            return "غير محدد";
-                          }
-                        })()}
+                        {selectedRequest.created_at
+                          ? new Date(
+                              selectedRequest.created_at
+                            ).toLocaleDateString("ar-DZ", {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })
+                          : "غير محدد"}
                       </p>
                     </div>
                     <div>
@@ -715,17 +900,17 @@ const ContactRequests = () => {
                 </div>
               </div>
 
-              <div className="flex justify-end space-x-3 space-x-reverse mt-8">
+              <div className="flex justify-end gap-3 mt-8">
                 {selectedRequest.status !== "replied" && (
                   <button
                     onClick={() => {
                       setShowViewModal(false);
                       handleReply(selectedRequest);
                     }}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center space-x-2 space-x-reverse"
+                    className="px-5 py-2.5 bg-[#09142b] text-white rounded-xl font-medium hover:bg-[#0b1a36] transition-colors flex items-center gap-2"
                   >
                     <FiMessageSquare size={16} />
-                    <span>رد</span>
+                    رد
                   </button>
                 )}
                 <button
@@ -733,7 +918,7 @@ const ContactRequests = () => {
                     setShowViewModal(false);
                     setSelectedRequest(null);
                   }}
-                  className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
+                  className="px-5 py-2.5 bg-slate-100 text-slate-700 rounded-xl font-medium hover:bg-slate-200 transition-colors"
                 >
                   إغلاق
                 </button>
@@ -745,11 +930,11 @@ const ContactRequests = () => {
 
       {/* Reply Modal */}
       {showReplyModal && selectedRequest && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-xl">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-[#09142b]">
                   رد على الطلب
                 </h2>
                 <button
@@ -758,51 +943,50 @@ const ContactRequests = () => {
                     setSelectedRequest(null);
                     setReplyMessage("");
                   }}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
                 >
-                  <FiX className="w-6 h-6" />
+                  <FiX className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
                     إلى: {selectedRequest.name} ({selectedRequest.email})
                   </label>
                 </div>
-
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
                     رسالة الرد
                   </label>
                   <textarea
                     value={replyMessage}
                     onChange={(e) => setReplyMessage(e.target.value)}
                     rows={6}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#09142b]/20 focus:border-[#09142b] outline-none"
                     placeholder="اكتب رسالة الرد هنا..."
                   />
                 </div>
+              </div>
 
-                <div className="flex items-center justify-end space-x-3 space-x-reverse pt-4">
-                  <button
-                    onClick={() => {
-                      setShowReplyModal(false);
-                      setSelectedRequest(null);
-                      setReplyMessage("");
-                    }}
-                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
-                  >
-                    إلغاء
-                  </button>
-                  <button
-                    onClick={handleSendReply}
-                    disabled={replyMutation.isPending}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400"
-                  >
-                    {replyMutation.isPending ? "جاري الإرسال..." : "إرسال الرد"}
-                  </button>
-                </div>
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  onClick={() => {
+                    setShowReplyModal(false);
+                    setSelectedRequest(null);
+                    setReplyMessage("");
+                  }}
+                  className="px-4 py-2.5 text-slate-600 bg-slate-100 rounded-xl font-medium hover:bg-slate-200 transition-colors"
+                >
+                  إلغاء
+                </button>
+                <button
+                  onClick={handleSendReply}
+                  disabled={!replyMessage.trim() || replyMutation.isPending}
+                  className="px-5 py-2.5 bg-[#09142b] text-white rounded-xl font-medium hover:bg-[#0b1a36] transition-colors disabled:opacity-50"
+                >
+                  {replyMutation.isPending ? "جاري الإرسال..." : "إرسال الرد"}
+                </button>
               </div>
             </div>
           </div>

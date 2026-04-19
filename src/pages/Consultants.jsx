@@ -53,8 +53,44 @@ const Consultants = () => {
         />
       </Helmet>
 
-      <div className="min-h-screen bg-[#faf6f0] py-10 sm:py-14" dir={isRTL ? "rtl" : "ltr"}>
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+      <div
+        className="relative min-h-screen overflow-hidden py-10 sm:py-14"
+        style={{
+          background: "linear-gradient(165deg, #f5f0e8 0%, #faf6f0 35%, #f2ebe0 100%)",
+        }}
+        dir={isRTL ? "rtl" : "ltr"}
+      >
+        {/* Background effects - same as home consultants section */}
+        <div className="pointer-events-none absolute inset-0 z-0 min-h-full" aria-hidden>
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse 90% 60% at 50% -10%, rgba(200, 164, 94, 0.22) 0%, transparent 55%), radial-gradient(ellipse 70% 50% at 110% 110%, rgba(9, 20, 43, 0.14) 0%, transparent 50%), radial-gradient(ellipse 60% 45% at -10% 90%, rgba(200, 164, 94, 0.16) 0%, transparent 50%)",
+            }}
+          />
+          <div className="absolute -top-20 -right-20 h-80 w-80 rounded-full bg-[#c8a45e] opacity-20 blur-3xl" />
+          <div className="absolute -bottom-24 -left-16 h-96 w-96 rounded-full bg-[#09142b] opacity-15 blur-3xl" />
+          <div className="absolute right-[15%] top-1/2 h-56 w-56 -translate-y-1/2 rounded-full bg-[#c8a45e] opacity-15 blur-2xl" />
+          <div className="absolute left-[20%] top-1/3 h-40 w-40 rounded-full bg-[#09142b] opacity-10 blur-2xl" />
+          <div
+            className="absolute inset-0 opacity-[0.06]"
+            style={{
+              backgroundImage: `linear-gradient(rgba(9, 20, 43, 0.4) 1px, transparent 1px),
+                                linear-gradient(90deg, rgba(9, 20, 43, 0.4) 1px, transparent 1px)`,
+              backgroundSize: "40px 40px",
+            }}
+          />
+          <div
+            className="absolute left-0 top-1/2 h-[2px] w-full -translate-y-1/2 opacity-20"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent 0%, rgba(9, 20, 43, 0.15) 25%, rgba(200, 164, 94, 0.35) 50%, rgba(9, 20, 43, 0.15) 75%, transparent 100%)",
+            }}
+          />
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           {/* Hero */}
           <header className="mb-10 text-center">
             <h1 className="text-3xl font-bold text-[#09142b] sm:text-4xl">

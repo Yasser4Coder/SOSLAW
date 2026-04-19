@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/useAuth";
 import usePaymentDetails from "../hooks/usePaymentDetails";
 import SEOHead from "../components/SEOHead";
@@ -8,9 +8,11 @@ import {
   FiPrinter,
   FiArrowLeft,
   FiCheckCircle,
+  FiAlertCircle,
   FiPhone,
   FiMail,
   FiMapPin,
+  FiCreditCard,
 } from "react-icons/fi";
 import "./PaymentDetails.css";
 
@@ -72,9 +74,11 @@ const mockServiceRequest = {
 const PaymentDetails = () => {
   const { t, i18n } = useTranslation();
   const { requestId } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const isRTL = i18n.language === "ar";
+  const urlStatus = searchParams?.get("status"); // success | failed from Chargily redirect
 
   // Check if user is authenticated
   if (!isAuthenticated) {
@@ -99,11 +103,17 @@ const PaymentDetails = () => {
     );
   }
 
-  // Get payment details from API
-  const { paymentDetails, loading, error } = usePaymentDetails(
+  // Use receipt token (unguessable) when param is not numeric; else fallback to legacy numeric id
+  const fetchType = requestId && /^\d+$/.test(requestId) ? "serviceRequest" : "reference";
+  const { paymentDetails, loading, error, refetch } = usePaymentDetails(
     requestId,
-    "serviceRequest"
+    fetchType
   );
+
+  // Refetch when returning from Chargily success so status can update
+  React.useEffect(() => {
+    if (urlStatus === "success" && requestId) refetch();
+  }, [urlStatus, requestId, refetch]);
 
   // Helper function to map API data to display format
   const mapPaymentData = (data) => {
@@ -145,6 +155,7 @@ const PaymentDetails = () => {
       paymentMethodFr: getPaymentMethodText(payment.paymentMethod || "ccp", "fr"),
       paymentReference: payment.paymentReference || "",
       transactionId: payment.transactionId || "",
+      chargilyCheckoutUrl: payment.chargilyCheckoutUrl || null,
       dueDate: payment.dueDate || serviceRequest.paymentDueDate || "",
       paidAt: payment.paidAt || "",
       clientInfo: {
@@ -207,28 +218,13 @@ const PaymentDetails = () => {
 
   const getPaymentMethodText = (method, lang) => {
     const methodMap = {
-      ccp: { 
-        ar: "CCP/Baridimob - أفراد", 
-        en: "CCP/Baridimob - Individuals", 
-        fr: "CCP/Baridimob - Particuliers" 
-      },
-      baridimob: { 
-        ar: "Baridimob", 
-        en: "Baridimob", 
-        fr: "Baridimob" 
-      },
-      bank_transfer: { 
-        ar: "تحويل بنكي", 
-        en: "Bank Transfer", 
-        fr: "Virement bancaire" 
-      },
-      cash: { 
-        ar: "نقداً", 
-        en: "Cash", 
-        fr: "Espèces" 
-      },
+      chargily: { ar: "EDAHABIA - CIB", en: "EDAHABIA - CIB", fr: "EDAHABIA - CIB" },
+      ccp: { ar: "CCP/Baridimob - أفراد", en: "CCP/Baridimob - Individuals", fr: "CCP/Baridimob - Particuliers" },
+      baridimob: { ar: "Baridimob", en: "Baridimob", fr: "Baridimob" },
+      bank_transfer: { ar: "تحويل بنكي", en: "Bank Transfer", fr: "Virement bancaire" },
+      cash: { ar: "نقداً", en: "Cash", fr: "Espèces" },
     };
-    return methodMap[method]?.[lang] || methodMap.ccp[lang];
+    return methodMap[method]?.[lang] ?? methodMap.ccp[lang];
   };
 
   const getLocalizedText = (item, field) => {
@@ -269,7 +265,7 @@ const PaymentDetails = () => {
             {t("noPaymentRequiredDesc", "هذا الطلب لا يتطلب دفع أو لم يتم إنشاء سجل دفع بعد")}
           </p>
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/service-requests")}
             className="px-4 py-2 bg-[#c8a45e] text-white rounded-lg hover:bg-[#b8944f] transition-colors"
           >
             {t("back", "العودة")}
@@ -323,7 +319,7 @@ const PaymentDetails = () => {
           </h2>
           <p className="text-gray-600 mb-4">{error}</p>
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/service-requests")}
             className="px-4 py-2 bg-[#c8a45e] text-white rounded-lg hover:bg-[#b8944f] transition-colors"
           >
             {t("back", "العودة")}
@@ -349,7 +345,7 @@ const PaymentDetails = () => {
       <div className="bg-white border-b border-gray-200 p-4 print:hidden">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/service-requests")}
             className="flex items-center gap-2 text-[#09142b] hover:text-[#c8a45e] transition-colors cursor-pointer"
           >
             <FiArrowLeft className="w-5 h-5" />
@@ -367,338 +363,141 @@ const PaymentDetails = () => {
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto p-6 print:p-3 print:max-w-none">
-        {/* Header Section */}
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <span
-                className={`px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(displayData.status)}`}
-                dir={isRTL ? "rtl" : "ltr"}
-              >
+        {/* Chargily redirect status banner */}
+        {urlStatus === "success" && (
+          <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-4 flex items-center gap-3">
+            <FiCheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
+            <div>
+              <p className="font-semibold text-green-800">{t("paymentSuccess", "تم الدفع بنجاح")}</p>
+              <p className="text-sm text-green-700">{t("paymentSuccessDesc", "سنراجع الطلب ونعلمك عند التأكيد.")}</p>
+            </div>
+          </div>
+        )}
+        {urlStatus === "failed" && (
+          <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 flex items-center gap-3">
+            <FiAlertCircle className="w-6 h-6 text-amber-600 flex-shrink-0" />
+            <div>
+              <p className="font-semibold text-amber-800">{t("paymentFailed", "لم يتم إتمام الدفع")}</p>
+              <p className="text-sm text-amber-700">{t("paymentFailedDesc", "يمكنك المحاولة مرة أخرى بالضغط على زر الدفع أدناه.")}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Receipt card – professional layout for screen and PDF */}
+        <div className="receipt-card bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden print:shadow-none print:border print:rounded-lg">
+          {/* Receipt header */}
+          <div className="receipt-header bg-[#09142b] text-white px-6 py-5 print:py-4">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center print:w-10 print:h-10">
+                  <img src="/logo.svg" alt="SOS Law" className="w-8 h-8 print:w-6 print:h-6" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold tracking-tight" dir="rtl">SOS LAW</h1>
+                  <p className="text-white/80 text-sm" dir="rtl">إيصال طلب خدمة</p>
+                </div>
+              </div>
+              <span className="px-4 py-2 rounded-lg text-sm font-semibold bg-white text-[#09142b] border border-white/30" dir="rtl">
                 {displayData.statusAr || getStatusText(displayData.status, "ar")}
               </span>
             </div>
-            <p className="text-xs text-gray-500" dir={isRTL ? "rtl" : "ltr"}>
-              {t("paymentId", "رقم الطلبية")}: {displayData.paymentId || displayData.id}
-            </p>
           </div>
-          <div className="text-right">
-            <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-1">
-              <img 
-                src="/logo.svg" 
-                alt="SOS Law Logo" 
-                className="w-8 h-8"
-              />
-            </div>
-            <p className="text-xs text-gray-500">SOS Law</p>
-          </div>
-        </div>
 
-        {/* Order Information */}
-        <div className="bg-gray-50 p-4 rounded-lg mb-4">
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <h3
-                className="text-sm font-semibold text-[#09142b] mb-2"
-                dir={isRTL ? "rtl" : "ltr"}
-              >
-                {t("orderCreatedFor", "أنشأت هذه الطلبية لـ")}
-              </h3>
-              <div className="space-y-1">
-                <p className="text-sm text-[#09142b] font-medium">
-                  {displayData.clientInfo.name}
-                </p>
-              </div>
+          <div className="p-6 print:p-5 space-y-5">
+            {/* رقم الطلبية + Service name */}
+            <div className="receipt-section">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5" dir="rtl">{t("paymentId", "رقم الطلبية")}</p>
+              <p className="text-sm font-mono font-semibold text-[#09142b] mb-3" dir="ltr">
+                {displayData.paymentId || displayData.id || "—"}
+              </p>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1" dir="rtl">{t("serviceName", "الخدمة")}</p>
+              <p className="text-lg font-bold text-[#09142b]" dir={isRTL ? "rtl" : "ltr"}>
+                {getLocalizedText(displayData, "serviceName")}
+              </p>
             </div>
-            <div className="space-y-2">
+
+            {/* Client & date & payment method */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 receipt-section border-t border-slate-100 pt-5">
               <div>
-                <h4
-                  className="text-sm font-semibold text-[#09142b] mb-1"
-                  dir={isRTL ? "rtl" : "ltr"}
-                >
-                  {t("orderDate", "تاريخ الطلبية")}
-                </h4>
-                <p className="text-sm text-[#09142b]">
-                  {displayData.createdAt}
-                </p>
+                <p className="text-xs text-slate-500 mb-0.5" dir="rtl">{t("orderCreatedFor", "العميل")}</p>
+                <p className="font-semibold text-[#09142b]">{displayData.clientInfo.name}</p>
+                {displayData.clientInfo.email && <p className="text-sm text-slate-600">{displayData.clientInfo.email}</p>}
               </div>
               <div>
-                <h4
-                  className="text-sm font-semibold text-[#09142b] mb-1"
-                  dir={isRTL ? "rtl" : "ltr"}
-                >
-                  {t("paymentMethod", "طريقة الدفع")}
-                </h4>
-                <p className="text-sm text-[#09142b]">
-                  {getLocalizedText(displayData, "paymentMethod")}
-                </p>
+                <p className="text-xs text-slate-500 mb-0.5" dir="rtl">{t("orderDate", "تاريخ الطلب")}</p>
+                <p className="font-semibold text-[#09142b]">{displayData.createdAt}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 mb-0.5" dir="rtl">{t("paymentMethod", "طريقة الدفع")}</p>
+                <p className="font-semibold text-[#09142b]">{getPaymentMethodText(displayData.paymentMethod, isRTL ? "ar" : i18n.language === "fr" ? "fr" : "en")}</p>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Order Items Table */}
-        <div className="mb-4">
-          <h3
-            className="text-sm font-semibold text-[#09142b] mb-2"
-            dir={isRTL ? "rtl" : "ltr"}
-          >
-            {t("orderItems", "عناصر الطلبية")}
-          </h3>
-          <div className="border border-gray-200 rounded-lg overflow-hidden">
-            <table className="w-full text-xs">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th
-                    className="px-2 py-2 text-left text-xs font-semibold text-[#09142b]"
-                    dir={isRTL ? "rtl" : "ltr"}
-                  >
-                    {t("details", "تفاصيل")}
-                  </th>
-                  <th
-                    className="px-2 py-2 text-right text-xs font-semibold text-[#09142b]"
-                    dir={isRTL ? "rtl" : "ltr"}
-                  >
-                    {t("amount", "المبلغ")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {displayData.items.map((item, index) => (
-                  <tr key={index} className="border-t border-gray-200">
-                    <td
-                      className="px-2 py-2 text-[#09142b]"
-                      dir={isRTL ? "rtl" : "ltr"}
-                    >
-                      {getLocalizedText(item, "details")}
-                    </td>
-                    <td className="px-2 py-2 text-right text-[#09142b] font-medium">
-                      {item.amount > 0
-                        ? `${item.amount.toLocaleString()} ${
-                            displayData.currency
-                          }`
-                        : `0.00 ${displayData.currency}`}
-                    </td>
+            {/* Amount table – receipt style */}
+            <div className="receipt-section border-t border-slate-100 pt-5">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-200">
+                    <th className="text-right py-2 font-semibold text-[#09142b]" dir="rtl">{t("details", "البيان")}</th>
+                    <th className="text-left py-2 font-semibold text-[#09142b]" dir="rtl">{t("amount", "المبلغ")}</th>
                   </tr>
-                ))}
-                {/* Summary Rows */}
-                <tr className="border-t-2 border-gray-300 bg-gray-50">
-                  <td
-                    className="px-2 py-2 font-semibold text-[#09142b]"
-                    dir={isRTL ? "rtl" : "ltr"}
-                  >
-                    {t("total", "المجموع")}
-                  </td>
-                  <td className="px-2 py-2 text-right font-semibold text-[#09142b]">
-                    {displayData.total.toLocaleString()} {displayData.currency}
-                  </td>
-                </tr>
-                <tr className="bg-gray-50">
-                  <td
-                    className="px-2 py-2 text-[#09142b]"
-                    dir={isRTL ? "rtl" : "ltr"}
-                  >
-                    {t("deductedBalance", "رصيد مستقطع")}
-                  </td>
-                  <td className="px-2 py-2 text-right text-[#09142b]">
-                    0.00 {displayData.currency}
-                  </td>
-                </tr>
-                <tr className="border-t-2 border-gray-400 bg-gray-100">
-                  <td
-                    className="px-2 py-2 font-bold text-sm text-[#09142b]"
-                    dir={isRTL ? "rtl" : "ltr"}
-                  >
-                    {t("grandTotal", "الإجمالي")}
-                  </td>
-                  <td className="px-2 py-2 text-right font-bold text-sm text-[#09142b]">
-                    {displayData.currency} {displayData.total.toLocaleString()}
-                    .00
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+                </thead>
+                <tbody>
+                  {displayData.items.map((item, index) => (
+                    <tr key={index} className="border-b border-slate-100">
+                      <td className="py-3 text-[#09142b]" dir={isRTL ? "rtl" : "ltr"}>{getLocalizedText(displayData, "serviceName")}</td>
+                      <td className="py-3 text-[#09142b] font-medium">{item.amount != null ? `${Number(item.amount).toLocaleString("ar-DZ")} ${displayData.currency}` : `—`}</td>
+                    </tr>
+                  ))}
+                  <tr className="bg-slate-50 font-bold text-[#09142b]">
+                    <td className="py-3" dir="rtl">{t("grandTotal", "الإجمالي")}</td>
+                    <td className="py-3">{displayData.total != null ? `${Number(displayData.total).toLocaleString("ar-DZ")} ${displayData.currency}` : `—`}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
-        {/* Payment Steps */}
-        <div className="bg-[#f8f9fa] p-4 rounded-lg mb-4 print:block">
-          <h3
-            className="text-sm font-semibold text-[#09142b] mb-3"
-            dir={isRTL ? "rtl" : "ltr"}
-          >
-            {t("paymentSteps", "خطوات الدفع")}
-          </h3>
-          <div className="space-y-3">
-            <div className="flex items-start gap-3">
-              <span className="bg-[#c8a45e] text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0">
-                1
-              </span>
-              <div>
-                <h5
-                  className="text-sm font-semibold text-[#09142b] mb-1"
-                  dir={isRTL ? "rtl" : "ltr"}
+            {/* Chargily Pay button – when pending */}
+            {displayData.status === "pending" && displayData.chargilyCheckoutUrl && (
+              <div className="receipt-section print:hidden bg-slate-50 rounded-xl p-4 border border-slate-100">
+                <p className="text-sm font-semibold text-[#09142b] mb-2" dir="rtl">{t("payNow", "ادفع الآن")}</p>
+                <a
+                  href={displayData.chargilyCheckoutUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#09142b] text-white rounded-xl font-semibold text-sm hover:bg-[#0b1a36] transition-colors"
                 >
-                  {t("step1Title", "الخطوة 1")}
-                </h5>
-                <p
-                  className="text-sm text-[#09142b]"
-                  dir={isRTL ? "rtl" : "ltr"}
-                >
-                  {t(
-                    "step1Payment",
-                    "قم بإرسال المبلغ المطلوب عبر إحدى وسائل الدفع المتاحة لدينا."
-                  )}
-                </p>
+                  <FiCreditCard className="w-4 h-4" />
+                  {t("payWithChargily", "الدفع عبر EDAHABIA - CIB")}
+                </a>
+              </div>
+            )}
+
+            {/* ملاحظات هامة */}
+            <div className="receipt-section border-t border-slate-200 pt-5 mt-5 bg-slate-50/80 rounded-xl p-4 print:bg-transparent">
+              <h3 className="text-sm font-bold text-[#09142b] mb-3" dir="rtl">
+                ملاحظات هامة
+              </h3>
+              <div className="space-y-2 text-sm text-slate-700 leading-relaxed" dir="rtl">
+                <p>تم استلام المبلغ بنجاح وسيتم الشروع في تنفيذ الخدمة وفقًا للإجراءات المعتمدة.</p>
+                <p>في حال وجود أي استفسار بخصوص هذه العملية أو مواجهة أي مشكلة تقنية، يرجى التواصل مع فريق الدعم.</p>
+                <p>يحتفظ هذا الإيصال كمرجع رسمي لعملية الدفع.</p>
               </div>
             </div>
-            <div className="flex items-start gap-3">
-              <span className="bg-[#c8a45e] text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0">
-                2
-              </span>
-              <div>
-                <h5
-                  className="text-sm font-semibold text-[#09142b] mb-1"
-                  dir={isRTL ? "rtl" : "ltr"}
-                >
-                  {t("step2Title", "الخطوة 2")}
-                </h5>
-                <p
-                  className="text-sm text-[#09142b]"
-                  dir={isRTL ? "rtl" : "ltr"}
-                >
-                  {t(
-                    "step2Payment",
-                    "أرسل وصل الدفع مرفقًا بالاسم واللقب ورقم الطلبية او قم بطباعة الوصل و ارسالة إلى بريدنا الإلكتروني الرسمي."
-                  )}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="bg-[#c8a45e] text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0">
-                3
-              </span>
-              <div>
-                <h5
-                  className="text-sm font-semibold text-[#09142b] mb-1"
-                  dir={isRTL ? "rtl" : "ltr"}
-                >
-                  {t("step3Title", "الخطوة 3")}
-                </h5>
-                <p
-                  className="text-sm text-[#09142b]"
-                  dir={isRTL ? "rtl" : "ltr"}
-                >
-                  {t(
-                    "step3Payment",
-                    "انتظر تأكيدنا بعد التحقق من عملية الدفع ومعالجة طلبك."
-                  )}
-                </p>
-              </div>
+
+            {/* Receipt footer */}
+            <div className="receipt-footer border-t border-slate-200 pt-4 text-center">
+              <p className="text-xs text-slate-600 font-medium" dir="rtl">SOS LAW — الخدمات القانونية والاستشارات</p>
             </div>
           </div>
         </div>
 
-        {/* Mobile Payment Info - Only visible on mobile */}
-        <div className="bg-[#f8f9fa] p-4 rounded-lg mb-4 print:hidden md:hidden">
-          <h4
-            className="text-sm font-semibold text-[#09142b] mb-3"
-            dir={isRTL ? "rtl" : "ltr"}
-          >
-            {t("paymentInfo", "معلومات الدفع")}
-          </h4>
-
-          {/* Email */}
-          <div className="mb-3">
-            <p
-              className="text-xs text-gray-600 mb-1"
-              dir={isRTL ? "rtl" : "ltr"}
-            >
-              {t("sendReceiptTo", "إرسال الوصل إلى")}:
-            </p>
-            <p className="text-sm font-semibold text-[#09142b] break-all">
-              payment@soslawdz.com
-            </p>
-          </div>
-
-          {/* CCP Account */}
-          <div className="mb-3">
-            <p
-              className="text-xs text-gray-600 mb-1"
-              dir={isRTL ? "rtl" : "ltr"}
-            >
-              {t("ccpAccount", "حساب CCP")}:
-            </p>
-            <p className="text-sm font-mono font-bold text-[#09142b]">
-              1234567890123456789
-            </p>
-          </div>
-
-          {/* Baridimob Account */}
-          <div>
-            <p
-              className="text-xs text-gray-600 mb-1"
-              dir={isRTL ? "rtl" : "ltr"}
-            >
-              {t("baridimobAccount", "حساب Baridimob")}:
-            </p>
-            <p className="text-sm font-mono font-bold text-[#09142b]">
-              007 12345 6789012345678 89
-            </p>
-          </div>
-        </div>
-
-        {/* Print Button - Only visible when printing */}
-        <div className="print:block hidden text-center">
-          <button
-            onClick={handlePrint}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[#09142b] text-white rounded-lg hover:bg-[#09142b]/80 transition-colors cursor-pointer"
-          >
-            <FiPrinter className="w-5 h-5" />
-            <span>{t("print", "طباعة")}</span>
-          </button>
-        </div>
+        {/* Save as PDF hint – screen only */}
+        <p className="mt-4 text-center text-sm text-slate-500 print:hidden" dir="rtl">
+          يمكنك تحميل هذا الإيصال بصيغة PDF عبر الضغط على زر &quot;طباعة&quot; ثم اختيار &quot;حفظ كـ PDF&quot;.
+        </p>
       </div>
 
-      {/* Floating Payment Info - Hidden when printing */}
-      <div className="fixed bottom-4 right-4 bg-white border border-gray-200 rounded-lg shadow-lg p-4 max-w-sm print:hidden z-50 hidden md:block">
-        <h4
-          className="text-sm font-semibold text-[#09142b] mb-3"
-          dir={isRTL ? "rtl" : "ltr"}
-        >
-          {t("paymentInfo", "معلومات الدفع")}
-        </h4>
-
-        {/* Email */}
-        <div className="mb-3">
-          <p className="text-xs text-gray-600 mb-1" dir={isRTL ? "rtl" : "ltr"}>
-            {t("sendReceiptTo", "إرسال الوصل إلى")}:
-          </p>
-          <p className="text-sm font-semibold text-[#09142b] break-all">
-            payment@soslawdz.com
-          </p>
-        </div>
-
-        {/* CCP Account */}
-        <div className="mb-3">
-          <p className="text-xs text-gray-600 mb-1" dir={isRTL ? "rtl" : "ltr"}>
-            {t("ccpAccount", "حساب CCP")}:
-          </p>
-          <p className="text-sm font-mono flex items-center justify-end flex-row-reverse gap-1 font-bold text-[#09142b]">
-          <span>0041584624</span> clé <span>71</span>
-          </p>  
-        </div>
-
-        {/* Baridimob Account */}
-        <div>
-          <p className="text-xs text-gray-600 mb-1" dir={isRTL ? "rtl" : "ltr"}>
-            {t("baridimobAccount", "حساب Baridimob")}:
-          </p>
-          <p className="text-sm font-mono flex items-center justify-end flex-row-reverse gap-1 font-bold text-[#09142b]">
-            00799999004158462471
-          </p>
-        </div>
-      </div>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import SEOHead from "../components/SEOHead";
 import { useContactInfo } from "../hooks/useContactInfo";
 import {
@@ -143,6 +144,42 @@ const Contact = () => {
         >
           {t("contactPageSubtitle")}
         </p>
+      </section>
+
+      {/* Important Notice */}
+      <section className="w-full max-w-6xl mx-auto px-4 pt-6 pb-2" dir="rtl">
+        <div className="rounded-2xl border-2 border-amber-500/80 bg-amber-50 shadow-md p-5 md:p-6">
+          <div className="flex items-start gap-3">
+            <FiAlertCircle className="text-amber-600 flex-shrink-0 w-6 h-6 mt-0.5" aria-hidden />
+            <div>
+              <h2 className="text-lg font-bold text-amber-900 mb-3">تنبيه هام</h2>
+              <p className="text-amber-900/90 text-sm md:text-base leading-relaxed mb-3">
+                تُخصص صفحة تواصل معنا للاستفسارات العامة فقط، مثل:
+              </p>
+              <ul className="list-disc list-inside text-amber-900/90 text-sm md:text-base space-y-1 mb-3 mr-2">
+                <li>الاستعلام عن الخدمات القانونية المتوفرة</li>
+                <li>طلب معلومات حول الأسعار</li>
+                <li>التأكد مما إذا كانت خدمة معينة متاحة</li>
+                <li>الاقتراحات أو طلبات التعاون والشراكات</li>
+              </ul>
+              <p className="text-amber-900/90 text-sm md:text-base leading-relaxed mb-2">
+                يرجى العلم أنه لا يتم استقبال أو معالجة طلبات الخدمات عبر هذه الصفحة.
+                أي طلب خدمة يُرسل من خلال نموذج &quot;تواصل معنا&quot; سيتم حذفه ولن يُؤخذ بعين الاعتبار.
+              </p>
+              <p className="text-amber-900 font-semibold text-sm md:text-base">
+                لطلب خدمة بشكل رسمي، يرجى استخدام صفحة{" "}
+                <Link
+                  to="/"
+                  state={{ scrollTo: "services" }}
+                  className="text-amber-700 underline underline-offset-2 hover:text-amber-800 font-bold"
+                >
+                  طلب خدمة
+                </Link>{" "}
+                المخصصة لذلك داخل المنصة.
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Main Content Split Layout */}

@@ -1,0 +1,78 @@
+1- fix the images it didnt upload i see them in upload folder in shop folder but i they didnt apir on the website in the front end
+when adding a new product in بيانات إضافية (مفصولة بفاصلة) i can do space some data need to have a space fix it also
+
+2- i want u to a section in the home page for the Training courses that we provide and add a page for it for showing more courses and a page for showing the course details when we click on a course
+the data that we use usglley use in the couses are this examples
+<VoiceCourseAnnouncement />,
+<TrainingCourseAnnouncement />,
+<NationalConferenceAnnouncement />
+and every course samtimes its free to register and somtimes it has a price
+
+create the backend for it for the admin to create and delete and update a course
+
+3- i want this "أول منصة في الجزائر تجمع بين
+القانون + ريادة الأعمال + التدريب " to be clear for the users that uses our website find a place in hero section for it 
+
+4- and find a place for this in about page "منصة متخصصة في:
+⚖️ الاستشارات والخدمات القانونية
+🚀 مرافقة المشاريع وريادة الأعمال
+🎓 التكوين والتدريب الاحترافي
+📚 الموارد التعليمية القانونية "
+
+without emojies
+
+
+
+دليل ريادة الأعمال – رحلتك نحو إطلاق مشروعك الخاص
+
+دليل ريادة الأعمال
+كتاب عملي يساعدك على تحويل فكرتك إلى مشروع حقيقي من خلال تعلم أساسيات إدارة المشاريع، التخطيط، التسويق، والتجارة الإلكترونية. يشمل أيضًا 4 ورشات تدريبية مصوّرة لمساعدتك على التطبيق خطوة بخطوة.
+
+
+دليل ريادة الأعمال – رحلتك نحو إطلاق مشروعك الخاص
+
+هل لديك فكرة مشروع وتريد تحويلها إلى واقع؟
+دليل ريادة الأعمال هو دليل عملي يهدف إلى مساعدتك على فهم أساسيات ريادة الأعمال وبناء مشروع ناجح خطوة بخطوة.
+
+تم إعداد هذا الدليل ليكون مرجعًا بسيطًا وواضحًا لكل شخص يريد دخول عالم المشاريع، حيث يشرح أهم المفاهيم التي يحتاجها أي رائد أعمال في بداية طريقه.
+
+ماذا يحتوي الدليل؟
+
+يغطي الدليل مجموعة من المحاور الأساسية التي تساعدك على بناء مشروعك بشكل صحيح، منها:
+
+إدارة المشاريع وفهم أساسيات تنظيم العمل
+
+التخطيط للمشروع وتحويل الفكرة إلى خطة واضحة
+
+التسويق وكيفية الوصول إلى العملاء
+
+التجارة الإلكترونية وطرق الاستفادة من الإنترنت لبيع منتجاتك أو خدماتك
+
+ماذا ستحصل مع الدليل؟
+
+عند حصولك على هذا الدليل ستحصل أيضًا على محتوى إضافي يساعدك على التطبيق:
+
+4 ورشات تدريبية مصوّرة عبر تطبيق تلغرام
+
+شرح عملي يساعدك على تجسيد فكرتك وتحويلها إلى مشروع
+
+كما يمكنك طلب شهادة مشاركة في الدورة التكوينية مقابل إضافة بسيطة.
+
+لمن هذا الدليل؟
+
+هذا الدليل مناسب لـ:
+
+الشباب الذين لديهم فكرة مشروع ويريدون البدء
+
+المبتدئين في مجال ريادة الأعمال
+
+من يريد تعلم أساسيات التسويق والتجارة الإلكترونية
+
+كل من يسعى لتطوير نفسه وبناء مشروعه الخاص
+
+ابدأ اليوم بخطوة بسيطة نحو مشروعك،
+فكل مشروع ناجح كان يومًا فكرة صغيرة تحتاج فقط إلى بداية صحيحة.
+
+
+
+
